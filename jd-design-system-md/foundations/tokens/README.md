@@ -3,8 +3,12 @@ zone: foundations
 section: tokens
 version: v1.0
 owner: Design System 维护组
-last_updated: 2026-04-29
+last_updated: 2026-05-06
 single_source_of_truth: tokens.json
+relay_source:
+  file_id: "1896756863949619202"
+  page_id: "44:1827"
+  url: https://relay.jd.com/file/design?id=1896756863949619202&page_id=44%3A1827
 ---
 
 # Design Tokens · 设计语言基础
@@ -19,12 +23,12 @@ single_source_of_truth: tokens.json
 
 | Token 类别 | 文档 | 数量级 |
 |---|---|---|
-| 🎨 [[color.md]] | 色彩 Token(品牌 / 语义 / 中性 / 功能 / 数据可视化) | ~120 个 |
-| ✏️ [[typography.md]] | 字体 Token(family / size / weight / lineheight / letter-spacing) | ~40 个 |
-| 📐 [[spacing.md]] | 间距 Token(4 的倍数体系 + 语义间距) | ~16 个 |
-| 🟫 [[radius.md]] | 圆角 Token(0/4/8/12/16/24/full + 语义) | ~10 个 |
-| 🌫 [[shadow.md]] | 阴影 Token(elevation 0-5 + 特殊) | ~8 个 |
-| 🎬 [[motion.md]] | 动效 Token(duration + easing) | ~12 个 |
+| 🎨 [[color.md]] | 色彩 Token(品牌 / 语义 / 中性 / 功能 / 平台色板 11×10) | ~135 个 ✅ Relay 同步 |
+| ✏️ [[typography.md]] | 字体 Token(family / size / weight / lineheight / role) | ~30 个 ✅ Relay 同步 |
+| 📐 [[spacing.md]] | 间距 Token(4 的倍数体系 + 语义间距) | ~16 个 ⏳ 待 Relay 同步(布局节点) |
+| 🟫 [[radius.md]] | 圆角 Token(0/2/4/6/12/24/full + 语义) | ~16 个 ✅ Relay 同步 |
+| 🌫 [[shadow.md]] | 阴影 Token(elevation 0-5 + 特殊) | ~8 个 ⏳ 15.0 待补充 |
+| 🎬 [[motion.md]] | 动效 Token(duration + easing) | ~12 个 ⏳ 待 Relay 同步(动效节点) |
 
 ---
 
@@ -34,14 +38,13 @@ single_source_of_truth: tokens.json
 {category}.{subcategory}.{role}.{state?}
 
 举例:
-color.brand.primary           # 品牌主色 默认
-color.brand.primary.pressed   # 品牌主色 按下
-color.semantic.danger         # 语义 危险红
-color.neutral.text.primary    # 中性 文字主色
-color.neutral.bg.surface      # 中性 背景表面
-typography.button.L           # 字体 按钮 L 尺寸
+color.brand.primary           # 品牌主色 #ff0f23(京东红)
+color.semantic.danger         # 语义 危险(15.0 中与 brand.primary 同色)
+color.neutral.text.primary    # 中性 文字主色 #171a26
+color.neutral.bg.surface      # 中性 背景表面 #ffffff
+typography.role.heading-page  # 字体 页面主标题(=size.18+semibold+sans)
 spacing.4                     # 间距 4pt
-radius.button                 # 圆角 按钮(语义,实际 = radius.8)
+radius.role.button            # 圆角 按钮(语义,= radius.base = 6px)
 motion.duration.fast          # 动效 时长 快
 motion.easing.standard        # 动效 缓动 标准
 ```
@@ -119,31 +122,35 @@ flowchart LR
 
 ---
 
-## tokens.json 结构样例
+## tokens.json 结构样例(2026-05-06 实际投产 v1.0)
 
 ```json
 {
   "color": {
     "brand": {
       "primary": {
-        "$value": { "light": "#fa2c19", "dark": "#ff4538" },
+        "$value": "#ff0f23",
         "$type": "color",
-        "$description": "京东品牌主色,用于主 CTA / 价格 / 品牌区"
+        "$description": "京东红主色,主 CTA / 价格 / 品牌区。Relay: 品牌色/brand_6"
       }
     },
     "semantic": {
       "danger": {
-        "$value": { "light": "#e62e1e", "dark": "#ff5544" },
+        "$value": "#ff0f23",
         "$type": "color",
-        "$description": "语义错误色,与品牌色略不同(避免错误提示与转化按钮混淆)"
+        "$description": "错误状态(15.0 中与 brand.primary 同色,通过 wash + 图标区分)"
       }
     }
   },
-  "spacing": {
-    "4": { "$value": "4px", "$type": "dimension" }
+  "radius": {
+    "base": { "$value": "6px", "$type": "dimension", "$description": "默认按钮 / 卡片" }
   }
 }
 ```
+
+完整定义见 [tokens.json](./tokens.json)。
+
+> **注意**:Relay 15.0 当前文件仅提供浅色值,深色 variant 暂未交付。所有 dark mode 字段标记为 TODO。
 
 W3C DTCG 规范:https://design-tokens.github.io/community-group/format/
 
@@ -173,7 +180,9 @@ CI 扫描所有 CSS / iOS / Android 代码,违反硬编码规则的 PR 自动 bl
 
 ## 待办
 
-- [ ] tokens.json W3C DTCG 化(目前 v0.9 草案)
+- [x] tokens.json W3C DTCG 化(2026-05-06 完成 v1.0,覆盖 color / typography / radius / icon;基于 Relay 文件 1896756863949619202)
+- [ ] tokens.json 补齐 spacing / shadow / motion(待对应 Relay 节点同步)
+- [ ] tokens.json 补齐 dark mode variants(待 Relay 交付深色集)
 - [ ] Style Dictionary 工具链落地(P1)
 - [ ] Figma Token Plugin 双向同步(P2)
 - [ ] 大促主题包管理后台(P2)
