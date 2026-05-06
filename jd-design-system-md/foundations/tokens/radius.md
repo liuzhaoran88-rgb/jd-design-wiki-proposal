@@ -27,6 +27,7 @@ sync_status: relay-aligned
 | `radius.xs` | 2 | `radius_xs` (Relay) | 极小元素描边 / 微小标签 |
 | `radius.s` | 4 | `radius_s` (Relay) | 小标签 / Tag / 骨架屏 |
 | `radius.base` | 6 | `radius_base` (Relay) | **默认按钮 / 卡片 / 输入框 / 列表卡** |
+| `radius.detail` | 8 | `卡片容器型/radius_8` / `组件型/Radius-8` (Relay) | **内容详情型** —— 商详 / 结算单页;某些组件型多行场景 |
 | `radius.xl` | 12 | `radius-xl` (Relay) | 大卡片 / 半弹层 / 提示弹层 |
 | `radius.structural` | 24 | `Radius-24` (Relay) | 结构分割型 —— 大块独立模块、长矩形顶部 |
 | `radius.full` | 9999 | - | 胶囊型(头像 / 圆形按钮 / 大促胶囊按钮) |
@@ -45,12 +46,12 @@ sync_status: relay-aligned
 - 卡片分割(双列卡):双列卡型搜索结果、首页、店铺
 - 卡片分割(单列卡):临时性组件应用、商详、PDP 等系统弹窗、楼层
 
-### b. 内容详情型 · 8dp(`> TODO: 15.0 列出 8dp 但未单列 token,沿用 6dp 或新增 radius.detail`)
-图标说明:用于内容描述详情页面,带满 6 处经按操作页面、点击直接进入下一级搜索次单页面。
+### b. 内容详情型 · 8dp(`radius.detail`)
+**确认 token**:Relay 中实际存在 `卡片容器型/radius_8 = 8` 与 `组件型/Radius-8 = 8` 两个变量,本仓库统一为 `radius.detail`。
 
-线框示例:商详 / 结算
+适用:用于内容描述详情页面、单页操作场景、点击进入下一级页面。
 
-`> TODO: 8dp 究竟是独立 token 还是 base 的别名,需与设计组确认。`
+线框示例:商详 / 结算 / 订单详情
 
 ### c. 组件型 · 6dp / 4dp / 24dp 等
 **多种圆角应用于不同组件场景**。
@@ -76,6 +77,7 @@ sync_status: relay-aligned
 |---|---|---|
 | `radius.button` | `radius.base` (6) | 默认按钮(可被主题覆盖为 `full`) |
 | `radius.card` | `radius.base` (6) | 默认卡片 / 商品卡 / 列表卡 |
+| `radius.card-detail` | `radius.detail` (8) | 内容详情型卡片 / 商详 / 结算 |
 | `radius.card-large` | `radius.xl` (12) | 大卡片 / 突出卡片 / 半弹层 |
 | `radius.modal` | `radius.xl` (12) | 模态对话框 / 弹层 |
 | `radius.tag` | `radius.s` (4) | 标签 / Chip |

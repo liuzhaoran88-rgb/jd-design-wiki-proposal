@@ -25,10 +25,10 @@ relay_source:
 |---|---|---|
 | 🎨 [[color.md]] | 色彩 Token(品牌 / 语义 / 中性 / 功能 / 平台色板 11×10) | ~135 个 ✅ Relay 同步 |
 | ✏️ [[typography.md]] | 字体 Token(family / size / weight / lineheight / role) | ~30 个 ✅ Relay 同步 |
-| 📐 [[spacing.md]] | 间距 Token(4 的倍数体系 + 语义间距) | ~16 个 ⏳ 待 Relay 同步(布局节点) |
-| 🟫 [[radius.md]] | 圆角 Token(0/2/4/6/12/24/full + 语义) | ~16 个 ✅ Relay 同步 |
+| 📐 [[spacing.md]] | 间距 Token(双梯度 平台型/导购型 + 塔式语义 + safe-area) | ~30 个 ✅ Relay 同步 |
+| 🟫 [[radius.md]] | 圆角 Token(0/2/4/6/8/12/24/full + 语义) | ~17 个 ✅ Relay 同步 |
 | 🌫 [[shadow.md]] | 阴影 Token(elevation 0-5 + 特殊) | ~8 个 ⏳ 15.0 待补充 |
-| 🎬 [[motion.md]] | 动效 Token(duration + easing) | ~12 个 ⏳ 待 Relay 同步(动效节点) |
+| 🎬 [[motion.md]] | 动效 Token(duration + easing + transition + role) | ~25 个 ✅ Relay 同步 |
 
 ---
 
@@ -180,9 +180,11 @@ CI 扫描所有 CSS / iOS / Android 代码,违反硬编码规则的 PR 自动 bl
 
 ## 待办
 
-- [x] tokens.json W3C DTCG 化(2026-05-06 完成 v1.0,覆盖 color / typography / radius / icon;基于 Relay 文件 1896756863949619202)
-- [ ] tokens.json 补齐 spacing / shadow / motion(待对应 Relay 节点同步)
+- [x] tokens.json W3C DTCG 化(2026-05-06 v1.1,覆盖 color / typography / radius / icon / **motion / spacing**)
+- [ ] tokens.json 补齐 shadow(Relay 15.0 暂未规范)
 - [ ] tokens.json 补齐 dark mode variants(待 Relay 交付深色集)
+- [ ] tokens.json 补齐 linear easing(持续型动效,Relay 15.0 未规范)
+- [ ] 折叠屏 / iPad 布局规范(Relay 15.0 当前未规范)
 - [ ] Style Dictionary 工具链落地(P1)
 - [ ] Figma Token Plugin 双向同步(P2)
 - [ ] 大促主题包管理后台(P2)
