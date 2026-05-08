@@ -60,17 +60,54 @@ URL 形如 `https://relay.jd.com/file/design?id={fileKey}&page_id={pageId}&node_
 
 ### Step 3 — 交叉校验
 
+#### 3·前置 · Token 命名唯一性检查(kebab/snake 双轨)
+
+**强制规则(机器判定,无需人工分辨)**:同一 token 概念在 variables 表中出现 ≥ 2 个命名变体(kebab-case / snake_case / 大小写混用 / 中英混用)且**值不同** → **必标 ❌ Naming-conflict**(违规)。
+
+#### 判定算法
+
+1. 把每个 variable name 规范化:取最后一段(去掉命名空间前缀),`lowercase + 删除所有 - 和 _` → 得到 fingerprint。
+2. 按 fingerprint 分组。
+3. 同组内若存在 ≥ 2 个不同 `$value` → 触发 Naming-conflict。
+4. 同组内 `$value` **相同**但命名风格不一致(snake vs kebab vs CamelCase)→ 仅标 ⚠️ Naming-style(警告,不阻塞)。
+
+#### 案例
+
+| 变量名 A | 变量名 B | fingerprint | 值 A | 值 B | 判定 |
+|---|---|---|---|---|---|
+| `color_text_help` | `color-text-help` | `colortexthelp` | `#828794` | `#888b93` | ❌ Naming-conflict |
+| `color_border` | `color-border` | `colorborder` | `#00000014` | `#0000000f` | ❌ Naming-conflict |
+| `color_background_sunken` | `color-background-sunken` | `colorbackgroundsunken` | `#f5f6fa` | `#f7f8fc` | ❌ Naming-conflict |
+| `spacing_8` | `Spacing-8` | `spacing8` | `8` | `8` | ⚠️ Naming-style |
+| `元素布局/Spacing-4` | `元素布局/spacing_4` | `spacing4` | `4` | `4` | ⚠️ Naming-style |
+
+#### 报告规则
+
+- Naming-conflict 类违规**置于 ❌ 段顶部**,优先于 off-token / legacy。
+- 每条建议必须显式给出**保留哪个 / 删除哪个**:优先保留 snake_case 与 15.0 命名空间(`色彩变量 Color/...`)一致的版本。
+- 若两版都不在 15.0 命名空间(如全是 `品牌色/Brand-x`),先按命名空间合规性挑,再按 snake_case。
+
+#### 为什么这是前置全局规则
+
+- 14.x → 15.0 迁移最普遍的残留模式——同一概念两个 token 同时存在,值已漂移。
+- 让 AI / 设计师选取时随机命中,是设计漂移最隐蔽的源头。
+- 占典型走查 30%+ 的违规来源——机器可判,**优先扫掉**避免后续 3a-3f 重复报。
+- 触发后该 fingerprint 组内的其他错误(Off-token / Legacy)**仍要标**,但归并到同一组建议下输出。
+
+---
+
 #### 3a. 颜色
 
 把 variables 里每个 `色彩变量 Color/...` 与 `平台色板/...` 与 `灰阶/...` 等命名空间下的 token,逐一与 tokens.json `color.*` 路径对照:
 
-判定 4 种结果:
+判定 5 种结果:
 | 状态 | 条件 |
 |---|---|
 | ✅ Pass | 设计稿 token 名 + 值都能映射到 tokens.json 某条目 |
 | ⚠️ Naming | 值在 tokens.json 中存在,但**命名空间错位**(如 `color_primary_disabled = #c2c4cc`,#c2c4cc 实际是 `text.disabled` 而非 primary) |
 | ⚠️ Legacy | token 命名带 `日间` / `C_Newgray` / `Newgray` 等 14.x 前缀 → 残留旧 token,15.0 已用新名 |
 | ❌ Off-token | 值不在 tokens.json 的任何条目中(且非透明度组合) |
+| ❌ Naming-conflict | 已由 Step 3 前置规则识别——同 fingerprint 出现 ≥2 个变体且值不同 |
 
 **特殊判定**:
 - `color_primary_light = #fff0f4` → 实际同 `semantic.danger-subtle` (15.0 中 brand 与 danger 同色,wash 共用) → 标 ⚠️ Naming,建议改名
@@ -144,6 +181,7 @@ URL 形如 `https://relay.jd.com/file/design?id={fileKey}&page_id={pageId}&node_
 
 ### ❌ 违规(必须改)
 <对每条:位置 + 规则引用 + 证据 + 建议>
+<排序:Naming-conflict 优先 → Off-token → 其他>
 
 ### ⚠️ 警告(命名 / 残留 / 语义偏移)
 <同上>
