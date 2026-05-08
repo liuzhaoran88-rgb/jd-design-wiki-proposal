@@ -1,6 +1,6 @@
 ---
 zone: ai-mechanism
-last_updated: 2026-04-29
+last_updated: 2026-05-08
 ---
 
 # 🤖 AI 机制 · AI Mechanism
@@ -18,6 +18,7 @@ last_updated: 2026-04-29
 | [[figma-organization.md]] | Figma 文件组织规范(Library / 页面 / 图层命名)|
 | [[schema-spec.md]] | `ai-schema.md` 字段规范 |
 | [[agent-protocol.md]] | Agent 评审协议(给跨业务 Skill 调用)|
+| [[design-review.md]] | `/design-review` skill 索引 — 设计稿合规走查 ✅ 已上线 |
 
 ---
 
@@ -55,9 +56,9 @@ flowchart LR
 | Skill | 用途 | 状态 |
 |---|---|---|
 | `jd-double-column-card` | 双列卡观察评价 | v0.5.2 已发布 |
+| `/design-review` | Relay 设计稿 vs 15.0 token 合规走查 | **v0.1 已上线**(2026-05-08),详见 [[design-review.md]] |
 | `jd-promotion-theming`(规划) | 大促主题适配 | P2 |
 | `jd-a11y-review`(规划) | 无障碍自动 review | P2 |
-| `jd-token-validator`(规划) | Token 引用合法性校验 | P1 |
 | `jd-figma-component-sync`(规划) | Figma 组件同步 | P2 |
 
 详见 [[../horizontal/double-column-card/]] 和未来的 [[ai-skills/]] 子目录。
