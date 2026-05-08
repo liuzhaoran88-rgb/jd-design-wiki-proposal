@@ -6,6 +6,8 @@ status: released
 skill_path: .claude/skills/design-review/
 ---
 
+> **2026-05-08 更新**:`/design-review` v0.1.1 新增 **Naming-conflict 前置全局规则**(PR #4 by @liuzhaoran88-rgb)。判定矩阵从 4 档升到 5 档(下方表格)。
+
 # 🛡 /design-review · 设计稿合规走查 Skill
 
 > 把 [`foundations/tokens/tokens.json`](../foundations/tokens/tokens.json) 真正用起来 —— 给定一个 Relay 节点,**自动出一份合规报告**。
@@ -49,11 +51,22 @@ skill 的 description 字段已经把关键词 surface 化,自然语言或 slash
 
 | 严重度 | 触发条件 | 例子 |
 |---|---|---|
+| ❌ **Naming-conflict**(置 ❌ 段顶部) | 同 fingerprint(lowercase + 去掉 `-` `_`)出现 ≥ 2 个变体且**值不同** | `color_border = #00000014` vs `color-border = #0000000f`(透明度 8% vs 6%) |
 | ❌ 违规 | size 不在 5 阶 / 圆角不在 token 表 / 出场时长 > 入场 / token 名带"临时新增" | 13pt"临时新增"(2026-05-06 实跑发现) |
 | ⚠️ 命名 | token 名空间错位 | `color_primary_disabled = #c2c4cc` 实际是 `text.disabled` |
+| ⚠️ Naming-style(新增) | 同 fingerprint 但**值相同**,只是命名风格不一致 | `spacing_8` vs `Spacing-8` 都是 8px |
 | ⚠️ 残留 | 14.x 旧命名 | `C_Newgray03_01`、`日间/...`、`临时新增` 后缀 |
 | ⚠️ 语义偏移 | 功能色用错场景 | `service-gold` 用于普通筛选 chip 而非 VIP / 金融 |
 | ✅ Pass | 命名 + 值都能映射到 tokens.json | 主色 #ff0f23 → `color.brand.primary` |
+
+### 为什么 Naming-conflict 是前置全局规则
+
+14.x → 15.0 迁移期最普遍的残留模式 —— 同一概念两个 token 同时存在,值已漂移。设计师 / AI 选取时随机命中,是设计漂移**最隐蔽的源头**之一。机器可判,优先扫掉避免后续 3a-3f 重复报。
+
+**触发后的处置**:
+- 报告 ❌ 段顶部优先列出
+- 每条建议必须显式给出**保留哪个 / 删除哪个**:优先保留 snake_case + 与 15.0 命名空间(`色彩变量 Color/...`)一致的版本
+- 同 fingerprint 组内的其他错误(Off-token / Legacy)**仍要标**,但归并到同一组建议下输出
 
 ---
 

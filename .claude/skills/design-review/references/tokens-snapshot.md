@@ -2,7 +2,25 @@
 
 > 当 `~/code/jd-design-wiki-proposal/jd-design-system-md/foundations/tokens/tokens.json` 不可读时,用本文件作为最小可走查的回退白名单。**优先**读 tokens.json。
 
-> 同步时间:2026-05-06,基于 wiki main 分支。
+> 同步时间:2026-05-08(更新:增加 Naming-conflict 前置规则 fallback 说明),基于 wiki main 分支。
+
+---
+
+## 0. 前置:Naming-conflict 检查(必跑)
+
+> SKILL.md §3 前置规则要求:走任何颜色 / 字体 / 圆角白名单匹配**之前**先跑一次 fingerprint 唯一性检查。fallback 模式同样适用。
+
+**算法**:对每个 variable name,取最后一段并 `lowercase + 去除所有 - 和 _` 得到 fingerprint。同 fingerprint 内若 `$value` 不同 → ❌ Naming-conflict;值相同但命名风格不一 → ⚠️ Naming-style。
+
+**已知存在双轨变体的 token 概念**(对照 15.0 文件 513:25300 vs 4061:7288 的 variables 数据漂移):
+
+| fingerprint | snake 值 | kebab 值 | 漂移 |
+|---|---|---|---|
+| `colorborder` | #00000014 | #0000000f | 透明度 8% vs 6% |
+| `colortexthelp` | #828794 | #888b94 | ~3 个色阶 |
+| `colorbackgroundsunken` | #f5f6fa | #f7f8fc | 接近但不同 |
+
+设计稿命中以上任一 → ❌ Naming-conflict 置 ❌ 段顶部,优先建议保留 **snake_case + `色彩变量 Color/...` 命名空间** 的版本(与下方白名单值一致)。
 
 ---
 
