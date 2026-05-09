@@ -863,34 +863,50 @@ footer {
 
       <div class="tree">
 <span class="tree-line">📚 Design 知识/</span>
-<span class="tree-line">├── <span class="biz">internal/</span>                          <span class="comment"># 部门内部知识库 (按部门切)</span></span>
+<span class="tree-line"><span class="comment"># 知识 / 研究 / 案例 (内部按部门切 + 公共通识)</span></span>
+<span class="tree-line"> </span>
+<span class="tree-line">├── <span class="biz">internal/</span></span>
+<span class="tree-line">│   <span class="comment"># 部门内部知识库 (按部门切)</span></span>
 <span class="tree-line">│   ├── <span class="dept">设计与用研部-综合业务设计部/</span></span>
-<span class="tree-line">│   │   ├── research/                       <span class="comment"># 本部门用研报告</span></span>
+<span class="tree-line">│   │   ├── research/</span>
+<span class="tree-line">│   │   │   <span class="comment"># 本部门用研报告</span></span>
 <span class="tree-line">│   │   │   ├── <span class="file">用户视频消费习惯调研-2026Q2.md</span></span>
 <span class="tree-line">│   │   │   ├── <span class="file">直播用户行为路径分析.md</span></span>
 <span class="tree-line">│   │   │   └── <span class="file">圈子用户画像研究.md</span></span>
-<span class="tree-line">│   │   ├── cases/                          <span class="comment"># 本部门案例研究</span></span>
+<span class="tree-line">│   │   ├── cases/</span>
+<span class="tree-line">│   │   │   <span class="comment"># 本部门案例研究</span></span>
 <span class="tree-line">│   │   │   ├── <span class="file">双列卡治理案例.md</span></span>
 <span class="tree-line">│   │   │   └── <span class="file">短视频卡迭代案例.md</span></span>
-<span class="tree-line">│   │   ├── notes/                          <span class="comment"># 设计师笔记</span></span>
-<span class="tree-line">│   │   └── decisions/                      <span class="comment"># ADR 决策记录</span></span>
+<span class="tree-line">│   │   ├── notes/</span>
+<span class="tree-line">│   │   │   <span class="comment"># 设计师笔记</span></span>
+<span class="tree-line">│   │   └── decisions/</span>
+<span class="tree-line">│   │       <span class="comment"># ADR 决策记录</span></span>
 <span class="tree-line">│   │       ├── <span class="file">ADR-001-双列卡家族体系.md</span></span>
 <span class="tree-line">│   │       └── <span class="file">ADR-002-跨场景同物种识别.md</span></span>
 <span class="tree-line">│   ├── <span class="dept">设计与用研部-XX 设计部/</span></span>
 <span class="tree-line">│   └── ...</span>
-<span class="tree-line">├── <span class="biz">wisdom/</span>                            <span class="comment"># 通识设计原则 (公共)</span></span>
-<span class="tree-line">│   ├── principles/                         <span class="comment"># 行业通用原则</span></span>
-<span class="tree-line">│   │   ├── <span class="file">cross-context-id.md</span>      跨场景同物种识别</span>
-<span class="tree-line">│   │   ├── <span class="file">structure-over-content.md</span> 结构优先内容无涉</span>
-<span class="tree-line">│   │   └── <span class="file">anti-ai-slop.md</span>          反 AI slop 守则</span>
-<span class="tree-line">│   └── philosophy/                         <span class="comment"># 设计哲学</span></span>
+<span class="tree-line">├── <span class="biz">wisdom/</span></span>
+<span class="tree-line">│   <span class="comment"># 通识设计原则 (公共)</span></span>
+<span class="tree-line">│   ├── principles/</span>
+<span class="tree-line">│   │   <span class="comment"># 行业通用原则</span></span>
+<span class="tree-line">│   │   ├── <span class="file">cross-context-id.md</span></span>
+<span class="tree-line">│   │   │   <span class="comment"># 跨场景同物种识别</span></span>
+<span class="tree-line">│   │   ├── <span class="file">structure-over-content.md</span></span>
+<span class="tree-line">│   │   │   <span class="comment"># 结构优先内容无涉</span></span>
+<span class="tree-line">│   │   └── <span class="file">anti-ai-slop.md</span></span>
+<span class="tree-line">│   │       <span class="comment"># 反 AI slop 守则</span></span>
+<span class="tree-line">│   └── philosophy/</span>
+<span class="tree-line">│       <span class="comment"># 设计哲学</span></span>
 <span class="tree-line">│       ├── <span class="file">家族 DNA 哲学.md</span></span>
 <span class="tree-line">│       └── <span class="file">设计师作为 AI 协作者.md</span></span>
-<span class="tree-line">└── <span class="biz">index/</span>                             <span class="comment"># 资源索引 (公共)</span></span>
-<span class="tree-line">    ├── external/                           <span class="comment"># 外部参考链接</span></span>
+<span class="tree-line">└── <span class="biz">index/</span></span>
+<span class="tree-line">    <span class="comment"># 资源索引 (公共)</span></span>
+<span class="tree-line">    ├── external/</span>
+<span class="tree-line">    │   <span class="comment"># 外部参考链接</span></span>
 <span class="tree-line">    │   ├── <span class="file">claude-design-philosophy.md</span></span>
 <span class="tree-line">    │   └── <span class="file">material-design-3-bench.md</span></span>
-<span class="tree-line">    └── benchmarks/                         <span class="comment"># 友商对标</span></span>
+<span class="tree-line">    └── benchmarks/</span>
+<span class="tree-line">        <span class="comment"># 友商对标</span></span>
 <span class="tree-line">        ├── <span class="file">小红书内容卡.md</span></span>
 <span class="tree-line">        └── <span class="file">抖音视频卡.md</span></span>
       </div>
@@ -960,31 +976,55 @@ footer {
       </div>
 
       <div class="tree">
-<span class="tree-line">🤖 AI 机制/                                <span class="comment"># 全公司公共 (不按部门切)</span></span>
-<span class="tree-line">├── <span class="biz">skills/</span>                            <span class="comment"># Skill 库 (按 agentskills.io 标准)</span></span>
-<span class="tree-line">│   ├── <span class="file">double-column-card/</span>             <span class="star">★</span> 已开源样本</span>
-<span class="tree-line">│   │   ├── SKILL.md                       agent 入口契约</span>
-<span class="tree-line">│   │   ├── references/                    详细规则参考</span>
-<span class="tree-line">│   │   ├── examples/                      gold-standard 样例</span>
-<span class="tree-line">│   │   └── prompts/                       PE 模板</span>
-<span class="tree-line">│   ├── <span class="file">视频卡治理-skill/</span>               (待建)</span>
-<span class="tree-line">│   ├── <span class="file">直播卡治理-skill/</span>               (待建)</span>
+<span class="tree-line">🤖 AI 机制/</span>
+<span class="tree-line"><span class="comment"># 全公司公共 (不按部门切)</span></span>
+<span class="tree-line"> </span>
+<span class="tree-line">├── <span class="biz">skills/</span></span>
+<span class="tree-line">│   <span class="comment"># Skill 库 (按 agentskills.io 标准)</span></span>
+<span class="tree-line">│   ├── <span class="file">double-column-card/</span> <span class="star">★</span></span>
+<span class="tree-line">│   │   <span class="comment"># 已开源样本</span></span>
+<span class="tree-line">│   │   ├── <span class="file">SKILL.md</span></span>
+<span class="tree-line">│   │   │   <span class="comment"># agent 入口契约</span></span>
+<span class="tree-line">│   │   ├── references/</span>
+<span class="tree-line">│   │   │   <span class="comment"># 详细规则参考</span></span>
+<span class="tree-line">│   │   ├── examples/</span>
+<span class="tree-line">│   │   │   <span class="comment"># gold-standard 样例</span></span>
+<span class="tree-line">│   │   └── prompts/</span>
+<span class="tree-line">│   │       <span class="comment"># PE 模板</span></span>
+<span class="tree-line">│   ├── <span class="file">视频卡治理-skill/</span></span>
+<span class="tree-line">│   │   <span class="comment"># (待建)</span></span>
+<span class="tree-line">│   ├── <span class="file">直播卡治理-skill/</span></span>
+<span class="tree-line">│   │   <span class="comment"># (待建)</span></span>
 <span class="tree-line">│   └── <span class="file">[其他组件 skill]/</span></span>
-<span class="tree-line">├── <span class="biz">meta/</span>                              <span class="comment"># 元规范</span></span>
-<span class="tree-line">│   ├── <span class="file">META.md</span>                          如何写 SKILL</span>
-<span class="tree-line">│   ├── <span class="file">skill-registry.md</span>                Skill 索引</span>
-<span class="tree-line">│   └── <span class="file">version-protocol.md</span>              版本协议</span>
-<span class="tree-line">├── <span class="biz">protocols/</span>                          <span class="comment"># 消费协议</span></span>
-<span class="tree-line">│   ├── <span class="file">figma-接入.md</span>                    Figma AI 消费</span>
-<span class="tree-line">│   ├── <span class="file">stitch-接入.md</span>                   Google Stitch 消费</span>
-<span class="tree-line">│   ├── <span class="file">cursor-接入.md</span>                   Cursor / Claude Code</span>
-<span class="tree-line">│   ├── <span class="file">v0-接入.md</span>                       Vercel v0</span>
+<span class="tree-line">├── <span class="biz">meta/</span></span>
+<span class="tree-line">│   <span class="comment"># 元规范</span></span>
+<span class="tree-line">│   ├── <span class="file">META.md</span></span>
+<span class="tree-line">│   │   <span class="comment"># 如何写 SKILL</span></span>
+<span class="tree-line">│   ├── <span class="file">skill-registry.md</span></span>
+<span class="tree-line">│   │   <span class="comment"># Skill 索引</span></span>
+<span class="tree-line">│   └── <span class="file">version-protocol.md</span></span>
+<span class="tree-line">│       <span class="comment"># 版本协议</span></span>
+<span class="tree-line">├── <span class="biz">protocols/</span></span>
+<span class="tree-line">│   <span class="comment"># 消费协议</span></span>
+<span class="tree-line">│   ├── <span class="file">figma-接入.md</span></span>
+<span class="tree-line">│   │   <span class="comment"># Figma AI 消费</span></span>
+<span class="tree-line">│   ├── <span class="file">stitch-接入.md</span></span>
+<span class="tree-line">│   │   <span class="comment"># Google Stitch 消费</span></span>
+<span class="tree-line">│   ├── <span class="file">cursor-接入.md</span></span>
+<span class="tree-line">│   │   <span class="comment"># Cursor / Claude Code</span></span>
+<span class="tree-line">│   ├── <span class="file">v0-接入.md</span></span>
+<span class="tree-line">│   │   <span class="comment"># Vercel v0</span></span>
 <span class="tree-line">│   └── <span class="file">自研 agent-接入.md</span></span>
-<span class="tree-line">└── <span class="biz">guards/</span>                            <span class="comment"># Agent 守则</span></span>
-<span class="tree-line">    ├── <span class="file">反 AI slop.md</span>                    避免塌缩到平庸</span>
-<span class="tree-line">    ├── <span class="file">自检环路.md</span>                      fork_verifier 模式</span>
-<span class="tree-line">    ├── <span class="file">IP 边界.md</span>                       不复刻竞品 UI</span>
-<span class="tree-line">    └── <span class="file">上下文优先.md</span>                    先读现有规范再生成</span>
+<span class="tree-line">└── <span class="biz">guards/</span></span>
+<span class="tree-line">    <span class="comment"># Agent 守则</span></span>
+<span class="tree-line">    ├── <span class="file">反 AI slop.md</span></span>
+<span class="tree-line">    │   <span class="comment"># 避免塌缩到平庸</span></span>
+<span class="tree-line">    ├── <span class="file">自检环路.md</span></span>
+<span class="tree-line">    │   <span class="comment"># fork_verifier 模式</span></span>
+<span class="tree-line">    ├── <span class="file">IP 边界.md</span></span>
+<span class="tree-line">    │   <span class="comment"># 不复刻竞品 UI</span></span>
+<span class="tree-line">    └── <span class="file">上下文优先.md</span></span>
+<span class="tree-line">        <span class="comment"># 先读现有规范再生成</span></span>
       </div>
     </div>
 
@@ -1001,20 +1041,35 @@ footer {
 
       <div class="tree">
 <span class="tree-line">🏗 产品架构/</span>
-<span class="tree-line">├── <span class="biz">domains/</span>                         <span class="comment"># 部门-业务-组件 三级结构 ★</span></span>
-<span class="tree-line">│   ├── <span class="dept">设计与用研部-综合业务设计部/</span>     <span class="comment"># 你所在的部门</span></span>
+<span class="tree-line"><span class="comment"># 业务线设计师主战场 (★)</span></span>
+<span class="tree-line"> </span>
+<span class="tree-line">├── <span class="biz">domains/</span></span>
+<span class="tree-line">│   <span class="comment"># 部门-业务-组件 三级结构 ★</span></span>
+<span class="tree-line">│   ├── <span class="dept">设计与用研部-综合业务设计部/</span></span>
+<span class="tree-line">│   │   <span class="comment"># 你所在的部门</span></span>
 <span class="tree-line">│   │   ├── 视频/</span>
-<span class="tree-line">│   │   │   ├── <span class="file">视频卡-基础/</span>                  <span class="star">★</span> multi-md 结构</span>
-<span class="tree-line">│   │   │   │   ├── <a href="#tpl-readme" class="file">README.md</a>          概述+Meta</span>
-<span class="tree-line">│   │   │   │   ├── <a href="#tpl-business" class="file">business.md</a>        业务视角 (PM)</span>
-<span class="tree-line">│   │   │   │   ├── <a href="#tpl-research" class="file">research.md</a>        用研视角 ★</span>
-<span class="tree-line">│   │   │   │   ├── <a href="#tpl-experience" class="file">experience.md</a>      体验视角 ★</span>
-<span class="tree-line">│   │   │   │   ├── <a href="#tpl-visual" class="file">visual.md</a>          视觉视角 ★</span>
-<span class="tree-line">│   │   │   │   ├── <a href="#tpl-interaction" class="file">interaction.md</a>     交互</span>
-<span class="tree-line">│   │   │   │   ├── <a href="#tpl-content" class="file">content.md</a>         文案规范</span>
-<span class="tree-line">│   │   │   │   ├── <a href="#tpl-donts" class="file">donts.md</a>           禁止用法</span>
-<span class="tree-line">│   │   │   │   ├── <a href="#tpl-ai-schema" class="file">ai-schema.md</a>       AI 消费字段</span>
-<span class="tree-line">│   │   │   │   ├── <a href="#tpl-changelog" class="file">CHANGELOG.md</a>       变更记录</span>
+<span class="tree-line">│   │   │   ├── <span class="file">视频卡-基础/</span> <span class="star">★</span></span>
+<span class="tree-line">│   │   │   │   <span class="comment"># multi-md 结构</span></span>
+<span class="tree-line">│   │   │   │   ├── <a href="#tpl-readme" class="file">README.md</a></span>
+<span class="tree-line">│   │   │   │   │   <span class="comment"># 概述 + Meta</span></span>
+<span class="tree-line">│   │   │   │   ├── <a href="#tpl-business" class="file">business.md</a></span>
+<span class="tree-line">│   │   │   │   │   <span class="comment"># 业务视角 (PM)</span></span>
+<span class="tree-line">│   │   │   │   ├── <a href="#tpl-research" class="file">research.md</a> <span class="star">★</span></span>
+<span class="tree-line">│   │   │   │   │   <span class="comment"># 用研视角</span></span>
+<span class="tree-line">│   │   │   │   ├── <a href="#tpl-experience" class="file">experience.md</a> <span class="star">★</span></span>
+<span class="tree-line">│   │   │   │   │   <span class="comment"># 体验视角</span></span>
+<span class="tree-line">│   │   │   │   ├── <a href="#tpl-visual" class="file">visual.md</a> <span class="star">★</span></span>
+<span class="tree-line">│   │   │   │   │   <span class="comment"># 视觉视角</span></span>
+<span class="tree-line">│   │   │   │   ├── <a href="#tpl-interaction" class="file">interaction.md</a></span>
+<span class="tree-line">│   │   │   │   │   <span class="comment"># 交互</span></span>
+<span class="tree-line">│   │   │   │   ├── <a href="#tpl-content" class="file">content.md</a></span>
+<span class="tree-line">│   │   │   │   │   <span class="comment"># 文案规范</span></span>
+<span class="tree-line">│   │   │   │   ├── <a href="#tpl-donts" class="file">donts.md</a></span>
+<span class="tree-line">│   │   │   │   │   <span class="comment"># 禁止用法</span></span>
+<span class="tree-line">│   │   │   │   ├── <a href="#tpl-ai-schema" class="file">ai-schema.md</a></span>
+<span class="tree-line">│   │   │   │   │   <span class="comment"># AI 消费字段</span></span>
+<span class="tree-line">│   │   │   │   ├── <a href="#tpl-changelog" class="file">CHANGELOG.md</a></span>
+<span class="tree-line">│   │   │   │   │   <span class="comment"># 变更记录</span></span>
 <span class="tree-line">│   │   │   │   ├── variants/</span>
 <span class="tree-line">│   │   │   │   └── examples/</span>
 <span class="tree-line">│   │   │   └── <span class="file">视频卡-沉浸式/</span></span>
@@ -1029,14 +1084,17 @@ footer {
 <span class="tree-line">│   │   ├── 业务 A/</span>
 <span class="tree-line">│   │   └── 业务 B/</span>
 <span class="tree-line">│   └── <span class="dept">设计与用研部-XXX 设计部/</span></span>
-<span class="tree-line">├── <span class="biz">shared/</span>                          <span class="comment"># 跨部门通用组件</span></span>
+<span class="tree-line">├── <span class="biz">shared/</span></span>
+<span class="tree-line">│   <span class="comment"># 跨部门通用组件</span></span>
 <span class="tree-line">│   ├── <span class="file">视频卡-通用/DESIGN.md</span></span>
 <span class="tree-line">│   └── ...</span>
-<span class="tree-line">├── <span class="biz">pages/</span>                           <span class="comment"># 核心页面</span></span>
+<span class="tree-line">├── <span class="biz">pages/</span></span>
+<span class="tree-line">│   <span class="comment"># 核心页面</span></span>
 <span class="tree-line">│   ├── 详情页/</span>
 <span class="tree-line">│   ├── 搜索结果/</span>
 <span class="tree-line">│   └── 个人中心/</span>
-<span class="tree-line">└── <span class="biz">relations/</span>                       <span class="comment"># 引用关系图</span></span>
+<span class="tree-line">└── <span class="biz">relations/</span></span>
+<span class="tree-line">    <span class="comment"># 引用关系图</span></span>
 <span class="tree-line">    ├── 跨部门复用/</span>
 <span class="tree-line">    └── 跨业务依赖/</span>
       </div>
@@ -1054,33 +1112,56 @@ footer {
       </div>
 
       <div class="tree">
-<span class="tree-line">🚀 横向专项/                              <span class="comment"># 跨部门 (按专项名切)</span></span>
-<span class="tree-line">├── <span class="biz">active/</span>                          <span class="comment"># 进行中</span></span>
-<span class="tree-line">│   ├── <span class="file">double-column-card/</span>             <span class="star">★</span> 已跑通样本</span>
-<span class="tree-line">│   │   ├── README.md                      专项概述</span>
-<span class="tree-line">│   │   ├── DESIGN.md                      专项设计语言</span>
-<span class="tree-line">│   │   ├── variants/                      变体案例库</span>
-<span class="tree-line">│   │   ├── skill/                         对应 AI Skill</span>
-<span class="tree-line">│   │   ├── ADR/                           决策记录</span>
+<span class="tree-line">🚀 横向专项/</span>
+<span class="tree-line"><span class="comment"># 跨部门 (按专项名切)</span></span>
+<span class="tree-line"> </span>
+<span class="tree-line">├── <span class="biz">active/</span></span>
+<span class="tree-line">│   <span class="comment"># 进行中</span></span>
+<span class="tree-line">│   ├── <span class="file">double-column-card/</span> <span class="star">★</span></span>
+<span class="tree-line">│   │   <span class="comment"># 已跑通样本</span></span>
+<span class="tree-line">│   │   ├── README.md</span>
+<span class="tree-line">│   │   │   <span class="comment"># 专项概述</span></span>
+<span class="tree-line">│   │   ├── DESIGN.md</span>
+<span class="tree-line">│   │   │   <span class="comment"># 专项设计语言</span></span>
+<span class="tree-line">│   │   ├── variants/</span>
+<span class="tree-line">│   │   │   <span class="comment"># 变体案例库</span></span>
+<span class="tree-line">│   │   ├── skill/</span>
+<span class="tree-line">│   │   │   <span class="comment"># 对应 AI Skill</span></span>
+<span class="tree-line">│   │   ├── ADR/</span>
+<span class="tree-line">│   │   │   <span class="comment"># 决策记录</span></span>
 <span class="tree-line">│   │   │   ├── <span class="file">ADR-001-五大家族.md</span></span>
 <span class="tree-line">│   │   │   └── <span class="file">ADR-002-跨场景识别.md</span></span>
-<span class="tree-line">│   │   └── screenshots/                   真实样本</span>
-<span class="tree-line">│   ├── <span class="file">视频卡治理/</span>                       (规划中)</span>
-<span class="tree-line">│   └── <span class="file">直播卡治理/</span>                       (规划中)</span>
-<span class="tree-line">├── <span class="biz">archive/</span>                         <span class="comment"># 已完成归档</span></span>
+<span class="tree-line">│   │   └── screenshots/</span>
+<span class="tree-line">│   │       <span class="comment"># 真实样本</span></span>
+<span class="tree-line">│   ├── <span class="file">视频卡治理/</span></span>
+<span class="tree-line">│   │   <span class="comment"># (规划中)</span></span>
+<span class="tree-line">│   └── <span class="file">直播卡治理/</span></span>
+<span class="tree-line">│       <span class="comment"># (规划中)</span></span>
+<span class="tree-line">├── <span class="biz">archive/</span></span>
+<span class="tree-line">│   <span class="comment"># 已完成归档</span></span>
 <span class="tree-line">│   ├── <span class="file">2024-Q4/</span></span>
 <span class="tree-line">│   ├── <span class="file">2025-Q1/</span></span>
 <span class="tree-line">│   └── <span class="file">2025-Q2/</span></span>
-<span class="tree-line">├── <span class="biz">protocols/</span>                       <span class="comment"># 治理协议</span></span>
-<span class="tree-line">│   ├── <span class="file">怎么发起.md</span>                      专项立项流程</span>
-<span class="tree-line">│   ├── <span class="file">Review 流程.md</span>                   评审协议</span>
-<span class="tree-line">│   ├── <span class="file">落地协议.md</span>                      推广路径</span>
-<span class="tree-line">│   ├── <span class="file">反哺机制.md</span>                      产出回流规则</span>
-<span class="tree-line">│   └── <span class="file">跨部门协调.md</span>                    多部门冲突解决</span>
-<span class="tree-line">└── <span class="biz">handoff/</span>                         <span class="comment"># 反哺接口</span></span>
-<span class="tree-line">    ├── <span class="file">产出回流-产品架构.md</span>              新组件回流到🏗</span>
-<span class="tree-line">    ├── <span class="file">产出回流-AI 机制.md</span>                新 Skill 回流到🤖</span>
-<span class="tree-line">    └── <span class="file">产出回流-Design 基础.md</span>             新 Token 回流到🎨</span>
+<span class="tree-line">├── <span class="biz">protocols/</span></span>
+<span class="tree-line">│   <span class="comment"># 治理协议</span></span>
+<span class="tree-line">│   ├── <span class="file">怎么发起.md</span></span>
+<span class="tree-line">│   │   <span class="comment"># 专项立项流程</span></span>
+<span class="tree-line">│   ├── <span class="file">Review 流程.md</span></span>
+<span class="tree-line">│   │   <span class="comment"># 评审协议</span></span>
+<span class="tree-line">│   ├── <span class="file">落地协议.md</span></span>
+<span class="tree-line">│   │   <span class="comment"># 推广路径</span></span>
+<span class="tree-line">│   ├── <span class="file">反哺机制.md</span></span>
+<span class="tree-line">│   │   <span class="comment"># 产出回流规则</span></span>
+<span class="tree-line">│   └── <span class="file">跨部门协调.md</span></span>
+<span class="tree-line">│       <span class="comment"># 多部门冲突解决</span></span>
+<span class="tree-line">└── <span class="biz">handoff/</span></span>
+<span class="tree-line">    <span class="comment"># 反哺接口</span></span>
+<span class="tree-line">    ├── <span class="file">产出回流-产品架构.md</span></span>
+<span class="tree-line">    │   <span class="comment"># 新组件回流到 🏗</span></span>
+<span class="tree-line">    ├── <span class="file">产出回流-AI 机制.md</span></span>
+<span class="tree-line">    │   <span class="comment"># 新 Skill 回流到 🤖</span></span>
+<span class="tree-line">    └── <span class="file">产出回流-Design 基础.md</span></span>
+<span class="tree-line">        <span class="comment"># 新 Token 回流到 🎨</span></span>
       </div>
     </div>
 
