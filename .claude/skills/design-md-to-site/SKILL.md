@@ -64,6 +64,16 @@ allowed-tools: [Bash, Read, Write, Edit, Glob]
 2. 同目录 `design-screenshot.png`
 3. 占位灰底（CSS `background: #f0f0f0`）
 
+### banner 装饰图资产
+
+`docs/design.html` 顶部 banner 右侧的装饰图（Relay 节点 `6:229;6:10`，548×240）走**手动导出**约定：
+
+- 设计师在 Relay 桌面端选中节点 → Export PNG → 落 `docs/assets/banner-art.png`
+- skill 本身**不**抓这张图（MCP `get_screenshot` 返回内联截图，没法落盘）
+- HTML 中已预置 fallback 径向渐变；PNG 缺失时仍能正常渲染（只是装饰差点意思）
+
+详细规范见 `docs/assets/README.md`。
+
 ## 工作流
 
 ### Step 1 · 扫所有 design.md

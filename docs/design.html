@@ -57,11 +57,16 @@
       width: 548px;
       height: 240px;
       mix-blend-mode: multiply;
-      /* TBD: 换真装饰图（Relay 节点 6:229;6:10 的 Untitled@2x 2.png）。
-         当前用径向渐变近似 Relay 原稿的「粉色球 + 紫色阴影」气质。 */
-      background:
+      /* 切图来源：Relay file 2054468374020227073 节点 6:229;6:10
+         (Untitled@2x 2.png_7NySLs)。导出步骤见 docs/assets/README.md。
+         若 PNG 缺失，下方渐变作为 fallback 自动顶上。 */
+      background-image:
+        url('assets/banner-art.png'),
         radial-gradient(circle at 30% 50%, #FFB8C5 0%, #FFE0E6 28%, transparent 62%),
         radial-gradient(circle at 68% 48%, #E8DDFF 0%, transparent 52%);
+      background-size: cover, auto, auto;
+      background-position: center, center, center;
+      background-repeat: no-repeat, no-repeat, no-repeat;
     }
 
     /* --- TOC --- */
