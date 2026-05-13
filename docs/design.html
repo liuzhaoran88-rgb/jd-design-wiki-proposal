@@ -3,11 +3,12 @@
   JD APP 16.0 GUIDELINE · 设计系统对外站点
   ═══════════════════════════════════════════════════════════════════════
 
-  本文件由 `.claude/skills/design-md-to-site/` 自动生成 —— 不要手动编辑。
+  本文件由 `.claude/skills/design-md-to-site/` 生成 —— 不要手动编辑。
   改板式请改 `.claude/skills/design-md-to-site/references/site-template.html`。
 
-  当前版本：v0.1 骨架 + 1 份 spec (button) smoke test
+  当前版本：v0.1 打样（手作）—— 用 design.html 框架介绍 relay-to-design-md skill
   状态：大量 section 留 TBD 占位，预期后续多轮迭代填
+  下次 /design-md-to-site 自动跑后，本 main 区会被替换为 design.md 集合的渲染产物
 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -31,33 +32,46 @@
     html, body { margin: 0; padding: 0; background: #fff; color: var(--color-text); font-family: var(--font-cjk); -webkit-font-smoothing: antialiased; }
     .wrap { max-width: var(--max-width); margin: 0 auto; }
 
+    /* --- banner：grid 双列，左文字 / 右装饰位，两侧都不截断 --- */
     .banner {
       position: relative;
       background: var(--color-banner-bg);
       border: 1px solid var(--color-banner-border);
-      height: 240px;
-      overflow: hidden;
-      display: flex;
-      align-items: flex-start;
+      display: grid;
+      grid-template-columns: 1fr 548px;
+      min-height: 240px;
     }
-    .banner__text { padding: 54px 60px; display: flex; flex-direction: column; gap: 28px; }
+    .banner__text {
+      padding: 54px 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      grid-column: 1;
+      min-width: 0;  /* 防止长标题撑爆 grid 列 */
+    }
     .banner__tag { font-family: var(--font-display); font-size: 20px; line-height: 20px; letter-spacing: 0.04em; }
-    .banner__title { font-family: var(--font-cjk); font-size: 40px; font-weight: 600; line-height: 40px; margin: 0; }
+    .banner__title { font-family: var(--font-cjk); font-size: 40px; font-weight: 600; line-height: 1.1; margin: 0; word-break: break-word; }
     .banner__subtitle { font-family: var(--font-cjk); font-size: 16px; line-height: 16px; margin: 0; }
     .banner__art {
-      position: absolute; right: 0; top: 0; width: 548px; height: 240px;
+      grid-column: 2;
+      width: 548px;
+      height: 240px;
       mix-blend-mode: multiply;
+      /* TBD: 换真装饰图（Relay 节点 6:229;6:10 的 Untitled@2x 2.png）。
+         当前用径向渐变近似 Relay 原稿的「粉色球 + 紫色阴影」气质。 */
       background:
-        radial-gradient(circle at 18% 50%, #FF2353 0%, transparent 35%),
-        radial-gradient(circle at 28% 48%, #A38BFF 0%, transparent 30%);
+        radial-gradient(circle at 30% 50%, #FFB8C5 0%, #FFE0E6 28%, transparent 62%),
+        radial-gradient(circle at 68% 48%, #E8DDFF 0%, transparent 52%);
     }
 
+    /* --- TOC --- */
     .toc { padding: 60px; border-bottom: 1px solid var(--color-divider); }
     .toc__title { font-size: 14px; opacity: 0.6; margin: 0 0 24px; letter-spacing: 0.08em; text-transform: uppercase; }
     .toc__list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px 32px; }
     .toc__list a { color: var(--color-text); text-decoration: none; font-size: 16px; line-height: 1.6; }
     .toc__list a:hover { text-decoration: underline; }
 
+    /* --- spec section --- */
     .spec { padding: 0 60px 96px; }
     .spec .banner { margin: 60px 0 40px; }
     .spec__screenshot {
@@ -70,11 +84,20 @@
 
     .site-footer { padding: 40px 60px; border-top: 1px solid var(--color-divider); font-size: 13px; opacity: 0.6; }
 
+    /* --- 移动端：banner 改单列竖排，装饰位变矮但**仍保留**（不截断） --- */
     @media (max-width: 768px) {
-      .banner { height: auto; }
-      .banner__art { display: none; }
+      .banner {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+        min-height: 0;
+      }
+      .banner__art {
+        grid-column: 1;
+        width: 100%;
+        height: 120px;
+      }
       .banner__text, .toc, .spec, .site-footer { padding: 32px 20px; }
-      .banner__title { font-size: 28px; line-height: 32px; }
+      .banner__title { font-size: 28px; line-height: 1.2; }
       .toc__list { grid-template-columns: 1fr; }
     }
   </style>
@@ -96,35 +119,47 @@
     <nav class="toc" aria-label="规范目录">
       <h2 class="toc__title">规范目录</h2>
       <ul class="toc__list">
-        <li><a href="#button">样式=主要操作（红色填充）, 状态=默认</a></li>
+        <li><a href="#relay-to-design-md">relay-to-design-md · 设计稿一键转 design.md</a></li>
       </ul>
     </nav>
 
     <main>
 
-      <section class="spec" id="button">
+      <!-- ╭─ 打样 section：用 design.html 框架介绍一个 skill ─────────────╮
+           结构沿用 spec section（banner + 截图 + 源链接），把"视觉规范"
+           的位置换成"skill 能力 / 触发 / 输入输出"。验证框架可承载多种
+           内容类型，不只设计 spec。
+      -->
+      <section class="spec" id="relay-to-design-md">
         <header class="banner">
           <div class="banner__text">
             <span class="banner__tag">JD APP 16.0&nbsp;&nbsp;GUIDELINE</span>
-            <h2 class="banner__title">样式=主要操作（红色填充）, 状态=默认</h2>
-            <p class="banner__subtitle">Button</p>
+            <h2 class="banner__title">relay-to-design-md</h2>
+            <p class="banner__subtitle">Skill · 设计稿 → design.md 一键同步 · v0.3</p>
           </div>
+          <div class="banner__art" aria-hidden="true"></div>
         </header>
+
+        <!-- TBD: 一句话概述段（什么是 relay-to-design-md） -->
+        <!-- TBD: 调用示例 (pre/code 块):
+                 /relay-to-design-md https://relay.jd.com/file/design?id=... -->
+        <!-- TBD: 4 能力卡：① 自动反查 V16 token ② 双向追溯（INDEX + sharedPluginData）
+                          ③ cross-file 校验 ④ preview.png 自动导出 -->
+        <!-- TBD: 工作流 4 步图示（输入 Relay URL → 抓节点 → 反查 token → 写盘）-->
 
         <img class="spec__screenshot"
              src="../jd-design-system-md-v16/horizontal/components-base/button/preview.png"
-             alt="Button 截图" />
+             alt="relay-to-design-md 实跑产物示例：button preview" />
 
-        <!-- TBD: 概述段（从 design.md 正文抽，本期不做） -->
-        <!-- TBD: token 表（color_primary / pingfang_semibold/font_size_18_600 / radius_l / spacing.24 / spacing.8） -->
-        <!-- TBD: 变体展示（uses_components: icon-home × 2） -->
-        <!-- TBD: 行为状态（hover / pressed / disabled） -->
-        <!-- TBD: AI schema / Code Connect -->
-        <!-- TBD: status=draft / version=0.1 / last_synced=2026-05-13 元信息条 -->
+        <!-- TBD: 截图说明 caption（"上图：skill 实跑产物 button preview.png"）-->
+        <!-- TBD: skill 演进时间线（v0.1 MVP → v0.3 sharedPluginData） -->
+        <!-- TBD: 配套工具（bin/validate.sh + bin/sync-index.sh）说明卡 -->
+        <!-- TBD: 与 design-md-to-site / design-review 的协作关系图 -->
 
         <div class="spec__source">
-          源：<a href="https://relay.jd.com/file/design?id=2029484645871009793&page_id=33%3A5&node_id=608%3A1031">Relay frame</a> ·
-          <a href="../jd-design-system-md-v16/horizontal/components-base/button/design.md">完整规范 (design.md)</a>
+          Skill：<a href="../.claude/skills/relay-to-design-md/SKILL.md">SKILL.md</a> ·
+          实跑产物：<a href="../jd-design-system-md-v16/horizontal/components-base/button/design.md">button design.md</a> ·
+          版本：v0.3 · status: stable
         </div>
       </section>
 
@@ -133,7 +168,7 @@
     <!-- TBD: 主体下方区域 —— 跨组件横向对比 / 设计原则索引 / 案例库 -->
 
     <footer class="site-footer">
-      生成于 <time datetime="2026-05-13T20:30:00+08:00">2026-05-13T20:30:00+08:00</time> ·
+      生成于 <time datetime="2026-05-13T20:50:00+08:00">2026-05-13T20:50:00+08:00</time> ·
       源：<a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal">jd-design-wiki-proposal</a>
       <!-- TBD: 4 份战略 HTML（executive-summary / master-diagram / knowledge-tree / contributor-guide）footer 互链 -->
     </footer>
