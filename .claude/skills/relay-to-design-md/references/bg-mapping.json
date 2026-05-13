@@ -1,0 +1,24 @@
+{
+  "$description": "Relay file_id → bg 映射。SKILL.md Step 3 查询本表。维护者：当业务方发新 Relay 文件 ID 给你，在这里加一行即可，不需改 SKILL.md。",
+  "$updated": "2026-05-13",
+
+  "mappings": {
+    "2029484645871009793": {
+      "bg": "horizontal",
+      "label": "JD APP 16.0 GUIDELINE (V16 master design system)",
+      "note": "本文件所有节点默认 horizontal。L2 业务组件如果出现在本文件需手动 mv 到 product-architecture/{bg}/。"
+    },
+    "1896756863949619202": {
+      "bg": "horizontal",
+      "label": "JD APP 15.0 GUIDELINE (V15 master design system, 已冻结)",
+      "note": "V15 文件目前已冻结，新建议从 V16 master 来。"
+    }
+  },
+
+  "$todo_when_new_business_file": "示例 entry: \"<file_id>\": { \"bg\": \"retail | health | finance | logistics | global | jx | industrial\", \"label\": \"...\", \"note\": \"...\" }",
+
+  "fallback": {
+    "bg": "horizontal",
+    "flag": "fallback"
+  }
+}

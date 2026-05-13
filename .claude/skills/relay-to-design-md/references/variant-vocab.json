@@ -1,0 +1,78 @@
+{
+  "$description": "Relay VARIANT 属性中文值 → 英文 slug 片段的映射表。SKILL.md Step 3 slug 推断时查询。",
+  "$updated": "2026-05-13",
+  "$note": "维护者按需追加。匹配优先级：精确 → 包含；不命中 → 走兜底（拼音 / 字面 / 编号）",
+
+  "exact": {
+    "默认": "default",
+    "禁用": "disabled",
+    "点击": "pressed",
+    "选中": "selected",
+    "未选中": "unselected",
+    "悬浮": "hover",
+    "聚焦": "focus",
+    "激活": "active",
+    "失效": "inactive",
+    "正常": "normal",
+    "错误": "error",
+    "成功": "success",
+    "警示": "warning",
+    "警告": "warning",
+    "信息": "info",
+    "加载中": "loading",
+
+    "主要操作": "primary",
+    "次要操作": "secondary",
+    "三级操作": "tertiary",
+    "辅助操作": "auxiliary",
+    "幽灵": "ghost",
+    "链接": "link",
+    "文字按钮": "text",
+
+    "大": "large",
+    "中": "medium",
+    "小": "small",
+    "迷你": "mini",
+    "巨大": "xlarge",
+
+    "横向": "horizontal",
+    "纵向": "vertical",
+    "竖向": "vertical",
+
+    "圆形": "circle",
+    "方形": "square",
+    "胶囊": "pill",
+
+    "日间": "day",
+    "暗黑": "dark",
+    "夜间": "night",
+    "通透": "transparent",
+    "实色": "solid",
+    "镂空": "outline",
+
+    "图文": "icon-text",
+    "纯文": "text-only",
+    "纯图标": "icon-only",
+    "图标在左": "icon-left",
+    "图标在右": "icon-right",
+
+    "顶部": "top",
+    "底部": "bottom",
+    "左侧": "left",
+    "右侧": "right"
+  },
+
+  "$contains_fallback": {
+    "$description": "exact 不命中时，按 substring 找。例如 '主要操作（红色填充）' 含 '主要操作' → primary",
+    "$rules": [
+      "去掉括号内补充说明再 exact 查",
+      "依然不命中 → 取首个汉字 + 'unk'，例如 '咖啡色' → 'kafei-unk'，等设计师 review 时改"
+    ]
+  },
+
+  "$true_false_value_mapping": {
+    "$description": "BOOLEAN type 不进 slug；VARIANT type 才进。但若设计师特意把 boolean 状态语义化（如 显示图标=true）也支持",
+    "true": "on",
+    "false": "off"
+  }
+}
