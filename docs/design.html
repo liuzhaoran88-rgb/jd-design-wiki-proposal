@@ -6,9 +6,8 @@
   本文件由 `.claude/skills/design-md-to-site/` 生成 —— 不要手动编辑。
   改板式请改 `.claude/skills/design-md-to-site/references/site-template.html`。
 
-  当前版本：v0.1 打样（手作）—— 用 design.html 框架介绍 relay-to-design-md skill
-  状态：大量 section 留 TBD 占位，预期后续多轮迭代填
-  下次 /design-md-to-site 自动跑后，本 main 区会被替换为 design.md 集合的渲染产物
+  当前版本：v0.2 打样（手作）—— 按 PDF「design.html 范式」结构，
+  顶部唯一 banner + 规范要素参考蓝框 + 示意章节
 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -20,26 +19,31 @@
   <style>
     :root {
       --color-text: #11141A;
-      /* banner 底色：用 V16 token color_background_component (= gray.6 = #F5F6FA, "组件/容器背景")
-         替代 Relay 里的 rgba(17,20,26,0.02) —— 后者算下来 ≈ #FAFAFA，浏览器渲染几乎纯白看不出。
-         #F5F6FA 是 16.0 体系内的语义 token，灰底真正可见，又跟设计稿气质一致。 */
+      --color-text-help: #6B6F7A;
       --color-banner-bg: #F5F6FA;
-      --color-banner-border: rgba(17, 20, 26, 0.08);
       --color-divider: rgba(17, 20, 26, 0.08);
+      /* 范式色板（来自 PDF），后续可换成 V16 真 token */
+      --color-tips-bg: #F0F7FF;
+      --color-tips-border: #B3D4FC;
+      --color-must: #E94B5A;
+      --color-optional: #5BAA5F;
+      --color-example-bg: #FFF8DC;
+      --color-link: #1976D2;
+      --color-bullet: #1976D2;
       --font-display: 'Intro', 'Helvetica Neue', Arial, sans-serif;
       --font-cjk: 'PingFang SC', 'PingFang-SC', 'Microsoft YaHei', sans-serif;
       --max-width: 1666px;
+      --page-max-width: 1200px;
     }
 
     * { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; background: #fff; color: var(--color-text); font-family: var(--font-cjk); -webkit-font-smoothing: antialiased; }
+    html, body { margin: 0; padding: 0; background: #fff; color: var(--color-text); font-family: var(--font-cjk); -webkit-font-smoothing: antialiased; line-height: 1.6; }
     .wrap { max-width: var(--max-width); margin: 0 auto; }
 
-    /* --- banner：grid 双列，左文字 / 右装饰位，两侧都不截断 --- */
+    /* ─── 顶部唯一 banner ────────────────────────────────────── */
     .banner {
       position: relative;
       background: var(--color-banner-bg);
-      border: 1px solid var(--color-banner-border);
       display: grid;
       grid-template-columns: 1fr 548px;
       min-height: 240px;
@@ -50,7 +54,7 @@
       flex-direction: column;
       gap: 28px;
       grid-column: 1;
-      min-width: 0;  /* 防止长标题撑爆 grid 列 */
+      min-width: 0;
     }
     .banner__tag { font-family: var(--font-display); font-size: 20px; line-height: 20px; letter-spacing: 0.04em; }
     .banner__title { font-family: var(--font-cjk); font-size: 40px; font-weight: 600; line-height: 1.1; margin: 0; word-break: break-word; }
@@ -60,9 +64,6 @@
       width: 548px;
       height: 240px;
       mix-blend-mode: multiply;
-      /* 切图来源：Relay file 2054468374020227073 节点 6:229;6:10
-         (Untitled@2x 2.png_7NySLs)。导出步骤见 docs/assets/README.md。
-         若 PNG 缺失，下方渐变作为 fallback 自动顶上。 */
       background-image:
         url('assets/banner-art.png'),
         radial-gradient(circle at 30% 50%, #FFB8C5 0%, #FFE0E6 28%, transparent 62%),
@@ -72,27 +73,136 @@
       background-repeat: no-repeat, no-repeat, no-repeat;
     }
 
-    /* --- TOC --- */
-    .toc { padding: 60px; border-bottom: 1px solid var(--color-divider); }
-    .toc__title { font-size: 14px; opacity: 0.6; margin: 0 0 24px; letter-spacing: 0.08em; text-transform: uppercase; }
-    .toc__list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px 32px; }
-    .toc__list a { color: var(--color-text); text-decoration: none; font-size: 16px; line-height: 1.6; }
-    .toc__list a:hover { text-decoration: underline; }
-
-    /* --- spec section --- */
-    .spec { padding: 0 60px 96px; }
-    .spec .banner { margin: 60px 0 40px; }
-    .spec__screenshot {
-      display: block; max-width: 100%; height: auto;
-      margin: 40px 0; border: 1px solid var(--color-divider);
-      background: #f0f0f0;
+    /* ─── 正文限宽容器 ──────────────────────────────────────── */
+    .page {
+      max-width: var(--page-max-width);
+      margin: 0 auto;
+      padding: 60px;
     }
-    .spec__source { font-size: 13px; opacity: 0.6; border-top: 1px solid var(--color-divider); padding-top: 16px; margin-top: 40px; }
-    .spec__source a { color: inherit; }
+    .page__h2 {
+      font-size: 28px;
+      font-weight: 600;
+      margin: 0 0 40px;
+      letter-spacing: 0.5px;
+    }
+    .page__h2 .num { color: var(--color-link); font-weight: 600; margin-right: 8px; }
 
-    .site-footer { padding: 40px 60px; border-top: 1px solid var(--color-divider); font-size: 13px; opacity: 0.6; }
+    /* ─── 规范要素参考蓝框 ──────────────────────────────────── */
+    .guideline-tips {
+      border: 1px solid var(--color-tips-border);
+      background: var(--color-tips-bg);
+      padding: 28px 36px;
+      border-radius: 8px;
+      margin: 0 0 56px;
+    }
+    .guideline-tips__title {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 16px;
+    }
+    .guideline-tips ol {
+      margin: 0;
+      padding-left: 24px;
+      font-size: 15px;
+      line-height: 1.85;
+    }
+    .guideline-tips ol li { margin-bottom: 4px; }
+    .guideline-tips .must { color: var(--color-must); font-weight: 500; }
+    .guideline-tips .optional { color: var(--color-optional); font-weight: 500; }
+    .guideline-tips strong { font-weight: 600; }
 
-    /* --- 移动端：banner 改单列竖排，装饰位变矮但**仍保留**（不截断） --- */
+    /* ─── 示意黄色标题 ──────────────────────────────────────── */
+    .example-header {
+      background: var(--color-example-bg);
+      padding: 10px 16px;
+      margin: 0 0 36px;
+      font-size: 15px;
+      border-radius: 4px;
+      display: flex;
+      align-items: baseline;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .example-tag { color: var(--color-must); font-weight: 600; }
+    .example-name { font-weight: 600; }
+    .example-link { color: var(--color-link); text-decoration: none; }
+    .example-link:hover { text-decoration: underline; }
+
+    /* ─── 圆点章节 ──────────────────────────────────────────── */
+    .bullet-section {
+      margin: 0 0 56px;
+    }
+    .bullet-section__title {
+      position: relative;
+      padding-left: 24px;
+      font-size: 18px;
+      font-weight: 500;
+      margin: 0 0 20px;
+      letter-spacing: 0.3px;
+    }
+    .bullet-section__title::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 9px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--color-bullet);
+    }
+    .bullet-section p,
+    .bullet-section ol,
+    .bullet-section ul {
+      font-size: 15px;
+      line-height: 1.8;
+      margin: 0 0 16px;
+    }
+    .bullet-section ol,
+    .bullet-section ul { padding-left: 24px; }
+    .bullet-section ol li,
+    .bullet-section ul li { margin-bottom: 6px; }
+
+    /* ─── 章节内插表格（用于对比 / 类型说明） ─────────────── */
+    .section-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 0 24px;
+      font-size: 14px;
+    }
+    .section-table th,
+    .section-table td {
+      text-align: left;
+      padding: 12px 16px;
+      border: 1px solid var(--color-divider);
+      vertical-align: top;
+    }
+    .section-table th {
+      background: var(--color-banner-bg);
+      font-weight: 600;
+    }
+
+    /* ─── 章节内图示 / 截图 ──────────────────────────────────── */
+    .section-figure {
+      margin: 16px 0 24px;
+    }
+    .section-figure img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      border: 1px solid var(--color-divider);
+      border-radius: 4px;
+    }
+    .section-figure figcaption {
+      font-size: 13px;
+      color: var(--color-text-help);
+      margin-top: 8px;
+    }
+
+    /* ─── 站点页脚 ──────────────────────────────────────────── */
+    .site-footer { padding: 40px 60px; border-top: 1px solid var(--color-divider); font-size: 13px; color: var(--color-text-help); }
+    .site-footer a { color: inherit; }
+
+    /* ─── 移动端 ────────────────────────────────────────────── */
     @media (max-width: 768px) {
       .banner {
         grid-template-columns: 1fr;
@@ -104,15 +214,16 @@
         width: 100%;
         height: 120px;
       }
-      .banner__text, .toc, .spec, .site-footer { padding: 32px 20px; }
+      .banner__text, .page, .site-footer { padding: 32px 20px; }
       .banner__title { font-size: 28px; line-height: 1.2; }
-      .toc__list { grid-template-columns: 1fr; }
+      .page__h2 { font-size: 22px; }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
 
+    <!-- ╭─ 顶部唯一 banner ──────────────────────────────────────╮ -->
     <header class="banner">
       <div class="banner__text">
         <span class="banner__tag">JD APP 16.0&nbsp;&nbsp;GUIDELINE</span>
@@ -122,62 +233,137 @@
       <div class="banner__art" aria-hidden="true"></div>
     </header>
 
-    <!-- TBD: 站点级面包屑 / 版本切换器 / 语言切换 -->
+    <!-- ╭─ 正文 ────────────────────────────────────────────────╮ -->
+    <main class="page">
 
-    <nav class="toc" aria-label="规范目录">
-      <h2 class="toc__title">规范目录</h2>
-      <ul class="toc__list">
-        <li><a href="#relay-to-design-md">relay-to-design-md · 设计稿一键转 design.md</a></li>
-      </ul>
-    </nav>
+      <h2 class="page__h2"><span class="num">1.</span>业务组件库（业务型组件）</h2>
 
-    <main>
+      <!-- 规范要素参考蓝框（按 PDF 完全照搬，作为对所有规范的元参考） -->
+      <aside class="guideline-tips">
+        <h3 class="guideline-tips__title">🌟 规范要素参考：</h3>
+        <ol>
+          <li><strong>组件定义</strong><span class="must">（必写）</span>：组件的目的或用途</li>
+          <li><strong>行为准则</strong><span class="optional">（选写）</span>：和用户约定好的行为规则</li>
+          <li><strong>组件类型</strong><span class="optional">（选写）</span>：根据不同交互/视觉形态或功能模式的分类</li>
+          <li><strong>组件结构</strong><span class="must">（必写）</span>：组件的骨架说明，包括组件的内部组成、层级关系、必需和可选元素，需明确每个元素的使用场景及使用上下限，包括是否为必配置项、文本字数限制、按钮数量等</li>
+          <li><strong>组件属性</strong><span class="must">（必写）</span>：元素的空间关系、对齐方式、间距、颜色、在不同尺寸下的适配规则等</li>
+          <li><strong>典型场景示意</strong><span class="must">（必写）</span>：组件的使用场景举例，需尽可能覆盖全部典型场景</li>
+          <li><strong>错误示例</strong><span class="optional">（选写）</span>：组件"千万别这么做"的反面案例，尽量避免滥用或误用</li>
+        </ol>
+      </aside>
 
-      <!-- ╭─ 打样 section：用 design.html 框架介绍一个 skill ─────────────╮
-           结构沿用 spec section（banner + 截图 + 源链接），把"视觉规范"
-           的位置换成"skill 能力 / 触发 / 输入输出"。验证框架可承载多种
-           内容类型，不只设计 spec。
-      -->
-      <section class="spec" id="relay-to-design-md">
-        <header class="banner">
-          <div class="banner__text">
-            <span class="banner__tag">JD APP 16.0&nbsp;&nbsp;GUIDELINE</span>
-            <h2 class="banner__title">relay-to-design-md</h2>
-            <p class="banner__subtitle">Skill · 设计稿 → design.md 一键同步 · v0.3</p>
-          </div>
-          <div class="banner__art" aria-hidden="true"></div>
-        </header>
+      <!-- 示意黄标题 -->
+      <p class="example-header">
+        <span class="example-tag">*示意：</span>
+        <span class="example-name">relay-to-design-md skill v0.3（用 design.html 范式介绍一个 skill 而非组件，验证框架通用性）</span>
+        <a class="example-link" href="../.claude/skills/relay-to-design-md/SKILL.md">SKILL.md →</a>
+      </p>
 
-        <!-- TBD: 一句话概述段（什么是 relay-to-design-md） -->
-        <!-- TBD: 调用示例 (pre/code 块):
-                 /relay-to-design-md https://relay.jd.com/file/design?id=... -->
-        <!-- TBD: 4 能力卡：① 自动反查 V16 token ② 双向追溯（INDEX + sharedPluginData）
-                          ③ cross-file 校验 ④ preview.png 自动导出 -->
-        <!-- TBD: 工作流 4 步图示（输入 Relay URL → 抓节点 → 反查 token → 写盘）-->
+      <!-- ─── 7 个章节，按 PDF 范式 ─────────────────────────────── -->
 
-        <img class="spec__screenshot"
-             src="../jd-design-system-md-v16/horizontal/components-base/button/preview.png"
-             alt="relay-to-design-md 实跑产物示例：button preview" />
+      <section class="bullet-section">
+        <h3 class="bullet-section__title">relay-to-design-md 定义</h3>
+        <p>把 Relay 设计稿一键转成结构化、token 化、可 review 的 <code>design.md</code>。设计师传一个 Relay URL，零输入零选择题，自动反查 V16 token、自动维护双向追溯索引、自动 flag 视觉问题。</p>
+        <!-- TBD: 一图概览（输入 → skill → 输出）流程图 -->
+      </section>
 
-        <!-- TBD: 截图说明 caption（"上图：skill 实跑产物 button preview.png"）-->
-        <!-- TBD: skill 演进时间线（v0.1 MVP → v0.3 sharedPluginData） -->
-        <!-- TBD: 配套工具（bin/validate.sh + bin/sync-index.sh）说明卡 -->
-        <!-- TBD: 与 design-md-to-site / design-review 的协作关系图 -->
+      <section class="bullet-section">
+        <h3 class="bullet-section__title">行为准则</h3>
+        <ol>
+          <li><strong>零输入</strong>：只接受 1 个 Relay URL 参数，不弹问、不选项</li>
+          <li><strong>自动推断</strong>：level / bg / slug / name_zh / name_en 全部从节点信息推断，5 处 TODO placeholder 留给设计师手填</li>
+          <li><strong>双向追溯</strong>：design.md ↔ INDEX.md ↔ Relay sharedPluginData，三处任一改动都能反向定位</li>
+          <li><strong>不依赖聪明模型</strong>：全部判断走 references/ 查找表，结果可预测、可回放</li>
+        </ol>
+      </section>
 
-        <div class="spec__source">
-          Skill：<a href="../.claude/skills/relay-to-design-md/SKILL.md">SKILL.md</a> ·
-          实跑产物：<a href="../jd-design-system-md-v16/horizontal/components-base/button/design.md">button design.md</a> ·
-          版本：v0.3 · status: stable
-        </div>
+      <section class="bullet-section">
+        <h3 class="bullet-section__title">relay-to-design-md 类型</h3>
+        <!-- TBD: 是否要按"调用形态"分类（手动 / CI / 批量）—— 本期 skill 只支持单 URL 手动调用，暂留空 -->
+        <p class="muted" style="color: var(--color-text-help);"><em>本节选写。当前 skill 只有单 URL 手动调用一种形态，无需分类。</em></p>
+      </section>
+
+      <section class="bullet-section">
+        <h3 class="bullet-section__title">relay-to-design-md 结构</h3>
+        <p>Skill 包内 16 文件 / 2500+ 行，分 4 大块：</p>
+        <table class="section-table">
+          <thead>
+            <tr>
+              <th style="width: 22%;">区块</th>
+              <th style="width: 30%;">关键文件</th>
+              <th>职责</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>入口</strong></td>
+              <td><code>SKILL.md</code></td>
+              <td>触发条件、调用方式、整体工作流说明</td>
+            </tr>
+            <tr>
+              <td><strong>references/</strong></td>
+              <td>token-reverse-lookup / slug-pinyin-fallback / node-type-mapping / auto-detect-rules / frontmatter-spec / traceability / checklist / bg-mapping.json / variant-vocab.json</td>
+              <td>查找表 + 规则库 + 受控词表，skill 所有判断都基于这一层，不靠模型瞎猜</td>
+            </tr>
+            <tr>
+              <td><strong>templates/</strong></td>
+              <td><code>component.md</code></td>
+              <td>design.md 输出模板</td>
+            </tr>
+            <tr>
+              <td><strong>bin/</strong></td>
+              <td><code>validate.sh</code> · <code>sync-index.sh</code></td>
+              <td>提交前 frontmatter 校验 + INDEX.md 自动重建（macOS bash 3.x 兼容）</td>
+            </tr>
+          </tbody>
+        </table>
+        <!-- TBD: 4 步工作流图示（输入 URL → 抓节点 → 反查 token → 写盘 + sharedPluginData） -->
+      </section>
+
+      <section class="bullet-section">
+        <h3 class="bullet-section__title">设计属性</h3>
+        <p><strong>输入</strong>：1 个 Relay URL，形如 <code>https://relay.jd.com/file/design?id=...&page_id=...&node_id=...</code></p>
+        <p><strong>输出</strong>：</p>
+        <ul>
+          <li><code>jd-design-system-md-v16/&lt;level&gt;/&lt;bg&gt;/&lt;slug&gt;/design.md</code> —— token 化的规范源</li>
+          <li>同目录 <code>preview.png</code> —— 自动导出的节点截图</li>
+          <li>Relay <code>sharedPluginData('jd-design-wiki', ...)</code> 写回 —— Relay 端反查仓库路径</li>
+          <li><code>INDEX.md</code> 自动追加 —— 仓库视角的全量索引</li>
+        </ul>
+        <p><strong>跨文件契约</strong>：<code>uses_components</code> ↔ <code>used_by</code> 互链；validate.sh 检测断链。</p>
+      </section>
+
+      <section class="bullet-section">
+        <h3 class="bullet-section__title">典型场景示意</h3>
+        <p>当前已实跑产物 1 例：</p>
+        <figure class="section-figure">
+          <img src="../jd-design-system-md-v16/horizontal/components-base/button/preview.png"
+               alt="relay-to-design-md 实跑产物：button preview.png" />
+          <figcaption>relay-to-design-md v0.3 实跑产物：<code>horizontal/components-base/button/preview.png</code>，由 skill 从 Relay file <code>2029484645871009793</code> node <code>608:1031</code> 自动导出</figcaption>
+        </figure>
+        <!-- TBD: 表格列出更多实跑产物（v16 横向组件库批量入库后填） -->
+        <!-- TBD: 端到端调用示例 GIF / 视频 -->
+      </section>
+
+      <section class="bullet-section">
+        <h3 class="bullet-section__title">错误示例</h3>
+        <p>❌ <strong>不要这样用 relay-to-design-md：</strong></p>
+        <ol>
+          <li>把它当 design-review 用 —— 本 skill 不审计合规，那是 <code>design-review</code> 的事</li>
+          <li>把它当 design-md-to-site 用 —— 本 skill 不渲染对外站点，那是 <code>design-md-to-site</code> 的事</li>
+          <li>跨 Relay 文件批量调 —— 本 skill 一次只处理 1 个 URL；批量需要在外层包脚本</li>
+          <li>跳过 review 就 commit —— skill 留了 5 处 TODO placeholder 给设计师手填，validate.sh 会 block 未填的提交</li>
+        </ol>
+        <!-- TBD: 真实踩坑案例（namespace 命名冲突 / preview.png 缺失 / sharedPluginData 写回失败 ...） -->
       </section>
 
     </main>
 
-    <!-- TBD: 主体下方区域 —— 跨组件横向对比 / 设计原则索引 / 案例库 -->
-
+    <!-- ╭─ 页脚 ────────────────────────────────────────────────╮ -->
     <footer class="site-footer">
-      生成于 <time datetime="2026-05-13T20:50:00+08:00">2026-05-13T20:50:00+08:00</time> ·
-      源：<a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal">jd-design-wiki-proposal</a>
+      生成于 <time datetime="2026-05-13T21:30:00+08:00">2026-05-13T21:30:00+08:00</time> ·
+      源：<a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal">jd-design-wiki-proposal</a> ·
+      范式：<a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/docs/design.html">design.html v0.2</a>
       <!-- TBD: 4 份战略 HTML（executive-summary / master-diagram / knowledge-tree / contributor-guide）footer 互链 -->
     </footer>
 

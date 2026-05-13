@@ -86,20 +86,31 @@ find jd-design-system-md-v16 -name "design.md" -type f
 
 逐份读首 `---` ~ `---` 段，提取上表字段。frontmatter 解析按 YAML，但**只**取顶层 + `relay_source.url`，深层结构 TBD。
 
-### Step 3 · 渲染 sections
+### Step 3 · 按 PDF 范式渲染 sections
 
-对每份 spec：
+每份 spec 按「design.html 范式」（见 `docs/design.html` v0.2）输出**示意黄头 + 7 圆点章节**：
+
+| 章节（PDF 顺位） | 必/选 | 数据源 |
+|---|---|---|
+| 示意黄头 | — | `name_zh` / `name_en` / `status` / `version` / `relay_source.url` |
+| `{{name_zh}} 定义` | 必写 | 正文 `## 定义` 段，缺则 TBD |
+| `行为准则` | 选写 | 正文 `## 行为准则` 段，缺则 TBD |
+| `{{name_zh}} 类型` | 选写 | frontmatter `variants` 或 references/variant-vocab，缺则 TBD |
+| `{{name_zh}} 结构` | 必写 | 正文 `## 结构` 段，缺则 TBD |
+| `设计属性` | 必写 | frontmatter `uses_tokens` 渲染表 + 正文 `## 属性` 段 |
+| `典型场景示意` | 必写 | 同目录 `preview.png` + `relay_source.url` |
+| `错误示例` | 选写 | 正文 `## 错误示例` 段，缺则 TBD |
+
+**渲染规则**：
 1. 复制 `references/site-template.html` 末尾的 **SPEC_SECTION 模板**
 2. 替换 `{{spec_*}}` 占位符
-3. 大量内部 section（token 表 / 变体 / 行为 / AI 字段）保持 `<!-- TBD -->`，**本期不填**
+3. 缺失字段保留 `<!-- TBD -->` 注释 + 一句话占位文案（不报错）
 
-按 `level` 分组（component-base / foundation / horizontal / ...），每组一个 h2 分隔条。
+### Step 4 · 拼接 sections
 
-### Step 4 · 拼接 TOC + sections
-
-- `{{toc_items}}`：每份 spec 一个 `<li><a href="#{slug}">{name_zh}</a></li>`
-- `{{spec_sections}}`：所有 spec sections 串联
+- `{{spec_sections}}`：所有 spec sections 串联，按 frontmatter `level` 分组（component-base / foundation / horizontal）
 - `{{generated_at}}`：ISO 时间戳
+- **顶部 banner 和「规范要素参考」蓝框是固定的**，已写在 site-template.html 主体内，不需替换
 
 ### Step 5 · 覆写 docs/design.html
 
@@ -107,19 +118,22 @@ find jd-design-system-md-v16 -name "design.md" -type f
 # 不 append，每次全量重建
 ```
 
-写完 `git diff docs/design.html` 给用户看，等他 review。
+写完跑 `git diff docs/design.html` 给用户看，等他 review。
 
-## 输出契约
+## 输出契约（v0.2 PDF 范式）
 
 `docs/design.html` 必须包含：
 
-- ✅ 16.0 GUIDELINE banner（顶部全站标题）
-- ✅ 目录（每份 spec 一行）
-- ✅ 每份 spec 一个 section：banner（标题 + 副标题）+ 截图 + 源链接
+- ✅ **顶部唯一 banner**（16.0 GUIDELINE 板式，全站只一次）
+- ✅ **规范要素参考蓝框**（按 PDF 完全照搬 7 条，固定不动）
+- ✅ 每份 spec：**示意黄头 + 7 圆点章节**（定义 / 行为准则 / 类型 / 结构 / 设计属性 / 典型场景 / 错误示例）
 - ✅ 页脚生成时间戳
-- ⚠️ token 表 / 变体卡 / 行为状态 / AI 字段 → **本期留 `<!-- TBD -->`**，预期后续多轮迭代填
 
-详见 `references/site-template.html` 顶部注释。
+**不要**：
+- ❌ 每个 spec 再加 banner —— 顶部已唯一，spec 内只用 `<h3>` 圆点
+- ❌ 加全站 TOC —— PDF 范式没有 TOC，长文章自然流式阅读
+
+详见 `references/site-template.html` 顶部注释和文件末尾的 SPEC_SECTION 模板。
 
 ## 偏好默认值（无需追问）
 
@@ -142,4 +156,5 @@ find jd-design-system-md-v16 -name "design.md" -type f
 ## 参考资源
 
 - `references/header-template.md` —— 16.0 GUIDELINE banner 板式（HTML 块 + 占位符 + 设计参数）
-- `references/site-template.html` —— 完整站点 HTML 骨架 + spec section 模板 + 所有 TBD 占位
+- `references/site-template.html` —— 完整站点 HTML 骨架 + SPEC_SECTION 模板 + 所有 TBD 占位
+- `references/design-html-paradigm.pdf` —— **范式真相源**：design.html 文档范式 PDF（顶部 banner + 规范要素参考蓝框 + 示意黄头 + 7 圆点章节）。改板式结构前先重读这份 PDF。
