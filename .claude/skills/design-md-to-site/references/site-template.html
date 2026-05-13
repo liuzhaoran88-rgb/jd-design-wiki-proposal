@@ -52,9 +52,11 @@
     .wrap { max-width: var(--max-width); margin: 0 auto; }
 
     /* ─── 顶部唯一 banner ────────────────────────────────────── */
+    /* banner 底色用纯白：panda PNG 透明区不再透出灰色，玻璃质感清爽。
+       --color-banner-bg (#F5F6FA) 留给表头等其它用途。 */
     .banner {
       position: relative;
-      background: var(--color-banner-bg);
+      background: #fff;
       display: grid;
       grid-template-columns: 1fr 548px;
       min-height: 240px;
@@ -67,7 +69,7 @@
       grid-column: 2;
       width: 548px;
       height: 240px;
-      mix-blend-mode: multiply;
+      /* 白底 banner 下 multiply 无作用，移除让 PNG 玻璃质感清爽渲染 */
       background-image:
         url('assets/banner-art.png'),
         radial-gradient(circle at 30% 50%, #FFB8C5 0%, #FFE0E6 28%, transparent 62%),
