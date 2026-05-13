@@ -87,7 +87,7 @@ skill_version: v0.5.2
 | [`business.md`](./business.md) | 业务线设计师 / 老板 | 五大家族业务背景 + 22 基线采集 + 家族识别决策树 |
 | [`experience.md`](./experience.md) | 设计师 / 评审委员会 | 8 条核心原则 + 体验判断维度工具箱 + 变体评估协议 |
 | [`visual.md`](./visual.md) | 设计师 | L1 9 条跨家族规约 + L2 家族专属规则的视觉差异点 |
-| [`donts.md`](./donts.md) | Skill 维护者 / 调用方 | 6 条 Skill 不该做的事（含 v0.5.2 血教训）|
+| [`donts.md`](./donts.md) | Skill 维护者 / 调用方 | 7 条 Skill 不该做的事（含 v0.5.2 血教训）|
 | [`ai-schema.md`](./ai-schema.md) | 其他 AI agent | 给 agent 的接入契约 + 输入输出协议 |
 | [`CHANGELOG.md`](./CHANGELOG.md) | 维护者 | v0.1 → v0.5.2 关键演进 + 设计哲学迭代 |
 
