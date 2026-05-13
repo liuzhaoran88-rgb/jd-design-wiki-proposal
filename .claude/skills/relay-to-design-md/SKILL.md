@@ -144,7 +144,35 @@ flow + {bg}                  → jd-design-system-md-v16/product-architecture/{b
 
 ### Step 8: 套模板生成 design.md
 
-读 [templates/component.md](./templates/component.md)，把模板里的 `{{...}}` 占位符替换成 Step 2-5 的实际数据。**严禁**：
+读 [templates/component.md](./templates/component.md)，把模板里的 `{{...}}` 占位符替换成 Step 2-5 的实际数据。
+
+#### 占位符语义 (v0.3.1 明确)
+
+**简单字符串替换**，**不是** jinja2 / handlebars / mustache 等 DSL：
+- `{{field_name}}` → 直接替换为对应字段的字面值（如 `{{slug}}` → `navbar`）
+- **不支持**条件 (`{% if %}`)、循环 (`{% for %}`)、表达式 (`{{ a | b }}`)、嵌套引用
+- 占位符位置如果数据缺失 → 替换为字面 `TODO` 或 ⚠️ 描述，**不要**留 `{{...}}` 在最终文件
+- 需要循环生成的段落（如 `section_colors_table` 多行）—— **由模型自己构造完整段落**作为单个字符串塞进去，不依赖模板 control flow
+
+例：
+```
+模板：name_zh: "{{name_zh}}"
+数据：name_zh = "按钮"
+结果：name_zh: "按钮"
+```
+
+```
+模板：{{section_colors_table}}
+数据：fills = [{用途:按钮底, token:color_primary, hex:#FF0F23}, ...]
+结果（模型自己构造 markdown table）：
+| 用途 | Token | 实际 hex |
+|---|---|---|
+| 按钮底 | `color_primary` | `#FF0F23` |
+| 文字 | `color_primary_text` | `#FFFFFF` |
+```
+
+#### 严禁
+
 - 任何 frontmatter 字段编造（缺数据 → 标 TODO）
 - 任何 token 名编造（没反查到 → 标 ⚠️ token-miss）
 - 任何视觉数据虚构（必须来自 Step 4 实际抽取）
