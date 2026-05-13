@@ -1,0 +1,193 @@
+<!--
+  ═══════════════════════════════════════════════════════════════════════
+  docs/design.html · 16.0 GUIDELINE 对外站点骨架
+  ═══════════════════════════════════════════════════════════════════════
+
+  本文件由 `design-md-to-site` skill 复制 → 替换占位符 → 覆写到
+  `docs/design.html`。**故意留大量 TBD 占位**，预期后续多轮迭代逐项填。
+
+  占位符（skill 渲染时替换）：
+    {{generated_at}}    —— ISO 时间戳
+    {{toc_items}}       —— 目录 <li> 串联，模板见文件末尾
+    {{spec_sections}}   —— 所有 spec section 串联，模板见文件末尾
+
+  禁止做的事（本期）：
+    × 加 token 表样式 —— 留 TBD
+    × 加变体 carousel —— 留 TBD
+    × 加暗色模式 —— 留 TBD
+    × 加搜索 —— 留 TBD
+    × 加响应式 12 断点 —— 只一个 768px 移动断点足够
+    × 一次填满 spec section —— 只保留 banner / 截图 / 源链接，其余 TBD
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>JD APP 16.0 GUIDELINE · 设计系统</title>
+  <meta name="description" content="JD APP 16.0 设计系统对外公开规范。设计与用研部 - AI 核心产品设计部。" />
+  <style>
+    /* ══ 仅 banner + 基础排版样式。其它一律 TBD。══════════════════════ */
+    :root {
+      --color-text: #11141A;
+      --color-banner-bg: rgba(17, 20, 26, 0.02);
+      --color-banner-border: rgba(17, 20, 26, 0.08);
+      --color-divider: rgba(17, 20, 26, 0.08);
+      --font-display: 'Intro', 'Helvetica Neue', Arial, sans-serif;
+      --font-cjk: 'PingFang SC', 'PingFang-SC', 'Microsoft YaHei', sans-serif;
+      --max-width: 1666px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: #fff; color: var(--color-text); font-family: var(--font-cjk); -webkit-font-smoothing: antialiased; }
+    .wrap { max-width: var(--max-width); margin: 0 auto; }
+
+    /* --- banner（站点 + spec 共用类） --- */
+    .banner {
+      position: relative;
+      background: var(--color-banner-bg);
+      border: 1px solid var(--color-banner-border);
+      height: 240px;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-start;
+    }
+    .banner__text { padding: 54px 60px; display: flex; flex-direction: column; gap: 28px; }
+    .banner__tag { font-family: var(--font-display); font-size: 20px; line-height: 20px; letter-spacing: 0.04em; }
+    .banner__title { font-family: var(--font-cjk); font-size: 40px; font-weight: 600; line-height: 40px; margin: 0; }
+    .banner__subtitle { font-family: var(--font-cjk); font-size: 16px; line-height: 16px; margin: 0; }
+    .banner__art {
+      position: absolute; right: 0; top: 0; width: 548px; height: 240px;
+      mix-blend-mode: multiply;
+      /* TBD: 换真装饰图。当前用径向渐变占位。 */
+      background:
+        radial-gradient(circle at 18% 50%, #FF2353 0%, transparent 35%),
+        radial-gradient(circle at 28% 48%, #A38BFF 0%, transparent 30%);
+    }
+
+    /* --- TOC --- */
+    .toc { padding: 60px; border-bottom: 1px solid var(--color-divider); }
+    .toc__title { font-size: 14px; opacity: 0.6; margin: 0 0 24px; letter-spacing: 0.08em; text-transform: uppercase; }
+    .toc__list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px 32px; }
+    .toc__list a { color: var(--color-text); text-decoration: none; font-size: 16px; line-height: 1.6; }
+    .toc__list a:hover { text-decoration: underline; }
+    /* TBD: TOC 分组（按 level/bg 折叠） */
+    /* TBD: TOC 搜索 */
+
+    /* --- spec section --- */
+    .spec { padding: 0 60px 96px; }
+    .spec .banner { margin: 60px 0 40px; }
+    .spec__screenshot {
+      display: block; max-width: 100%; height: auto;
+      margin: 40px 0; border: 1px solid var(--color-divider);
+      background: #f0f0f0;  /* 缺截图时的占位灰底 */
+    }
+    .spec__source { font-size: 13px; opacity: 0.6; border-top: 1px solid var(--color-divider); padding-top: 16px; margin-top: 40px; }
+    .spec__source a { color: inherit; }
+
+    /* TBD: spec status 角标（draft / wip / stable） */
+    /* TBD: spec 概述段排版 */
+    /* TBD: token 表样式 */
+    /* TBD: 变体卡 / carousel */
+    /* TBD: 行为状态展示 */
+    /* TBD: AI schema / Code Connect 渲染 */
+    /* TBD: 相关组件链接 */
+
+    /* --- footer --- */
+    .site-footer { padding: 40px 60px; border-top: 1px solid var(--color-divider); font-size: 13px; opacity: 0.6; }
+
+    /* --- 移动端：仅一个断点，确保不爆版 --- */
+    @media (max-width: 768px) {
+      .banner { height: auto; }
+      .banner__art { display: none; }
+      .banner__text, .toc, .spec, .site-footer { padding: 32px 20px; }
+      .banner__title { font-size: 28px; line-height: 32px; }
+      .toc__list { grid-template-columns: 1fr; }
+    }
+
+    /* TBD: 暗色模式 (prefers-color-scheme: dark) */
+    /* TBD: 打印样式 */
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <!-- ╭─ 全站 banner ────────────────────────────────────────────╮ -->
+    <header class="banner">
+      <div class="banner__text">
+        <span class="banner__tag">JD APP 16.0&nbsp;&nbsp;GUIDELINE</span>
+        <h1 class="banner__title">设计系统</h1>
+        <p class="banner__subtitle">设计与用研部 - AI 核心产品设计部</p>
+      </div>
+      <div class="banner__art" aria-hidden="true"></div>
+    </header>
+
+    <!-- TBD: 站点级面包屑 / 版本切换器 / 语言切换 -->
+
+    <!-- ╭─ 目录 ───────────────────────────────────────────────────╮ -->
+    <nav class="toc" aria-label="规范目录">
+      <h2 class="toc__title">规范目录</h2>
+      <ul class="toc__list">
+        {{toc_items}}
+      </ul>
+    </nav>
+
+    <!-- ╭─ 规范章节 ──────────────────────────────────────────────╮ -->
+    <main>
+      {{spec_sections}}
+    </main>
+
+    <!-- TBD: 主体下方区域 —— 跨组件横向对比 / 设计原则索引 / 案例库 -->
+
+    <!-- ╭─ 页脚 ──────────────────────────────────────────────────╮ -->
+    <footer class="site-footer">
+      生成于 <time datetime="{{generated_at}}">{{generated_at}}</time> ·
+      源：<a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal">jd-design-wiki-proposal</a>
+      <!-- TBD: 4 份战略 HTML（executive-summary / master-diagram / knowledge-tree / contributor-guide）footer 互链 -->
+    </footer>
+
+  </div>
+</body>
+</html>
+
+<!--
+═══════════════════════════════════════════════════════════════════════
+  TEMPLATES（skill 渲染时按下面 3 个模板循环替换占位符）
+═══════════════════════════════════════════════════════════════════════
+
+  ─── TOC_ITEM 模板 ─────────────────────────────────────────────────
+  填到 {{toc_items}}，每份 spec 一行：
+
+  <li><a href="#{{spec_slug}}">{{spec_name_zh}}</a></li>
+
+  ─── SPEC_SECTION 模板 ────────────────────────────────────────────
+  填到 {{spec_sections}}，每份 spec 一段：
+
+  <section class="spec" id="{{spec_slug}}">
+    <header class="banner">
+      <div class="banner__text">
+        <span class="banner__tag">JD APP 16.0&nbsp;&nbsp;GUIDELINE</span>
+        <h2 class="banner__title">{{spec_name_zh}}</h2>
+        <p class="banner__subtitle">{{spec_name_en}}</p>
+      </div>
+    </header>
+
+    <img class="spec__screenshot" src="{{spec_screenshot_relpath}}" alt="{{spec_name_zh}} 截图" />
+
+    <!-- TBD: 概述段（从 design.md 正文抽，本期不做） -->
+    <!-- TBD: token 表（按 color / typography / radius 分组） -->
+    <!-- TBD: 变体展示（uses_components 链 + 内部变体 carousel） -->
+    <!-- TBD: 行为状态（hover / pressed / disabled） -->
+    <!-- TBD: AI schema / Code Connect 引用 -->
+    <!-- TBD: status 角标 + version + last_synced 元信息条 -->
+
+    <div class="spec__source">
+      源：<a href="{{spec_relay_url}}">{{spec_relay_url}}</a> ·
+      <a href="../{{spec_md_relpath}}">完整规范 (design.md)</a>
+    </div>
+  </section>
+
+  ─── LEVEL_GROUP_HEADER 模板 ───────────────────────────────────────
+  TBD：是否按 level 分组（component-base / foundation / ...）。
+  本期不做分组，所有 spec 平铺。等 spec 数量 > 10 再考虑。
+-->

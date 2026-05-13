@@ -1,0 +1,135 @@
+---
+name: design-md-to-site
+description: 把 jd-design-system-md-v16/**/design.md 集合一键聚合成 docs/design.html —— 一份对外公开的 16.0 GUIDELINE 设计系统总站。零输入、全量重建、覆写。仅做骨架，大量 section 留 TBD 占位，预期多轮迭代。Triggered by /design-md-to-site or verbs like "更新设计站", "重建 design.html", "发布最新设计系统", "把新规范挂上站点".
+allowed-tools: [Bash, Read, Write, Edit, Glob]
+---
+
+# /design-md-to-site · design.md 集合 → docs/design.html
+
+把仓库内**所有**已存在的 `design.md`（V16 规范源）聚合成一份 `docs/design.html` 对外站点。
+
+**职能边界**（与姊妹 skill 配套）：
+
+| Skill | 输入 | 输出 | 用户 |
+|---|---|---|---|
+| `relay-to-design-md` | Relay URL | `design.md`（编辑面） | 设计师 maintainer |
+| **`design-md-to-site`（本）** | `design.md` 集合 | `docs/design.html`（发布面） | 公开站访客 |
+
+本 skill **不调 Relay MCP**，**不**修改任何 `design.md` 源 —— 只读 + 渲染 + 覆写发布产物。
+
+## 何时触发
+
+满足任意一项：
+
+- 用户调 `/design-md-to-site`
+- 用户说「更新设计站」/「重建 design.html」/「把新规范挂上站点」/「发布最新设计系统」
+- 任何一份 `design.md` 新增 / 修改后，希望对外站点同步
+
+## 不适用场景
+
+| 场景 | 该走哪里 |
+|---|---|
+| 从 Relay 抽稿生成新 `design.md` | `relay-to-design-md` |
+| 修单份 `design.md` 内容 | 手动 `Edit` |
+| 审单份稿是否合规 | `design-review` |
+| 生成 V15 站点 | 不适用（本 skill 只扫 V16） |
+
+## 输入解析
+
+- **glob**：`jd-design-system-md-v16/**/design.md`（递归全量）
+- **不扫**：`jd-design-system-md/`（V15 已冻结）
+- 每份只读 **frontmatter**（不读正文，正文将来由「点详情」按需加载，本期 TBD）
+
+### 必读 frontmatter 字段
+
+| 字段 | 用途 | 缺失兜底 |
+|---|---|---|
+| `slug` | section id + TOC 锚点 | 从文件路径推断 |
+| `name_zh` | section 标题 + TOC 文案 | `slug` |
+| `name_en` | section 副标题 | 空 |
+| `level` | section 分组（component-base / foundation / ...） | `uncategorized` |
+| `bg` | 业务背景标签 | 空 |
+| `status` | 角标（draft / wip / stable） | `draft` |
+| `relay_source.url` | 源链接 | 空 |
+| `version` | 版本号 | `0.0` |
+| `last_synced` | 抓取时间 | 空 |
+
+> **不强制**正文格式 —— 缺字段就 fallback，不报错退出。
+
+### 配套资源
+
+每份 spec **可选**有一张同目录截图（推测约定：`preview.png` / `design-screenshot.png`）。skill 启动时按以下顺序探测，命中即用，找不到就用占位灰底：
+
+1. 同目录 `preview.png`
+2. 同目录 `design-screenshot.png`
+3. 占位灰底（CSS `background: #f0f0f0`）
+
+## 工作流
+
+### Step 1 · 扫所有 design.md
+
+```bash
+find jd-design-system-md-v16 -name "design.md" -type f
+```
+
+### Step 2 · 解析每份 frontmatter
+
+逐份读首 `---` ~ `---` 段，提取上表字段。frontmatter 解析按 YAML，但**只**取顶层 + `relay_source.url`，深层结构 TBD。
+
+### Step 3 · 渲染 sections
+
+对每份 spec：
+1. 复制 `references/site-template.html` 末尾的 **SPEC_SECTION 模板**
+2. 替换 `{{spec_*}}` 占位符
+3. 大量内部 section（token 表 / 变体 / 行为 / AI 字段）保持 `<!-- TBD -->`，**本期不填**
+
+按 `level` 分组（component-base / foundation / horizontal / ...），每组一个 h2 分隔条。
+
+### Step 4 · 拼接 TOC + sections
+
+- `{{toc_items}}`：每份 spec 一个 `<li><a href="#{slug}">{name_zh}</a></li>`
+- `{{spec_sections}}`：所有 spec sections 串联
+- `{{generated_at}}`：ISO 时间戳
+
+### Step 5 · 覆写 docs/design.html
+
+```bash
+# 不 append，每次全量重建
+```
+
+写完 `git diff docs/design.html` 给用户看，等他 review。
+
+## 输出契约
+
+`docs/design.html` 必须包含：
+
+- ✅ 16.0 GUIDELINE banner（顶部全站标题）
+- ✅ 目录（每份 spec 一行）
+- ✅ 每份 spec 一个 section：banner（标题 + 副标题）+ 截图 + 源链接
+- ✅ 页脚生成时间戳
+- ⚠️ token 表 / 变体卡 / 行为状态 / AI 字段 → **本期留 `<!-- TBD -->`**，预期后续多轮迭代填
+
+详见 `references/site-template.html` 顶部注释。
+
+## 偏好默认值（无需追问）
+
+| 项 | 默认 |
+|---|---|
+| 输入 glob | `jd-design-system-md-v16/**/design.md` |
+| 输出路径 | 仓库根 `docs/design.html` |
+| 截图相对路径 | 从 `docs/design.html` 看，是 `../jd-design-system-md-v16/.../preview.png` |
+| 缺 frontmatter 字段 | 按上表 fallback，不报错 |
+| 缺截图 | 占位灰底 |
+| 全量重建 | 是，每次覆写 |
+| 触发节奏 | 用户手动 `/design-md-to-site`，**不自动**跟 design.md 变更联动 |
+
+## 与其他 skill 的关系
+
+- `relay-to-design-md` 上游：先有 `design.md`，再聚合
+- `design-review` 平行：reviews `design.md`，本 skill 渲染同一份
+- 4 份手写 HTML（executive-summary / master-diagram / knowledge-tree / contributor-guide）：与本 skill 产出的 `design.html` **同级共存**在 `docs/` 下，footer 互链 TBD
+
+## 参考资源
+
+- `references/header-template.md` —— 16.0 GUIDELINE banner 板式（HTML 块 + 占位符 + 设计参数）
+- `references/site-template.html` —— 完整站点 HTML 骨架 + spec section 模板 + 所有 TBD 占位
