@@ -14,6 +14,7 @@
 
 | Slug | Path | Relay node | Owner | Last Synced |
 |---|---|---|---|---|
+| button | [jd-design-system-md-v16/horizontal/components-base/button/design.md](../../../jd-design-system-md-v16/horizontal/components-base/button/design.md) | `2029484645871009793 / 33:5 / 608:1031` | @xushui2018 | 2026-05-13 |
 | navbar-search-day | [.claude/skills/relay-to-design-md/examples/navbar-search-day/design.md](../../../.claude/skills/relay-to-design-md/examples/navbar-search-day/design.md) | `2029484645871009793 / 47:1 / 542:6495` | @xushuai133 | 2026-05-13 |
 
 ---
@@ -38,11 +39,11 @@ _（空 — v0.4+ 启用）_
 
 ## 统计
 
-- L1 通用组件：1 个
+- L1 通用组件：2 个
 - L2 业务组件：0 个
 - L3 页面：0 个
 - L4 流程：0 个
-- **总计**：1 个
+- **总计**：2 个
 
 ---
 
