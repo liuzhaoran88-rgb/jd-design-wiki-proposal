@@ -30,7 +30,10 @@
     /* ══ 仅 banner + 基础排版样式。其它一律 TBD。══════════════════════ */
     :root {
       --color-text: #11141A;
-      --color-banner-bg: rgba(17, 20, 26, 0.02);
+      /* banner 底色：用 V16 token color_background_component (= gray.6 = #F5F6FA)
+         替代 Relay 输出的 rgba(17,20,26,0.02) —— 后者 ≈ #FAFAFA 几乎纯白。
+         #F5F6FA 是 16.0 语义 token，灰底可见，气质一致。 */
+      --color-banner-bg: #F5F6FA;
       --color-banner-border: rgba(17, 20, 26, 0.08);
       --color-divider: rgba(17, 20, 26, 0.08);
       --font-display: 'Intro', 'Helvetica Neue', Arial, sans-serif;
