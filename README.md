@@ -8,7 +8,7 @@
 
 ## ⭐ 给老板的 30 秒汇报
 
-→ **[`jd-design-wiki-executive-summary.html`](./jd-design-wiki-executive-summary.html)** — Executive Summary，老板看 30 秒能 get 全貌
+→ **[`docs/jd-design-wiki-executive-summary.html`](./docs/jd-design-wiki-executive-summary.html)** — Executive Summary，老板看 30 秒能 get 全貌
 
 5 段式：**WHY**（4 个结构性问题）→ **WHAT**（3 个核心改造）→ **SO WHAT**（3 阶段量化结果）→ **NEXT**（进度+需要支持）→ **CTA**（核心金句）
 
@@ -18,10 +18,10 @@
 
 | 文件 | 用途 | 谁看 |
 |---|---|---|
-| **[`jd-design-wiki-executive-summary.html`](./jd-design-wiki-executive-summary.html)** | **30 秒汇报版**（WHY/WHAT/SO WHAT/NEXT/CTA 五段式） | **老板 / 决策层** |
-| **[`jd-design-wiki-master-diagram.html`](./jd-design-wiki-master-diagram.html)** | **架构大图 · 演讲用**（5 个 Zone 可点击切换 + 29 个 md 模板） | 评审 / 跨部门同事 |
-| **[`jd-design-wiki-knowledge-tree.html`](./jd-design-wiki-knowledge-tree.html)** | **知识树 · 顶层导航**（5 大 Zone + 二级目录 + 角色 owner） | 全员 |
-| **[`jd-design-wiki-contributor-guide.html`](./jd-design-wiki-contributor-guide.html)** | **贡献指南 · 执行手册**（5 步流程 + 维度边界 + multi-md 文件结构） | 业务线设计师 |
+| **[`docs/jd-design-wiki-executive-summary.html`](./docs/jd-design-wiki-executive-summary.html)** | **30 秒汇报版**（WHY/WHAT/SO WHAT/NEXT/CTA 五段式） | **老板 / 决策层** |
+| **[`docs/jd-design-wiki-master-diagram.html`](./docs/jd-design-wiki-master-diagram.html)** | **架构大图 · 演讲用**（5 个 Zone 可点击切换 + 29 个 md 模板） | 评审 / 跨部门同事 |
+| **[`docs/jd-design-wiki-knowledge-tree.html`](./docs/jd-design-wiki-knowledge-tree.html)** | **知识树 · 顶层导航**（5 大 Zone + 二级目录 + 角色 owner） | 全员 |
+| **[`docs/jd-design-wiki-contributor-guide.html`](./docs/jd-design-wiki-contributor-guide.html)** | **贡献指南 · 执行手册**（5 步流程 + 维度边界 + multi-md 文件结构） | 业务线设计师 |
 
 **配套战略文档**：[`jd-design-os-proposal.md`](./jd-design-os-proposal.md) — 4500 字完整方案 + 6 个附录（外部标杆调研 + 实施路径）
 
@@ -62,20 +62,20 @@
 ## 推荐阅读顺序
 
 ### 给老板汇报（30 秒 → 2 分钟弹性）★
-→ 打开 `jd-design-wiki-executive-summary.html`
+→ 打开 `docs/jd-design-wiki-executive-summary.html`
 → 30 秒版：只读 Hero + Final CTA 金句
 → 2 分钟版：+ WHY 4 痛点 + WHAT 3 改造 + 3 阶段时间线
-→ 老板深问 → 跳转 `master-diagram.html` 看具体架构
+→ 老板深问 → 跳转 `docs/jd-design-wiki-master-diagram.html` 看具体架构
 
 ### 给评审 / 跨部门同事（10 分钟）
-→ 打开 `jd-design-wiki-master-diagram.html`
+→ 打开 `docs/jd-design-wiki-master-diagram.html`
 → 按 **F11 全屏**讲第一屏架构图
 → **点 5 个 Zone 卡切换**看每个 Zone 的 multi-md 结构和模板
 
 ### 业务线设计师上手（10 分钟）
-→ 先看 `jd-design-wiki-knowledge-tree.html` 找到"我归到哪个 Zone"
-→ 再看 `jd-design-wiki-contributor-guide.html` 知道"怎么写"
-→ 点击文件名跳转到 `master-diagram.html` 的 Templates 章节看具体模板
+→ 先看 `docs/jd-design-wiki-knowledge-tree.html` 找到"我归到哪个 Zone"
+→ 再看 `docs/jd-design-wiki-contributor-guide.html` 知道"怎么写"
+→ 点击文件名跳转到 `docs/jd-design-wiki-master-diagram.html` 的 Templates 章节看具体模板
 
 ### 深度方案研读（30 分钟）
 → `jd-design-os-proposal.md` 完整战略方案
