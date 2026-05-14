@@ -188,6 +188,7 @@ bundle 模式下追加读取 `spec.md` / `variants.md` / `behaviors.md`，按 [r
 | [references/style-tokens.md](./references/style-tokens.md) | CSS variable ↔ V16 tokens.json 映射 |
 | [references/stage-images-export.md](./references/stage-images-export.md) | 切图导出流程（v0.2 加）— chunked b64 / sharedPluginData 中转 / jq 解 dump |
 | [references/view-toggle.md](./references/view-toggle.md) | Pro / Basic 视图切换标记规则（v0.3 加）— 元素级 / inline / 7 章节标记策略 |
+| [references/deploy-notes.md](./references/deploy-notes.md) | GitHub Pages 部署的 2 个坑（v0.3.1 实战记录）— .nojekyll / CDN cache-bust ?v=N / 私有仓选项 / 部署后 checklist |
 
 ## 版本历史
 
@@ -213,4 +214,10 @@ bundle 模式下追加读取 `spec.md` / `variants.md` / `behaviors.md`，按 [r
   - **⑥ 模板沉淀**:CSS / HTML title-row / JS 全部进 [templates/spec-page.html](./templates/spec-page.html)
   - **⑦ References 加 view-toggle.md**:7 章节标记策略 + Class 决策表 + 失败模式
   - 实战:tabbar 现状 basic 占 pro 81%(藏 6000 chars / 112 行)
-- v0.4 (planned) 加批量模式(一次跑多组件)+ 增量 diff(保留人写演示 mockup)+ TOC 自动嵌套(含 h3 子标题)+ 切图节点自动选择(避免每次手枚举)
+- **v0.3.1** (2026-05-14) GitHub Pages 部署实战(无代码改动,纯文档):
+  - **① 实战 deploy tabbar/spec-page.html** 到 https://shuaimxu.github.io/jd-design-wiki-proposal/...
+  - **② 撞 `.nojekyll` 坑**:Jekyll 默认滤掉 `_` 开头目录 → `_assets/*.png` 全 404。修法仓库根加 `.nojekyll` 空文件
+  - **③ 撞 CDN cache 坑**:GitHub Pages Fastly CDN 默认 10 分钟 cache,旧 404 被缓存。修法 HTML 内 `<img>` 加 `?v=N` query string 强制 cache-bust
+  - **④ 私有仓限制**:GitHub Pages 不支持私有仓(除 Pro)。整理 5 个备选(临时 Public / Cloudflare Pages / R2 / Surge / GitHub Pro)
+  - **⑤ 新增 [references/deploy-notes.md](./references/deploy-notes.md)** 完整记录 + 部署后 6 项 checklist
+- v0.4 (planned) 加批量模式(一次跑多组件)+ 增量 diff(避免每次全量重导切图)+ HTML 自动给 `<img>` 加 `?v={today_iso}` cache-bust + TOC 自动嵌套(含 h3 子标题)+ 切图节点自动选择(避免每次手枚举)
