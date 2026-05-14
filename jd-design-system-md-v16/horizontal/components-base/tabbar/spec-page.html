@@ -361,6 +361,13 @@
   关联 Foundation:<code>color</code> / <code>typography</code> / <code>radius</code> / <code>spacing</code> / <code>materials</code>
 </div>
 
+<!-- ========== 视图切换 (v0.3): 常规 vs 专业 ========== -->
+<div class="view-tabs" role="tablist" aria-label="视图切换">
+  <button class="view-tab is-active" role="tab" data-view="basic" aria-selected="true">常规版</button>
+  <button class="view-tab" role="tab" data-view="pro" aria-selected="false">专业版</button>
+  <span class="view-hint">切到「专业版」展开 token 名 / DP 数 / API 速查 / 章节细节</span>
+</div>
+
 <div class="toc">
   <h3>目录</h3>
   <ol>
@@ -408,6 +415,57 @@
   .m-slot { flex: 1; text-align: center; line-height: 1.2; }
   .m-slot--sel { color: var(--c-brand); font-weight: 600; }
   .m-slot--bad { color: var(--c-danger); }
+
+  /* ========== v0.3: 视图切换 (Pro / Basic) ========== */
+  .view-tabs {
+    display: flex; align-items: center; gap: 8px;
+    margin: 0 0 24px;
+    padding: 8px;
+    background: var(--c-bg-sunken);
+    border-radius: var(--r-base);
+  }
+  .view-tab {
+    background: transparent;
+    border: none;
+    padding: 8px 18px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--c-text-2);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 150ms;
+  }
+  .view-tab:hover { color: var(--c-text); }
+  .view-tab.is-active {
+    background: var(--c-bg);
+    color: var(--c-text);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    font-weight: 600;
+  }
+  .view-hint { color: var(--c-text-3); font-size: 12px; margin-left: auto; }
+  /* basic 模式隐藏 .pro-only,显示 .basic-only / 不带 class 的元素 */
+  body.mode-basic .pro-only { display: none !important; }
+  body.mode-pro .basic-only { display: none !important; }
+  /* 默认两版都不显示直到 JS 加 mode-* class,避免闪烁 */
+  body:not(.mode-basic):not(.mode-pro) .pro-only,
+  body:not(.mode-basic):not(.mode-pro) .basic-only {
+    display: none;
+  }
+  /* basic-only 段落用 info 蓝引用块包,容易认出 */
+  .basic-only.summary {
+    margin: 16px 0;
+    padding: 12px 20px;
+    background: var(--c-info-bg);
+    border-left: 3px solid var(--c-info);
+    border-radius: 0 var(--r-base) var(--r-base) 0;
+    color: var(--c-text-2);
+    font-size: 14px;
+  }
+  .basic-only.summary strong { color: var(--c-text); }
+  /* pro 模式下,table 行内 token / atom code 等小标记继承字号 */
+  body.mode-pro .pro-inline { display: inline; }
+  .pro-inline { color: var(--c-text-3); font-size: 12px; margin-left: 6px; }
 </style>
 
 <!-- ==========================================
@@ -516,6 +574,12 @@
 
 <p>Tabbar 由<strong>容器 + N 个坑位(可选 Joy Agent + 可选灵动岛)</strong>组成,其中<strong>容器和至少 2 个坑位为必要元素</strong>。</p>
 
+<div class="basic-only summary">
+  <p><strong>基础结构(常规版概述)</strong>:容器位于屏幕底部 → N 个坑位均分占满 → 每个坑位 = 图标 + 文本(默认/选中/营销三态)→ 招手位(红点 / 数字 / 文字)→ 可选灵动岛(占消息位)→ 可选 Joy Agent(左侧固定)→ 文字 + 多端材质适配。具体 token 名 / DP 数值 / 字号 字重 见 <strong>专业版</strong>。</p>
+</div>
+
+<div class="pro-only">
+
 <h3>4.1 容器</h3>
 
 <table>
@@ -578,6 +642,8 @@
 </tbody>
 </table>
 
+</div><!-- /pro-only 4.1-4.4 -->
+
 <h3>4.5 状态 + 招手实体预览</h3>
 
 <div class="stage stage--image">
@@ -607,9 +673,9 @@
 <p><strong>不允许 center / top 位</strong>:Tabbar 是全局常驻导航,只能在屏幕底部。center / top 区域留给 Toast、NavBar、Banner 等其它组件。</p>
 </blockquote>
 
-<h3>5.2 内部布局示意</h3>
+<h3 class="pro-only">5.2 内部布局示意</h3>
 
-<pre><code>常规底导:                              Joy Agent 组合底导:
+<pre class="pro-only"><code>常规底导:                              Joy Agent 组合底导:
 ┌─────────────────────────────┐        ┌───┐  ┌──────────────────────┐
 │ [icon][icon][icon][icon][i] │  52    │ A │ 8│[icon][icon][icon][i] │ 52
 │  首页  分类  车   消息  我  │        │ g │  │ 首页 分类  车   我    │
@@ -751,9 +817,9 @@
 
 <hr>
 
-<h3>API 速查</h3>
+<h3 class="pro-only">API 速查</h3>
 
-<pre><code>// 全局 API(规范草案,基于 design.md AI Schema)
+<pre class="pro-only"><code>// 全局 API(规范草案,基于 design.md AI Schema)
 JDTabbar.config({
   form: 'regular' | 'agent_combo',         // 默认 regular
   slots: [                                  // 2 ~ 5 个
@@ -801,6 +867,38 @@ JDTabbar.dismissIsland();</code></pre>
 </div>
 
 </div>
+
+<!-- v0.3: 视图切换 JS (轻量,无依赖) -->
+<script>
+(function () {
+  var STORAGE_KEY = 'spec-page-view-mode';
+  var body = document.body;
+  var tabs = document.querySelectorAll('.view-tab');
+
+  function setMode(mode) {
+    body.classList.remove('mode-basic', 'mode-pro');
+    body.classList.add('mode-' + mode);
+    tabs.forEach(function (t) {
+      var on = t.dataset.view === mode;
+      t.classList.toggle('is-active', on);
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    try { localStorage.setItem(STORAGE_KEY, mode); } catch (e) {}
+  }
+
+  // 默认 basic;若 localStorage 有偏好则用偏好
+  var initial = 'basic';
+  try {
+    var saved = localStorage.getItem(STORAGE_KEY);
+    if (saved === 'pro' || saved === 'basic') initial = saved;
+  } catch (e) {}
+  setMode(initial);
+
+  tabs.forEach(function (t) {
+    t.addEventListener('click', function () { setMode(t.dataset.view); });
+  });
+})();
+</script>
 
 </body>
 </html>
