@@ -376,147 +376,45 @@
 
 
 <!-- ==========================================
-     tabbar 专属 mockup CSS（design-md-to-spec-page v0.1 自动加）
+     spec-page v0.2: 切图为主，反例 mockup 极简
+     切图来源: tabbar/_assets/ (skill 自动 export 自 Relay 节点)
      ========================================== -->
 <style>
-  .tabbar-mock {
-    display: inline-flex;
-    align-items: stretch;
-    background: var(--c-bg);
+  /* image-only stage：响应式适配 max-width，保持比例 */
+  .stage img {
+    display: block;
+    max-width: 100%;
+    height: auto;
     border-radius: var(--r-base);
-    box-shadow: 0 -2px 6px rgba(0,0,0,0.04);
-    border: 1px solid var(--c-line);
-    overflow: hidden;
-    font-family: "PingFang SC", system-ui, sans-serif;
-    user-select: none;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
   }
-  .tabbar-mock--regular { width: 351px; }
-  .tabbar-mock--agent { width: 387px; gap: 8px; padding-left: 0; background: transparent; box-shadow: none; border: none; }
-  .tabbar-mock__agent {
-    width: 52px; height: 52px;
-    background: linear-gradient(135deg, #ff0f23, #b80024);
-    border-radius: 50%;
-    box-shadow: 0 4px 12px rgba(255,15,35,0.3);
-    display: flex; align-items: center; justify-content: center;
-    color: #fff; font-size: 11px; font-weight: 600;
-    margin-top: 0;
-    flex-shrink: 0;
+  .stage--image { padding: 24px; min-height: auto; }
+  .stage--mini-mock {
+    padding: 24px;
+    background: var(--c-bg-sunken);
+    min-height: 100px;
+    border: 1px dashed var(--c-line);
   }
-  .tabbar-mock__rail {
-    flex: 1;
-    display: flex;
+  /* 极简 mockup tokens（仅反例用，正例全切图） */
+  .m-bar {
+    width: 280px; height: 56px;
     background: var(--c-bg);
+    border: 1px solid var(--c-line);
     border-radius: var(--r-base);
-    border: 1px solid var(--c-line);
-    height: 69px;
-    padding-bottom: 17px;
+    display: flex; align-items: center; justify-content: space-around;
+    font-size: 11px; color: var(--c-text-3);
+    padding: 0 8px;
   }
-  .tabbar-mock__slots {
-    display: flex;
-    flex: 1;
-    align-items: center;
-  }
-  .tabbar-mock__slot {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    color: var(--c-text-3);
-    font-size: 10px;
-    line-height: 1.2;
-    padding: 4px 0;
-    height: 52px;
-  }
-  .tabbar-mock__slot--selected { color: var(--c-brand); font-weight: 600; }
-  .tabbar-mock__icon {
-    width: 20px; height: 20px;
-    border-radius: 4px;
-    background: var(--c-text-3);
-    opacity: 0.85;
-    position: relative;
-  }
-  .tabbar-mock__slot--selected .tabbar-mock__icon { background: var(--c-brand); opacity: 1; }
-  .tabbar-mock__dot {
-    position: absolute;
-    top: -2px; left: 14px;
-    width: 8px; height: 8px;
-    background: var(--c-brand);
-    border-radius: 50%;
-    border: 1.5px solid var(--c-bg);
-  }
-  .tabbar-mock__num {
-    position: absolute;
-    top: -8px; left: 11px;
-    min-width: 14px; height: 14px;
-    padding: 0 3px;
-    background: var(--c-brand);
-    color: #fff;
-    border-radius: 7px;
-    font-size: 10px; line-height: 14px;
-    text-align: center;
-    border: 1.5px solid var(--c-bg);
-  }
-  /* 灵动岛 */
-  .island {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--c-bg-sunken);
-    border-radius: var(--r-xl);
-    padding: 6px 10px;
-    color: var(--c-text);
-    font-size: 13px;
-    line-height: 1.2;
-  }
-  .island__img {
-    width: 32px; height: 32px;
-    background: var(--c-bg);
-    border-radius: 6px;
-    border: 1px solid var(--c-line);
-    flex-shrink: 0;
-  }
-  .island--operation { background: linear-gradient(135deg, #fff8e5, #fff3cc); }
-  .island--promo {
-    background: linear-gradient(135deg, #fff0f4, #ffd6e0);
-    padding: 8px 12px;
-    border-radius: 16px;
-  }
-  .island--promo .island__img { width: 34px; height: 34px; background: linear-gradient(135deg, #ff5a78, #ff0f23); border: none; }
-  /* 招手位 */
-  .badge-pill {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-weight: 500;
-    background: var(--c-bg-sunken);
-    color: var(--c-text-2);
-    margin-left: 6px;
-  }
-  /* 配色应用对比块 */
-  .swatch {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 10px;
-    border-radius: 6px;
-    background: var(--c-bg-sunken);
-    font-size: 13px;
-    color: var(--c-text-2);
-  }
-  .swatch__chip {
-    width: 16px; height: 16px;
-    border-radius: 3px;
-    border: 1px solid var(--c-line);
-  }
+  .m-slot { flex: 1; text-align: center; line-height: 1.2; }
+  .m-slot--sel { color: var(--c-brand); font-weight: 600; }
+  .m-slot--bad { color: var(--c-danger); }
 </style>
 
 <!-- ==========================================
-     7 章节 — 由 design-md-to-spec-page v0.1 自动渲染
+     7 章节 — 切图为主版本（v0.2）
      来源: jd-design-system-md-v16/horizontal/components-base/tabbar/
            (design.md + spec.md + variants.md + behaviors.md bundle)
+           + _assets/*.png (Relay 节点 export)
      ========================================== -->
 
 <h2 id="sec-1"><span class="num">1</span>定义</h2>
@@ -539,6 +437,11 @@
 <blockquote>
 <p><strong>V16 立场</strong>:Tabbar 是 APP 唯一全局导航,不允许在底部并行存在其它常驻导航条;不允许超过 5 个一级 Tab(章节 01 建议上限);不允许定制坑位高度或图标尺寸偏离 44×44 / 20×20 规范。</p>
 </blockquote>
+
+<div class="stage stage--image">
+  <img src="./_assets/sec-1-principles.png" alt="Relay 章节 01 设计原则原稿">
+</div>
+<div class="stage-label">📖 Relay 章节 01 设计原则原稿(节点 312:46895,1426×304)</div>
 
 <h2 id="sec-2"><span class="num">2</span>行为准则</h2>
 
@@ -578,40 +481,32 @@
 </tbody>
 </table>
 
-<h3>3.3 静态预览(各形态)</h3>
+<h3>3.3 各形态原稿展示</h3>
 
-<div class="stage" style="flex-direction: column; gap: 24px;">
-  <div>
-    <div class="tabbar-mock tabbar-mock--regular">
-      <div class="tabbar-mock__rail" style="border:none; box-shadow:none;">
-        <div class="tabbar-mock__slots">
-          <div class="tabbar-mock__slot tabbar-mock__slot--selected"><div class="tabbar-mock__icon"></div>首页</div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>分类</div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"><div class="tabbar-mock__dot"></div></div>购物车</div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"><div class="tabbar-mock__num">99+</div></div>消息</div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>我的</div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="tabbar-mock tabbar-mock--agent" style="background:transparent;border:none;box-shadow:none;">
-    <div class="tabbar-mock__agent">Joy<br>Agent</div>
-    <div class="tabbar-mock__rail">
-      <div class="tabbar-mock__slots">
-        <div class="tabbar-mock__slot tabbar-mock__slot--selected"><div class="tabbar-mock__icon"></div>首页</div>
-        <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>分类</div>
-        <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>购物车</div>
-        <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>我的</div>
-      </div>
-    </div>
-  </div>
-  <div style="display:flex;gap:16px;align-items:center;justify-content:center;flex-wrap:wrap;">
-    <div class="island"><div class="island__img"></div>常规型 131×44</div>
-    <div class="island island--operation"><div class="island__img"></div>运营型 131×44</div>
-    <div class="island island--promo"><div class="island__img"></div>大促型 144×52</div>
-  </div>
+<div class="stage stage--image">
+  <img src="./_assets/sec-2-regular-layout.png" alt="常规底导布局原稿">
 </div>
-<div class="stage-label">上:常规 5 坑位 + 红点 + 数字角标 · 中:Joy Agent 组合 4 坑位 · 下:三型灵动岛</div>
+<div class="stage-label">📖 常规底导布局(总高 69 / 导航 52 / 安全区 17 DP, 2-5 坑位 + 灵动岛)— 节点 312:46904, 1426×1476</div>
+
+<div class="stage stage--image">
+  <img src="./_assets/sec-2-agent-layout.png" alt="Agent + 底导布局原稿">
+</div>
+<div class="stage-label">📖 Agent + 底导布局(Joy Agent 52×52 + 右侧 319 DP)— 节点 312:47132, 1426×1460</div>
+
+<div class="stage stage--image">
+  <img src="./_assets/sec-3-island-regular.png" alt="常规灵动岛">
+</div>
+<div class="stage-label">📖 常规灵动岛(131×44, gray_6 纯色,商品图 32 DP)— 节点 312:47480, 1426×1856</div>
+
+<div class="stage stage--image">
+  <img src="./_assets/sec-3-island-operation.png" alt="运营灵动岛">
+</div>
+<div class="stage-label">📖 运营灵动岛(131×44, 渐变描边 100% + 85% 灰阶叠加,推荐同频色)— 节点 312:47617, 1426×1419</div>
+
+<div class="stage stage--image">
+  <img src="./_assets/sec-3-island-promo.png" alt="大促灵动岛">
+</div>
+<div class="stage-label">📖 大促灵动岛(144×52, 渐变描边 0~60% + 异型背板,运营图 34 DP)— 节点 312:47747, 1426×2154</div>
 
 <blockquote class="danger">
 <p><strong>不允许</strong>新增 Tabbar 形态。运营 / 大促诉求由灵动岛(占用消息位)承载,不允许新增第 5+ 坑位或将 Tabbar 整条改色。</p>
@@ -683,6 +578,20 @@
 </tbody>
 </table>
 
+<h3>4.5 状态 + 招手实体预览</h3>
+
+<div class="stage stage--image">
+  <img src="./_assets/sec-2-states-badges.png" alt="交互状态 + 4 型招手原稿">
+</div>
+<div class="stage-label">📖 默认 / 选中 / 营销 三态 + 红点 / 数字 / 文字 / 灵动岛展开 4 型招手 — 节点 312:47337, 1426×1942</div>
+
+<h3>4.6 Joy Agent 实体预览</h3>
+
+<div class="stage stage--image">
+  <img src="./_assets/sec-2-joy-agent.png" alt="Joy Agent 形态原稿">
+</div>
+<div class="stage-label">📖 Joy Agent 基础布局 + 招手气泡 + 灵动岛态 — 节点 312:47431, 1426×902</div>
+
 <h2 id="sec-5"><span class="num">5</span>布局</h2>
 
 <h3>5.1 位置</h3>
@@ -715,35 +624,12 @@
 灵动岛在消息位嵌入,131×44 (日常/运营) 或 144×52 (大促)
 距底部安全区 4 DP</code></pre>
 
-<h3>5.3 浅深底应用</h3>
+<h3>5.3 多端材质适配</h3>
 
-<div class="stage" style="flex-direction:column;gap:16px;">
-  <div class="tabbar-mock tabbar-mock--regular">
-    <div class="tabbar-mock__rail" style="border:none;box-shadow:none;">
-      <div class="tabbar-mock__slots">
-        <div class="tabbar-mock__slot tabbar-mock__slot--selected"><div class="tabbar-mock__icon"></div>首页</div>
-        <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>分类</div>
-        <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>购物车</div>
-        <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>我的</div>
-      </div>
-    </div>
-  </div>
+<div class="stage stage--image">
+  <img src="./_assets/sec-5-multi-platform.png" alt="多端材质适配原稿">
 </div>
-<div class="stage-label">浅底页(默认)— iOS 26+ 液态玻璃 / 老系统毛玻璃 fallback</div>
-
-<div class="stage dark" style="flex-direction:column;gap:16px;">
-  <div class="tabbar-mock tabbar-mock--regular" style="background:rgba(20,20,28,0.85);backdrop-filter:blur(20px);">
-    <div class="tabbar-mock__rail" style="border:none;background:transparent;">
-      <div class="tabbar-mock__slots">
-        <div class="tabbar-mock__slot tabbar-mock__slot--selected" style="color:#fff;"><div class="tabbar-mock__icon" style="background:#fff;"></div>首页</div>
-        <div class="tabbar-mock__slot" style="color:rgba(255,255,255,0.6);"><div class="tabbar-mock__icon" style="background:rgba(255,255,255,0.6);"></div>分类</div>
-        <div class="tabbar-mock__slot" style="color:rgba(255,255,255,0.6);"><div class="tabbar-mock__icon" style="background:rgba(255,255,255,0.6);"></div>购物车</div>
-        <div class="tabbar-mock__slot" style="color:rgba(255,255,255,0.6);"><div class="tabbar-mock__icon" style="background:rgba(255,255,255,0.6);"></div>我的</div>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="stage-label">深底页(沉浸式 / 视频 / 图片详情)— 同 token 取浅深态</div>
+<div class="stage-label">📖 iOS 26+ 液态玻璃 vs iOS 26 以下 + Android 毛玻璃 fallback — 节点 312:52986, 1426×1374</div>
 
 <h3>5.4 动效</h3>
 
@@ -759,85 +645,45 @@
 
 <div class="case good">
   <h4><span class="badge">✓ 正例 A</span> 标准 5 坑位常规底导</h4>
-  <div class="stage">
-    <div class="tabbar-mock tabbar-mock--regular">
-      <div class="tabbar-mock__rail" style="border:none;box-shadow:none;">
-        <div class="tabbar-mock__slots">
-          <div class="tabbar-mock__slot tabbar-mock__slot--selected"><div class="tabbar-mock__icon"></div>首页</div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>分类</div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>购物车</div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>消息</div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>我的</div>
-        </div>
-      </div>
-    </div>
+  <div class="stage stage--image">
+    <img src="./_assets/sec-2-regular-layout.png" alt="常规 5 坑位">
   </div>
   <ul>
     <li>形态 <code>regular</code>,5 坑位均分,坑位文本 ≤ 4 汉字</li>
     <li>选中态 <code>jdred</code>,默认态 <code>gray_1</code>,符合所有规则</li>
+    <li>📖 见上方 sec-3 常规底导布局原稿展示具体细节</li>
   </ul>
 </div>
 
 <div class="case good">
-  <h4><span class="badge">✓ 正例 B</span> Agent 组合 4 坑位 · 含红点招手</h4>
-  <div class="stage">
-    <div class="tabbar-mock tabbar-mock--agent" style="background:transparent;border:none;box-shadow:none;">
-      <div class="tabbar-mock__agent">Joy<br>Agent</div>
-      <div class="tabbar-mock__rail">
-        <div class="tabbar-mock__slots">
-          <div class="tabbar-mock__slot tabbar-mock__slot--selected"><div class="tabbar-mock__icon"></div>首页</div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>分类</div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"><div class="tabbar-mock__dot"></div></div>购物车</div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>我的</div>
-        </div>
-      </div>
-    </div>
+  <h4><span class="badge">✓ 正例 B</span> Agent 组合 4 坑位</h4>
+  <div class="stage stage--image">
+    <img src="./_assets/sec-2-agent-layout.png" alt="Agent + 底导布局">
   </div>
   <ul>
-    <li>形态 <code>agent_combo</code>,Joy Agent 52×52,右侧 4 坑位 319 DP</li>
-    <li>红点位偏移距图标左 19 / 底 14 DP,符合招手规范</li>
+    <li>形态 <code>agent_combo</code>,Joy Agent 52×52,右侧 319 DP</li>
+    <li>距 Agent 间距 8 DP,Agent 距底部 17 DP</li>
+    <li>📖 完整 Joy Agent 行为见 4.6 实体预览</li>
   </ul>
 </div>
 
 <div class="case good">
-  <h4><span class="badge">✓ 正例 C</span> 灵动岛大促展开态</h4>
-  <div class="stage">
-    <div class="tabbar-mock tabbar-mock--regular" style="position:relative;height:84px;align-items:flex-start;padding-top:8px;">
-      <div class="tabbar-mock__rail" style="border:none;box-shadow:none;align-items:flex-end;">
-        <div class="tabbar-mock__slots" style="position:relative;">
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>首页</div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>分类</div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>购物车</div>
-          <div style="flex:1;display:flex;justify-content:center;align-items:flex-end;height:52px;">
-            <div class="island island--promo" style="position:relative;top:-8px;font-size:11px;">
-              <div class="island__img"></div>大促必抢
-            </div>
-          </div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>我的</div>
-        </div>
-      </div>
-    </div>
+  <h4><span class="badge">✓ 正例 C</span> 大促灵动岛展开态</h4>
+  <div class="stage stage--image">
+    <img src="./_assets/sec-3-island-promo.png" alt="大促灵动岛">
   </div>
   <ul>
     <li>大促型灵动岛 144×52,占用消息坑位</li>
+    <li>异型背板 + 渐变描边 0~60% + 85% 灰阶叠加</li>
     <li>展开期间该坑位选中态背景消失;同形态如有 Joy Agent,Agent 抽缩 16 → 28 DP</li>
   </ul>
 </div>
 
 <div class="case bad">
   <h4><span class="badge">✗ 反例 D</span> 6 坑位超出建议上限</h4>
-  <div class="stage">
-    <div class="tabbar-mock tabbar-mock--regular" style="width:420px;">
-      <div class="tabbar-mock__rail" style="border:none;box-shadow:none;">
-        <div class="tabbar-mock__slots">
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>首页</div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>分类</div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>购物车</div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>消息</div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>动态</div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>我的</div>
-        </div>
-      </div>
+  <div class="stage stage--mini-mock">
+    <div class="m-bar" style="width:340px;">
+      <div class="m-slot m-slot--sel">首页</div><div class="m-slot">分类</div><div class="m-slot">车</div><div class="m-slot">消息</div><div class="m-slot m-slot--bad">动态</div><div class="m-slot">我</div>
     </div>
   </div>
   <p><strong>问题</strong>:章节 01 设计原则建议 2 ~ 5 坑位,超出会导致坑位宽 / 文本可读性下降,且决策成本上升。应在内容层重新组织(如将"动态"并入"消息")。</p>
@@ -845,17 +691,9 @@
 
 <div class="case bad">
   <h4><span class="badge">✗ 反例 E</span> 坑位文本超 4 汉字</h4>
-  <div class="stage">
-    <div class="tabbar-mock tabbar-mock--regular">
-      <div class="tabbar-mock__rail" style="border:none;box-shadow:none;">
-        <div class="tabbar-mock__slots">
-          <div class="tabbar-mock__slot tabbar-mock__slot--selected"><div class="tabbar-mock__icon"></div>首页推荐</div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>商品分类</div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>购物车</div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>消息中心</div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>个人中心</div>
-        </div>
-      </div>
+  <div class="stage stage--mini-mock">
+    <div class="m-bar">
+      <div class="m-slot m-slot--sel m-slot--bad">首页推荐</div><div class="m-slot m-slot--bad">商品分类</div><div class="m-slot">购物车</div><div class="m-slot m-slot--bad">消息中心</div><div class="m-slot m-slot--bad">个人中心</div>
     </div>
   </div>
   <p><strong>问题</strong>:章节 02 默认态规定底导标签最多 4 汉字。"首页推荐"5 字应改为"推荐","个人中心"应改为"我的"。多字会导致文本框 44×14 DP 截断或缩字。</p>
@@ -863,49 +701,22 @@
 
 <div class="case bad">
   <h4><span class="badge">✗ 反例 F</span> 营销态修改图片以外样式</h4>
-  <div class="stage">
-    <div class="tabbar-mock tabbar-mock--regular">
-      <div class="tabbar-mock__rail" style="border:none;box-shadow:none;">
-        <div class="tabbar-mock__slots">
-          <div class="tabbar-mock__slot tabbar-mock__slot--selected"><div class="tabbar-mock__icon"></div>首页</div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>分类</div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon" style="background:linear-gradient(135deg,#ffd700,#ff8c00);width:38px;height:38px;border:2px solid #ff0f23;border-radius:50%;animation:pulse 1s infinite;"></div><span style="color:#ff8c00;">超值</span></div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>消息</div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>我的</div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <p><strong>问题</strong>:章节 02 营销态明确"仅可替换图片,不可做其它样式更改"。本例修改了文本颜色、加了边框和动画,违反规范。应保留 38×38 图片本身的视觉表达,不改文本/背景/边框。</p>
+  <p><strong>问题</strong>:章节 02 营销态明确"<strong>仅可替换图片,不可做其它样式更改</strong>"。常见错误包括:① 给营销态加自定义边框/动画;② 改文本颜色为非品牌色;③ 调整图片尺寸偏离 38×38 DP。这些都违反规范。应保留 38×38 图片本身的视觉表达,不改文本/背景/边框。</p>
 </div>
 
 <div class="case bad">
-  <h4><span class="badge">✗ 反例 G</span> 灵动岛红区出现元素</h4>
-  <div class="stage">
-    <div class="island" style="position:relative;background:linear-gradient(135deg,#fff0f4,#ffd6e0);">
-      <div class="island__img"></div>必抢
-      <div style="position:absolute;top:-6px;right:-6px;background:#ff0f23;color:#fff;font-size:10px;padding:1px 5px;border-radius:8px;">NEW</div>
-    </div>
-  </div>
-  <p><strong>问题</strong>:章节 03 三型布局规定"红色区域禁止出现任何元素"。"NEW" 角标越界占据红色保护区,违反规范。应将 NEW 标识合并到主文本中,或改用 gif 素材内嵌。</p>
+  <h4><span class="badge">✗ 反例 G</span> 灵动岛红色禁区出现元素</h4>
+  <p><strong>问题</strong>:章节 03 三型布局规定"<strong>红色区域禁止出现任何元素</strong>"。常见错误包括:① 在灵动岛右上角加 NEW 角标;② 在灵动岛左侧加额外图标。应将所有附加标识合并到主文本中,或改用 gif 素材内嵌(运营/大促型灵动岛文本走 gif 渲染)。</p>
 </div>
 
 <div class="case bad">
-  <h4><span class="badge">✗ 反例 H</span> Tabbar 中部留空 / 一级 Tab 不齐</h4>
-  <div class="stage">
-    <div class="tabbar-mock tabbar-mock--regular">
-      <div class="tabbar-mock__rail" style="border:none;box-shadow:none;">
-        <div class="tabbar-mock__slots">
-          <div class="tabbar-mock__slot tabbar-mock__slot--selected"><div class="tabbar-mock__icon"></div>首页</div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>分类</div>
-          <div style="flex:1;"></div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>消息</div>
-          <div class="tabbar-mock__slot"><div class="tabbar-mock__icon"></div>我的</div>
-        </div>
-      </div>
+  <h4><span class="badge">✗ 反例 H</span> 中部留空 / 一级 Tab 不齐</h4>
+  <div class="stage stage--mini-mock">
+    <div class="m-bar">
+      <div class="m-slot m-slot--sel">首页</div><div class="m-slot">分类</div><div class="m-slot" style="opacity:0.2;">—</div><div class="m-slot">消息</div><div class="m-slot">我</div>
     </div>
   </div>
-  <p><strong>问题</strong>:坑位均分布局是 V16 强约束,中部留空破坏均分(章节 02 各坑位均分)。如要嵌入灵动岛,应使用灵动岛占用消息位规则,不要直接留白。</p>
+  <p><strong>问题</strong>:坑位均分布局是 V16 强约束(章节 02 各坑位均分)。中部留空破坏均分。如要嵌入灵动岛,应使用灵动岛占用消息位规则(见 sec-3),不要直接留白。</p>
 </div>
 
 <h2 id="sec-7"><span class="num">7</span>典型场景</h2>
@@ -976,6 +787,7 @@ JDTabbar.dismissIsland();</code></pre>
 <ul>
   <li>Relay 节点 — <a href="https://relay.jd.com/file/design?id=2029484645871009793&page_id=31:1&node_id=312:46893">JD APP V16.0 GUIDELINE · 导航类-底部导航栏设计规范</a></li>
   <li>Bundle 源 — <a href="./design.md">design.md</a> · <a href="./spec.md">spec.md</a> · <a href="./variants.md">variants.md</a> · <a href="./behaviors.md">behaviors.md</a></li>
+  <li>原稿切图 — <code>./_assets/sec-{1-5}-*.png</code>(9 张,2.0 MB,SCALE 1:1 from Relay)</li>
   <li><code>foundations/tokens/color.md</code> — <code>color_primary</code> / <code>gray_1</code> / <code>gray_6</code> / <code>jdred</code> / <code>white</code></li>
   <li><code>foundations/tokens/typography.md</code> — <code>pingfang_regular/font_size_10_400</code> / <code>pingfang_semibold/font_size_10_600</code> / <code>pingfang_semibold/font_size_14_600</code> / <code>pingfang_medium/font_size_10_500</code></li>
   <li><code>foundations/tokens/radius.md</code> — <code>radius_xxl</code>(底导容器,16px) / <code>radius_xl</code>(灵动岛容器,12px)</li>
@@ -985,7 +797,7 @@ JDTabbar.dismissIsland();</code></pre>
 </ul>
 
 <div style="margin-top:60px; padding-top:20px; border-top:1px solid var(--c-line); color:var(--c-text-3); font-size:12px; text-align:center;">
-  JD APP V16.0 Design System · 底部导航栏(Tabbar) 规范 · 生成于 2026-05-14 · 样式 = Relay 节点 312:46893 · skill design-md-to-spec-page v0.1
+  JD APP V16.0 Design System · 底部导航栏(Tabbar) 规范 · 生成于 2026-05-14 · 样式 = Relay 节点 312:46893 · skill design-md-to-spec-page v0.2(切图增强)
 </div>
 
 </div>

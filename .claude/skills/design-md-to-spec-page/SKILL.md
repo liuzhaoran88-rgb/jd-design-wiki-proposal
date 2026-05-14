@@ -96,14 +96,30 @@ bundle 模式下追加读取 `spec.md` / `variants.md` / `behaviors.md`，按 [r
 
 ### Step 5: 演示 stage 处理
 
-`jd-toast-spec(1).html` 含 JS Toast engine + 按钮触发演示。**这是 Toast 特化**：
+3 种 stage 形态（按优先级）:
 
-- 简单状态组件（Toast / Tag / Badge / Tooltip） → 可保留 JS engine（参考 jd-toast-spec 内嵌 `<script>` 段，模板留 `{{embedded_demo_script}}` 占位）
-- **大型结构组件**（Tabbar / NavBar / Sheet / Modal） → 演示 stage 改为**静态 mockup**（多个 `.stage` 并排展示不同变体），无需 JS。模板占位 `{{stage_blocks}}` 由模型按组件性质构造静态 / 交互
+| 形态 | 何时用 | 备注 |
+|---|---|---|
+| **切图 stage**（v0.2 推荐） | 组件来自 Relay,节点 ID 已知,展示标准形态 | 走 [references/stage-images-export.md](./references/stage-images-export.md) |
+| 静态 mockup | 反例（违反规范的形态）或 Relay 上没有的形态 | 简化 div + class,不要复杂还原 |
+| JS engine | feedback 类组件需要交互演示（如 toast 按钮触发） | 参考 jd-toast-spec 内嵌 script,模板留 `{{embedded_demo_script_or_empty}}` |
 
-判断启发：
-- frontmatter 含 `interaction_role: feedback` 或 slug 是 toast/tag/badge → 走 JS 演示
-- 其它 → 走静态 mockup
+判断启发:
+- 单组件（例如 button） → 切图 1 张 + variants 各 1 张
+- page-doc bundle（例如 tabbar） → 章节 02-05 各章节子段 1 张,加 章节 01 整章 1 张
+- 仅 feedback 组件（toast / loading / spinner） → 切图 + JS engine
+- 反例 → 简化 div+class CSS mockup,不强求像
+
+### Step 5b: 切图导出（v0.2 新）
+
+走 [references/stage-images-export.md](./references/stage-images-export.md) 4 步流程:
+
+1. **chunked b64 export 到 sharedPluginData**（use_design_script）:必须 chunkedB64 helper 避免栈溢出;namespace 固定 `jd-spec-page-assets`;一次脚本可批 export 7-12 张
+2. **批量 readback 触发 dump**（use_design_script）:MCP 自动把 result 落到磁盘文件,不污染 LLM context
+3. **jq + base64 -d 写 PNG**（Bash）:`jq -r '.[0].text | fromjson | to_entries[] | "\(.key)\n\(.value)"' "$SRC" | while ...`
+4. **清理 sharedPluginData**（use_design_script,可选）:避免 Relay 文件膨胀
+
+切图统一存 `<bundle-dir>/_assets/`,命名 `sec-{N}-{slug}.png`（如 `sec-3-island-promo.png`)。模板 `<style>` 已有 `.stage--image` class 自动适配宽度。
 
 ### Step 6: token CSS 变量
 
@@ -154,6 +170,7 @@ bundle 模式下追加读取 `spec.md` / `variants.md` / `behaviors.md`，按 [r
 | [templates/spec-page.html](./templates/spec-page.html) | 7 章节单页 HTML 模板（基于 jd-toast-spec(1).html v0.1） |
 | [references/section-mapping.md](./references/section-mapping.md) | 7 章节 ↔ design.md / bundle 字段映射表 |
 | [references/style-tokens.md](./references/style-tokens.md) | CSS variable ↔ V16 tokens.json 映射 |
+| [references/stage-images-export.md](./references/stage-images-export.md) | 切图导出流程（v0.2 加）— chunked b64 / sharedPluginData 中转 / jq 解 dump |
 
 ## 版本历史
 
@@ -163,4 +180,11 @@ bundle 模式下追加读取 `spec.md` / `variants.md` / `behaviors.md`，按 [r
   - 支持 single design.md + page-doc bundle 两种输入
   - 演示 stage 静态 mockup（feedback 组件可走 JS engine fallback）
   - 输出固定 `<bundle-dir>/spec-page.html`
-- v0.2 (planned) 加批量模式（一次跑多组件）+ 增量 diff（保留人写演示 mockup）+ TOC 自动生成嵌套（含 h3 子标题）
+- **v0.2** (2026-05-14) 切图能力(实战兑现):
+  - **① chunked b64 export 流程**:helper 60KB 块包装,绕过 `relay.base64Encode` 栈递归爆栈;实测对 1426×2154 的灵动岛节点(247KB raw)成功
+  - **② sharedPluginData 中转**:b64 字符串通过 Relay 节点 sharedPluginData 持久化,namespace `jd-spec-page-assets`,单 value 实测 800k+ chars 无问题
+  - **③ Dump-file readback 模式**:批量 readback 故意触发 MCP result-too-large,落地到磁盘 dump 文件,然后 `jq -r '.[0].text | fromjson | to_entries[] | "\(.key)\n\(.value)"'` 一次性提取所有 b64,bash 解码写 PNG。**整个流程不污染 LLM context**
+  - **④ Stage block 模板支持**:`<style>` 加 `.stage--image` 自动适配宽度,`<img>` 替代 CSS+div mockup
+  - **⑤ 实战:tabbar 9 张切图入页**:章节 01-05 各章节子段 export 到 `_assets/`,spec-page.html 12 处 `<img>` 替代原 mockup,文件从 994 → 806 行(精简 188 行 mockup CSS+div)
+  - **⑥ References 加 stage-images-export.md**:完整 4 步流程文档
+- v0.3 (planned) 加批量模式(一次跑多组件)+ 增量 diff(保留人写演示 mockup)+ TOC 自动嵌套(含 h3 子标题)+ 切图节点自动选择(避免每次手枚举)
