@@ -6,17 +6,17 @@
 >
 > 见 [references/traceability.md](./references/traceability.md) 了解维护机制。
 >
-> 上次 sync: 2026-05-13
+> 上次 sync: 2026-05-14
 
 ---
 
 ## L1 通用组件 (horizontal · component-base)
 
-| Slug | Path | Relay node | Owner | Last Synced |
-|---|---|---|---|---|
-| button | [jd-design-system-md-v16/horizontal/components-base/button/design.md](../../../jd-design-system-md-v16/horizontal/components-base/button/design.md) | `2029484645871009793 / 33:5 / 608:1031` | @xushui2018 | 2026-05-13 |
-| navbar-search-day | [.claude/skills/relay-to-design-md/examples/navbar-search-day/design.md](../../../.claude/skills/relay-to-design-md/examples/navbar-search-day/design.md) | `2029484645871009793 / 47:1 / 542:6495` | @xushuai133 | 2026-05-13 |
-| tabbar | [jd-design-system-md-v16/horizontal/components-base/tabbar/design.md](../../../jd-design-system-md-v16/horizontal/components-base/tabbar/design.md) | `2029484645871009793 / 31:1 / 312:46893` | @xushui2018 | 2026-05-13 |
+| Slug | Path | Bundle | Relay node | Owner | Last Synced |
+|---|---|---|---|---|---|
+| button | [jd-design-system-md-v16/horizontal/components-base/button/design.md](../../../jd-design-system-md-v16/horizontal/components-base/button/design.md) | single | `2029484645871009793 / 33:5 / 608:1031` | @xushui2018 | 2026-05-13 |
+| navbar-search-day | [.claude/skills/relay-to-design-md/examples/navbar-search-day/design.md](../../../.claude/skills/relay-to-design-md/examples/navbar-search-day/design.md) | single | `2029484645871009793 / 47:1 / 542:6495` | @xushuai133 | 2026-05-13 |
+| tabbar | [jd-design-system-md-v16/horizontal/components-base/tabbar/design.md](../../../jd-design-system-md-v16/horizontal/components-base/tabbar/design.md) | **page-doc** (4 files) | `2029484645871009793 / 31:1 / 312:46893` | @xushui2018 | 2026-05-14 |
 
 ---
 

@@ -29,16 +29,18 @@ allowed-tools: [mcp__zero-design__get_design_metadata, mcp__zero-design__get_des
 
 只接受 1 个参数（URL）。**不要**问设计师额外问题 —— 全部字段自动推断。
 
-## v0.1 范围（被 v0.4 扩展）
+## v0.1 范围（被 v0.4 / v0.5 扩展）
 
 - ✅ L1 通用组件（component-base）
-- ⏳ L2/L3/L4（component-business / page / flow）→ v0.5+
-- ✅ 单一 design.md（不拆 multi-md bundle）→ multi-md bundle 留 v0.5+
-- ✅ **page-doc 大节点**（高 > 5000px 或 ≥3 个章节 FRAME）→ **v0.4 加单 md 内章节切分**，不拆 bundle
+- ⏳ L2/L3/L4（component-business / page / flow）→ v0.6+
+- ✅ 单一 design.md（普通组件） + **multi-md bundle**（page-doc，v0.5）
+- ✅ **page-doc 大节点**（高 > 5000px 或 ≥3 个章节 FRAME）→ **v0.4 单 md 内章节切分** → **v0.5 拆 4 文件 bundle（design / spec / variants / behaviors）**
 
 如果检测到 level ≠ component-base，**仍然写文件**，但 frontmatter `auto_detected.level` 标 ⚠️，并在终端输出"非 L1 节点，结果可能不准，请 review"。
 
-**page-doc 模式**（v0.4 新加）：抽取脚本自动判定，输出多带 `chapters[]` 元数据 + 每条 text/instance/layout 的 `chapter` 归属。模板渲染时在 `## 变体` 后追加 `## 设计规范细节(按章节)` 段，逐章节展示图示 / 尺寸 / 禁止规则 / 关键 notes。
+**page-doc 模式**：
+- v0.4：抽取脚本自动判定（`pageDocMode`），输出 `chapters[]` 元数据 + 每条 text/instance/layout 的 `chapter` 归属。模板渲染时在 `## 变体` 后追加 `## 设计规范细节(按章节)` 段
+- **v0.5**：直接走 [templates/page-doc/](./templates/page-doc/) 4 模板 bundle，把 page-doc 内容拆成 design.md (index) + spec.md + variants.md + behaviors.md。design.md frontmatter 加 `bundle: page-doc` 标识 + `bundle_files: [...]` 清单
 
 ---
 
@@ -143,13 +145,73 @@ page + {bg}                  → jd-design-system-md-v16/product-architecture/{b
 flow + {bg}                  → jd-design-system-md-v16/product-architecture/{bg}/flows/{slug}/design.md
 ```
 
+#### v0.5 page-doc bundle 路径
+
+如果 `pageDocMode === true`，**输出目录**与上面相同（`{slug}/`），但写 **4 个文件**：
+
+```
+{slug}/
+├── design.md       # index（含 bundle: page-doc 标识 + bundle_files 清单）
+├── spec.md         # 视觉规范
+├── variants.md     # 变体维度
+└── behaviors.md    # 交互 / Donts / AI Schema
+```
+
+如果 `{slug}/design.md` 已存在 + 是 v0.1 单 md（`bundle:` 字段缺失）→ 全部 4 个文件都加 `.NEW` 后缀写入，让设计师手动迁移。终端输出："⚠️ {slug}/design.md 是 v0.1 单 md 形态，page-doc bundle 写入 design.md.NEW / spec.md.NEW / variants.md.NEW / behaviors.md.NEW，请手动迁移。"
+
 如果路径已存在 `design.md`，**不要覆盖**：改名为 `design.md.NEW`，让设计师手动 diff。终端输出："⚠️ {path}/design.md 已存在，新版本写入 design.md.NEW，请 diff 后合并。"
 
 ### Step 8: 套模板生成 design.md
 
+#### v0.5 模板分流（首先决定走哪套模板）
+
+| 条件 | 模板 | 输出 |
+|---|---|---|
+| `rootInfo.pageDocMode === false` | [templates/component.md](./templates/component.md)（v0.1 单 md） | `{slug}/design.md` 一个文件 |
+| `rootInfo.pageDocMode === true` | [templates/page-doc/](./templates/page-doc/) bundle 4 模板 | `{slug}/{design,spec,variants,behaviors}.md` 4 个文件 |
+
+##### page-doc bundle 渲染规则
+
+读 4 个模板各自渲染：
+
+1. **[templates/page-doc/design.md](./templates/page-doc/design.md)** → `{slug}/design.md` (index)
+   - frontmatter 含 `bundle: page-doc` 标识 + `bundle_files: [...]` 4 文件清单
+   - 主体只放 Relay 章节大纲表 + 一句话定义 + 关联段
+   - 占位符 `{{section_chapter_outline_table}}` = 5 章节 markdown table（# / 标题 / 节点 ID / 高度 / 内容要点）
+   - 占位符 `{{chapter_count}}` = `chapters[].length`
+
+2. **[templates/page-doc/spec.md](./templates/page-doc/spec.md)** → `{slug}/spec.md`
+   - frontmatter 含 `file: spec` + `bundle_part_of: design.md` 反向指针 + 完整 `uses_tokens` 段
+   - 主体含 colors / typography / radius / spacing / materials 全表 + 章节 01-02 原文引用块
+   - 占位符 `{{section_chapter_01_02_full_text_or_empty}}` = 章节 01 设计原则全文 + 章节 02 组件设计属性核心规范文字（按 v0.4 抽取的 chapters[].notes 渲染）
+
+3. **[templates/page-doc/variants.md](./templates/page-doc/variants.md)** → `{slug}/variants.md`
+   - frontmatter 含 `file: variants` + `bundle_part_of`
+   - 主体含变体维度概览 + 各维度详细规范 + 章节 02 状态/招手 + 章节 03 灵动岛三型原文
+   - 占位符 `{{section_variant_dimensions_overview}}` = 形态 / 状态 / 坑位 / 子组件 等维度的 bullet list
+   - 占位符 `{{section_variant_details_per_dimension}}` = 每个维度展开（继承 v0.4 章节细分段的渲染逻辑）
+
+4. **[templates/page-doc/behaviors.md](./templates/page-doc/behaviors.md)** → `{slug}/behaviors.md`
+   - frontmatter 含 `file: behaviors` + `bundle_part_of`
+   - 主体含应用场景 ✅/❌ + 交互 + Donts + AI Schema + 多端适配 + 章节 04-05 原文
+   - 占位符 `{{section_donts_auto_or_todo}}` = v0.4 自动收的 dont_rule 聚合（每条标来源章节）
+   - 占位符 `{{section_ai_schema}}` = AI Schema YAML
+
+> **bundle 之间的反向引用**
+>
+> design.md (index) 在主体表格列出 4 文件链接;spec.md / variants.md / behaviors.md 顶部有 `> design.md → [index](./design.md) · 同 bundle: ...` 导航条;3 个子文件 frontmatter 都有 `bundle_part_of: design.md` 标识。
+
+> **如果只是 `pageDocMode === false`（普通组件）**
+>
+> 走 v0.1 单 md 模板（`templates/component.md`），与 v0.4 兼容路径一致。下面的"v0.4 章节细分渲染"仅在 `pageDocMode === true` 但**未走 bundle 模式**时才生效（极少情况，比如设计师强制 `--single` flag，v0.5 暂未开启）。
+
+---
+
+#### 旧路径：v0.1 单 md 模板（`pageDocMode === false`）
+
 读 [templates/component.md](./templates/component.md)，把模板里的 `{{...}}` 占位符替换成 Step 2-5 的实际数据。
 
-> **v0.4：page-doc 模式渲染**
+> **v0.4：page-doc 模式渲染**（已被 v0.5 bundle 路径取代，但保留兼容）
 >
 > 如果 `rootInfo.pageDocMode === true`，渲染 `{{section_chapter_details_or_empty}}` 为完整的 "## 设计规范细节（按章节）" 段。对每个 chapter（来自返回的 `chapters[]`）：
 >
@@ -305,7 +367,11 @@ return { keys: node.getSharedPluginDataKeys('jd-design-wiki') }
 
 | 文件 | 作用 |
 |---|---|
-| [templates/component.md](./templates/component.md) | 唯一模板 (v0.1) |
+| [templates/component.md](./templates/component.md) | 单 md 模板 (v0.1) — 普通组件 |
+| [templates/page-doc/design.md](./templates/page-doc/design.md) | page-doc bundle index 模板 (v0.5) |
+| [templates/page-doc/spec.md](./templates/page-doc/spec.md) | page-doc bundle 视觉规范模板 (v0.5) |
+| [templates/page-doc/variants.md](./templates/page-doc/variants.md) | page-doc bundle 变体模板 (v0.5) |
+| [templates/page-doc/behaviors.md](./templates/page-doc/behaviors.md) | page-doc bundle 行为模板 (v0.5) |
 | [references/auto-detect-rules.md](./references/auto-detect-rules.md) | 推断 level / bg / slug / name_zh 的规则表（v0.2 加 slug 变体后缀） |
 | [references/node-type-mapping.md](./references/node-type-mapping.md) | Relay 节点属性 → design.md section 对照 + 统一抽取脚本 |
 | [references/token-reverse-lookup.md](./references/token-reverse-lookup.md) | hex / fontSize+weight / radius / spacing 反查 V16 token 算法（v0.2 加 rgba 容差） |
@@ -356,4 +422,10 @@ return { keys: node.getSharedPluginDataKeys('jd-design-wiki') }
   - **⑥ Radius token 改 T-shirt size**：tabbar design.md `Radius_6/8/12/16` (atom) → `radius_base/l/xl/xxl` (token)，与 V16 tokens.json `radius.*` 命名对齐
   - **⑦ frontmatter spacing list 类型规整**：`- TODO: xxx` (map) → `- "TODO: xxx"` (string)
   - **⑧ frontmatter 长行注释拆出独立块**：auto_detected.level 行内 100 字符注释 → 上方独立 # 块
-- v0.5 (planned) 加 page.md / flow.md 模板 + batch 模式 + 多 md bundle 拆分 (visual.md / interaction.md / donts.md) + Diff 模式（只更新机器抽取段，保留人写段）
+- **v0.5** (2026-05-14) page-doc multi-md bundle —— 兑现 issue #18:
+  - **① 新建 [templates/page-doc/](./templates/page-doc/) 4 模板**：design.md (index) / spec.md / variants.md / behaviors.md
+  - **② Step 7 路径决策加 page-doc 分支**：同目录写 4 个文件，已存在 v0.1 单 md 时全 4 文件加 `.NEW` 后缀
+  - **③ Step 8 模板分流**：`pageDocMode === true` 走 bundle 4 模板，否则走 v0.1 单 md。v0.4 单 md 内章节细分段保留作 fallback
+  - **④ bundle 反向引用**：design.md frontmatter 加 `bundle: page-doc` + `bundle_files: [...]`；spec/variants/behaviors 三个子文件 frontmatter 加 `bundle_part_of: design.md` + 顶部导航条
+  - **⑤ 回填重跑 tabbar**：540 行单 design.md 拆成 4 文件 bundle（PR 同时提交）
+- v0.6 (planned) 加 page.md / flow.md 模板 + batch 模式 + Diff 模式（只更新机器抽取段，保留人写段）
