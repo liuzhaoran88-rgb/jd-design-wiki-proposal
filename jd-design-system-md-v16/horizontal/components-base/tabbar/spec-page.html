@@ -354,18 +354,18 @@
 <body>
 <div class="doc">
 
-<h1>底部导航栏 · Tabbar 组件规范</h1>
+<div class="title-row">
+  <h1>底部导航栏 · Tabbar 组件规范</h1>
+  <!-- ========== 视图切换 (v0.3): 常规 vs 专业 ========== -->
+  <div class="view-tabs" role="tablist" aria-label="视图切换">
+    <button class="view-tab is-active" role="tab" data-view="basic" aria-selected="true">常规版</button>
+    <button class="view-tab" role="tab" data-view="pro" aria-selected="false">专业版</button>
+  </div>
+</div>
 <div class="meta">
   适用范围:JD APP V16.0 全场景(横向 BG · 通用组件 component-base)<br>
   样式来源:Relay V16.0 GUIDELINE 节点 <code>312:46893</code> · Token 版本:<code>tokens.json V16 / page-doc bundle v0.3</code><br>
   关联 Foundation:<code>color</code> / <code>typography</code> / <code>radius</code> / <code>spacing</code> / <code>materials</code>
-</div>
-
-<!-- ========== 视图切换 (v0.3): 常规 vs 专业 ========== -->
-<div class="view-tabs" role="tablist" aria-label="视图切换">
-  <button class="view-tab is-active" role="tab" data-view="basic" aria-selected="true">常规版</button>
-  <button class="view-tab" role="tab" data-view="pro" aria-selected="false">专业版</button>
-  <span class="view-hint">切到「专业版」展开 token 名 / DP 数 / API 速查 / 章节细节</span>
 </div>
 
 <div class="toc">
@@ -416,25 +416,39 @@
   .m-slot--sel { color: var(--c-brand); font-weight: 600; }
   .m-slot--bad { color: var(--c-danger); }
 
-  /* ========== v0.3: 视图切换 (Pro / Basic) ========== */
+  /* ========== v0.3: 视图切换 (Pro / Basic) — 标题旁紧凑 segmented ========== */
+  .title-row {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    gap: 24px; flex-wrap: wrap;
+    border-bottom: 2px solid var(--c-text);
+    padding-bottom: 16px;
+    margin-bottom: 8px;
+  }
+  .title-row h1 {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin: 0;
+    flex: 1 1 auto;
+  }
   .view-tabs {
-    display: flex; align-items: center; gap: 8px;
-    margin: 0 0 24px;
-    padding: 8px;
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px;
     background: var(--c-bg-sunken);
     border-radius: var(--r-base);
+    flex-shrink: 0;
   }
   .view-tab {
     background: transparent;
     border: none;
-    padding: 8px 18px;
+    padding: 6px 14px;
     font-family: inherit;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 500;
     color: var(--c-text-2);
     cursor: pointer;
     border-radius: 4px;
     transition: all 150ms;
+    line-height: 1.4;
   }
   .view-tab:hover { color: var(--c-text); }
   .view-tab.is-active {
@@ -443,7 +457,8 @@
     box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     font-weight: 600;
   }
-  .view-hint { color: var(--c-text-3); font-size: 12px; margin-left: auto; }
+  /* h1 已带下划线,这里取消;title-row 自己接管下划线 */
+  h1 { border-bottom: none !important; padding-bottom: 0 !important; }
   /* basic 模式隐藏 .pro-only,显示 .basic-only / 不带 class 的元素 */
   body.mode-basic .pro-only { display: none !important; }
   body.mode-pro .basic-only { display: none !important; }
@@ -504,19 +519,36 @@
 <h2 id="sec-2"><span class="num">2</span>行为准则</h2>
 
 <ol>
-  <li><strong>建议 2 ~ 5 坑位</strong>,超过 5 个时应在内容层重新组织(章节 01 设计原则)</li>
-  <li><strong>iOS 安全区 17 DP 不可放置任何操作</strong>(章节 02 基础布局 a)</li>
-  <li><strong>坑位文本最多 4 个汉字</strong>(章节 02 默认态),超出截断或换设计</li>
-  <li><strong>Joy Agent 招手气泡最多 18 个汉字</strong>(章节 01 b / 02 交互状态 b)</li>
-  <li><strong>同时仅 1 个灵动岛</strong>,展开期间对应坑位选中态背景消失,Joy Agent(若有)抽缩从 16 → 28 DP</li>
-  <li><strong>灵动岛红色区域禁止任何元素</strong>(章节 03 三型布局通用 dont)</li>
-  <li><strong>营销态仅可替换 38×38 DP 图片</strong>,其它样式不可改(章节 02 交互状态 c)</li>
-  <li><strong>底导材质按 OS 版本差异化</strong>:iOS 26+ 液态玻璃 / iOS 26 以下 + Android 毛玻璃 fallback(章节 05)</li>
+  <li><strong>建议 2 ~ 5 坑位</strong>,超过 5 个时应在内容层重新组织<span class="pro-only pro-inline">(章节 01 设计原则)</span></li>
+  <li><strong>iOS 安全区不可放置任何操作</strong><span class="pro-only pro-inline"> — 17 DP(章节 02 基础布局 a)</span></li>
+  <li><strong>坑位文本最多 4 个汉字</strong>,超出截断或换设计<span class="pro-only pro-inline">(章节 02 默认态)</span></li>
+  <li><strong>Joy Agent 招手气泡最多 18 个汉字</strong><span class="pro-only pro-inline">(章节 01 b / 02 交互状态 b)</span></li>
+  <li><strong>同时仅 1 个灵动岛</strong>,展开期间对应坑位选中态背景消失<span class="pro-only pro-inline">,Joy Agent(若有)抽缩从 16 → 28 DP</span></li>
+  <li><strong>灵动岛红色区域禁止任何元素</strong><span class="pro-only pro-inline">(章节 03 三型布局通用 dont)</span></li>
+  <li><strong>营销态仅可替换图片,其它样式不可改</strong><span class="pro-only pro-inline"> — 图 38×38 DP(章节 02 交互状态 c)</span></li>
+  <li><strong>底导材质按 OS 版本差异化</strong><span class="basic-only">(液态玻璃 vs 毛玻璃)</span><span class="pro-only pro-inline">:iOS 26+ 液态玻璃 / iOS 26 以下 + Android 毛玻璃 fallback(章节 05)</span></li>
 </ol>
 
 <h2 id="sec-3"><span class="num">3</span>类型</h2>
 
 <p>V16 共定义 <strong>2 种形态</strong>(常规 / Joy Agent 组合) + <strong>3 种灵动岛运营资源位</strong>(常规型 / 运营型 / 大促型)。</p>
+
+<div class="basic-only summary">
+  <p><strong>形态(常规版速览)</strong>:</p>
+  <ul style="margin-top:4px;">
+    <li><strong>常规底导</strong> — 普通业务页面全局导航</li>
+    <li><strong>Joy Agent 组合底导</strong> — 左侧 AI 入口 + 右侧导航,适用首页/会场</li>
+  </ul>
+  <p style="margin-top:8px;"><strong>灵动岛(占消息位)</strong>:</p>
+  <ul style="margin-top:4px;">
+    <li><strong>常规型</strong> — 日常商品推荐</li>
+    <li><strong>运营型</strong> — 运营会场推广(同频色)</li>
+    <li><strong>大促型</strong> — 重点大促(异型背板)</li>
+  </ul>
+  <p style="margin-top:8px;color:var(--c-text-3);">具体尺寸 / 标识 / 字号 / 材质规则,见 <strong>专业版</strong>。形态原稿可在下方 3.3 看。</p>
+</div>
+
+<div class="pro-only">
 
 <h3>3.1 形态维度</h3>
 
@@ -538,6 +570,8 @@
 <tr><td>大促型</td><td><code>promotion</code></td><td>144×52 DP</td><td>34 DP</td><td>gif 文本 + 京东正黑强调</td><td>渐变描边 0~60% + 异型背板</td><td>同频色 / 浅色背景 + 深色字</td><td>重点大促活动</td></tr>
 </tbody>
 </table>
+
+</div><!-- /pro-only 3.1-3.2 -->
 
 <h3>3.3 各形态原稿展示</h3>
 
