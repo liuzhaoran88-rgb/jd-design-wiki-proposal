@@ -98,10 +98,52 @@ knowledge-tree.html (顶层导航)
 
 ---
 
+## 组件 spec page 维护流程
+
+落地产物示例:[tabbar/spec-page.html](./jd-design-system-md-v16/horizontal/components-base/tabbar/spec-page.html) — 单组件 7 章节规范页,含 Pro / Basic 视图切换、原稿切图、应用场景、Donts、AI Schema。在线版(repo 公开时)走 GitHub Pages。
+
+### Relay 改稿后的同步链路
+
+当 Relay 设计稿更新,要让对外的 spec-page.html 同步:
+
+```
+1. Relay 改稿
+   ↓ local Claude session 跑:/relay-to-design-md <relay-url>
+2. design.md / spec.md / variants.md / behaviors.md bundle 自动同步
+   ↓ local Claude session 跑:/design-md-to-spec-page <slug>
+3. _assets/*.png 切图重导(3~5 min)+ spec-page.html 重渲染
+   ↓ git add -A && git commit -m "update <slug> spec" && git push
+4. GitHub Pages 自动重 build (~30s),URL 立即更新
+```
+
+### 涉及的 3 个 skill
+
+| Skill | 输入 | 输出 |
+|---|---|---|
+| [`relay-to-design-md`](./.claude/skills/relay-to-design-md/) | Relay URL | design.md / page-doc bundle(编辑面) |
+| [`design-md-to-site`](./.claude/skills/design-md-to-site/) | 所有 design.md | `docs/design.html` 总站(聚合发布面) |
+| [`design-md-to-spec-page`](./.claude/skills/design-md-to-spec-page/) | 单 design.md / bundle | `<slug>/spec-page.html` 单组件页(单页发布面) |
+
+### 已知效率痛点(待优化)
+
+当前每次跑 `/design-md-to-spec-page` 都会全量重导 9 张切图(走 use_design_script + chunkedB64 + sharedPluginData 中转 + jq 解 dump file),即使你只是改了一段 design.md 文字。skill v0.4 计划加增量逻辑:
+
+- 默认对比 `_assets/*.png` mtime vs design.md mtime,后者新才重导
+- `--refresh-assets` 强制全量
+- `--dry-run` 只看会变什么不动文件
+
+详见 [issue 列表](https://github.com/ShuaiMXu/jd-design-wiki-proposal/issues)。
+
+### CI 自动化?
+
+GitHub Actions 触发 skill 重跑这条路**走不通** —— skill 依赖 `use_design_script` MCP 调 Relay,GHA runner 没 Relay 浏览器 plugin。**必须 local Claude session 跑**,push 后 Pages 自动重 build 是免操作的最后一步。
+
+---
+
 ## 状态
 
 **v0.4 · 内部已授权推进**
-**牵引**：综合业务设计组 · Shaka
+**牵引**:综合业务设计组 · Shaka
 
 **P1 阶段** (1 个月内):
 - Week 1-2: 录入 15.0 设计语言到 foundations/ + 建角色模板
