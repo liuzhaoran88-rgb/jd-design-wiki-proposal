@@ -88,7 +88,7 @@ used_by: []
 |---|---|---|---|
 | 2026-05-13 | 创建 | skill v0.1 手作 / page-doc 模式 | 自动抽 token + Relay 5 章节大纲 / 5 处 TODO / 6 处 ⚠️ |
 | 2026-05-13 | v0.4 升级 | skill v0.4（page-doc）+ get_design_context 真文本 | 修正 spacing / 补章节 02-03 全部内容 / 自动收 Donts 9 条 / AI Schema 完整草稿 |
-| 2026-05-14 | v0.5 拆 bundle | skill v0.5 multi-md bundle | 540 行单 design.md → 4 文件 bundle（design / spec / variants / behaviors）|
+| 2026-05-14 | v0.5 拆 bundle | skill v0.5 multi-md bundle | 540 行单 design.md → 4 文件 bundle（design / spec / variants / behaviors）— close issue #18 |
 
 ---
 
