@@ -47,7 +47,7 @@ used_by: []
 
 # {{name_zh}} · {{name_en}}
 
-> 自动同步 {{today_iso}} · skill v0.1 · Relay [`{{node_id}}`]({{relay_url}})
+> 自动同步 {{today_iso}} · skill {{skill_version}} · Relay [`{{node_id}}`]({{relay_url}})
 
 ## 一句话定义
 
@@ -133,7 +133,7 @@ events:
 
 | 时间 | 操作 | 来源 | 备注 |
 |---|---|---|---|
-| {{today_iso}} | 创建 | skill v0.1 | 自动生成 / 5 处 TODO 待补{{flag_count_note}} |
+| {{today_iso}} | 创建 | skill {{skill_version}} | 自动生成 / {{todo_count}} 处 TODO 待补{{flag_count_note}} |
 
 ---
 

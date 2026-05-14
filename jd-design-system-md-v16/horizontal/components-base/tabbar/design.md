@@ -13,8 +13,11 @@ version: "0.2"
 last_synced: "2026-05-13"
 
 # skill 自动推断的字段。如不对，请改 frontmatter + mv 文件夹后告知。
+# ⚠️ 实际节点 312:46893 是 page-doc 规范文档（1666×18519，含 5 大章节）。
+#    skill v0.4 已支持 page-doc 模式（章节切分 + text bucket 分类），
+#    仍套 L1 component-base 模板，但加 `## 设计规范细节（按章节）` 段。
 auto_detected:
-  level: component-base  # ⚠️ 实际节点 312:46893 是 page-doc 规范文档（1666×18519，含 5 大章节）。skill v0.4 已支持 page-doc 模式（章节切分 + text bucket 分类），仍套 L1 模板但加 `## 设计规范细节（按章节）` 段
+  level: component-base
   bg: horizontal
   slug: "tabbar"
   page_doc: true  # v0.4 自动判定（root.height > 5000）
@@ -66,10 +69,11 @@ references:
       - zhenghei_bold/font_size_14_600         # 京东正黑 Bold 14/lh20 — 大促灵动岛强调
 
     radius:
-      - Radius_6                    # 6
-      - Radius_8                    # 8
-      - Radius_12                   # 12 — 灵动岛容器圆角
-      - Radius_16                   # 16
+      # token 名（V16 T-shirt size）+ atom 名（V16 数字尺寸，括号内）
+      - radius_base                 # 6  (atom: Radius_6) — 单行高度 28-36 组件
+      - radius_l                    # 8  (atom: Radius_8) — 单行高度 40+ / 卡片
+      - radius_xl                   # 12 (atom: Radius_12) — 顶导/吐司/灵动岛容器
+      - radius_xxl                  # 16 (atom: Radius_16) — 弹层/底导悬浮容器
 
     spacing:
       # ⚠️ spacing token 未在 Relay variables 中绑定。v0.4 已从 Relay 章节 02/03 真实文本抽出以下 DP 标注，
@@ -82,7 +86,7 @@ references:
       # - 灵动岛商品图: 常规 32 / 大促 34
       # - Joy Agent: 52×52 / 距底部 17 / 抽缩 16（默认）/ 28（灵动岛展开）/ 招手气泡距 Agent 8 / 距页边距 16
       # - 招手位置: 红点 19/14 / 数字+文字 15/14 / 营销图 28-32
-      - TODO: spacing tokens 待回填
+      - "TODO: spacing tokens 待回填"
 
     materials:
       - liquid-glass                # iOS 26+ 液态玻璃材质（章节 05 图 1）
@@ -172,14 +176,14 @@ used_by: []
 
 ### 圆角
 
-| Token | px |
-|---|---|
-| `Radius_6` | 6 |
-| `Radius_8` | 8 |
-| `Radius_12` | 12 |
-| `Radius_16` | 16 |
+| Token | Atom | px | 角色 |
+|---|---|---|---|
+| `radius_base` | `Radius_6` | 6 | 单行高度 28-36 组件 |
+| `radius_l` | `Radius_8` | 8 | 单行高度 40+ / 卡片 |
+| `radius_xl` | `Radius_12` | 12 | 顶导 / 吐司 / **灵动岛容器** |
+| `radius_xxl` | `Radius_16` | 16 | 弹层 / 底导悬浮容器 |
 
-> 灵动岛容器使用 `Radius_12`；其它角色对应 px 待与设计师按章节确认。
+> 灵动岛容器使用 `radius_xl` (12px)；其它角色对应 px 待与设计师按章节确认。
 
 ### 间距 / 布局
 

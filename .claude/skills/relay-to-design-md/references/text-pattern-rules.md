@@ -10,11 +10,13 @@
 
 | Bucket | Pattern | 去向 |
 |---|---|---|
-| `chapter_title` | `fontSize ≥ 32` **且** 文本包含 `/^\s*\d{1,2}[\.、 ]?\s*[一-龥]/` 或英文 chapter heading | `## 章节大纲` 段（page-doc 模式） |
+| `chapter_title` | `fontSize ≥ 32` **且** 文本匹配 `/^\s*\d{1,2}[\.、 ]?\s*[一-龥]/` | `## 章节大纲` 段（page-doc 模式）|
 | `figure_label` | 文本完全匹配 `/^图\s*\d+[\.：:]?\s*.{0,40}$/` | 当前章节的 `figures[]` |
-| `dont_rule` | 文本以 `禁止` / `不可` / `不要` / `不能` 开头，**或** 文本含 `❌` / `不允许` | `## Donts` 段（自动收，不再 TODO） |
-| `dimension_spec` | 文本匹配 `/^\s*\d+(\.\d+)?\s*(DP|dp|px|PX|%)(\s|$|×|x|\*)/i`（含组合如 `131×44 DP`） | 当前章节的 `dimensions[]` |
-| `description` | 长度 ≥ 6 且不是纯英数字/纯符号 | 当前章节的 `notes[]` |
+| `dont_rule` | 文本以 `禁止` / `不可` / `不要` / `不能` / `不允许` 开头，**或** 文本含 `❌` | `## Donts` 段（自动收，不再 TODO） |
+| `dimension_spec` | 文本匹配 `/^\s*\d+(\.\d+)?\s*(DP\|dp\|px\|PX\|%)(\s\|$\|×\|x\|\*\|\/)/i`（含组合如 `131×44 DP`、`14/lh 20`） | 当前章节的 `dimensions[]` |
+| `description` | 长度 ≥ 6 且含中文字符 | 当前章节的 `notes[]` |
+
+> v0.4.1 (2026-05-14)：表格 pattern 与 `node-type-mapping.md` 抽取脚本里的 `classifyText()` 实现保持 1:1 一致。chapter_title 仅支持中文标号（v0.5 再加英文 fallback）。dimension_spec 接受 `/` 分隔符（如 `font_size_14/lh20`）。
 
 > 短文本（< 6 字符）但非 figure_label / dont_rule / dimension_spec → 丢弃（视为 UI 装饰文字，如 "Tab" / "01" / "+"）。
 
@@ -29,24 +31,34 @@
 
 ---
 
-## 3. 章节大纲优先抽
+## 3. 章节归属：抽取层 vs 渲染层
 
-每个 chapter 必抽以下 5 字段：
+**抽取脚本只在每条 text/instance/layout 上加 `chapter` 字段（`{id, name}` 或 `null`），不做章节聚合。**
+
+模板渲染层（SKILL.md Step 8）按 `chapter.id` 做 group-by，把同章节的 text 按 bucket 分桶为 `figures / donts / dimensions / notes`。
+
+**不在抽取层聚合的理由**：
+- 抽取脚本已经 200 行，加聚合逻辑会让单个 `use_design_script` 调用更脆弱
+- 渲染层用 string substitution 而非 control flow（见 SKILL.md "占位符语义"），group-by 在模型一次性构造段落时本就要做
+- `chapters[]` 元数据（id / name / bounds）已由抽取脚本返回，渲染时按这个列表迭代即可
+
+**渲染期望的章节聚合形态**（仅供模板渲染参考，**不是**抽取脚本返回结构）：
 
 ```ts
+// 渲染层在内存里构造的形态
 {
-  id: string,         // chapter root id
-  name: string,       // chapter root name
+  id: string,
+  name: string,
   bounds: { w, h },
-  title: string | null,   // 章节标题（chapter_title bucket 第 1 条）
-  figures: { label, ctx }[],   // 图 N 列表
-  donts: string[],
-  dimensions: { value, ctx }[],
-  notes: string[],
+  title: string | null,             // chapter_title bucket 首条
+  figures: { label, ctx }[],        // figure_label bucket
+  donts: string[],                  // dont_rule bucket
+  dimensions: { value, ctx }[],     // dimension_spec bucket
+  notes: string[],                  // description bucket（建议 ≤ 3 避免淹没）
 }
 ```
 
-`ctx` 是这个 text node 同 frame 内最近的兄弟 text（首选 `description` bucket、其次 `chapter_title`），用于给 figure / dimension 配语境。脚本里抽：`n.parent?.children?.filter(c => c !== n && c.type==='TEXT')` 取第一个有效。
+`ctx` 是该文本节点同 frame 内最近的兄弟 text（首选 `description` 桶、其次 `chapter_title`），渲染层从抽取结果里查找。
 
 ---
 

@@ -45,14 +45,16 @@ function rgbHex({r, g, b}) {
 }
 
 // v0.4: page-doc 模式判定
-// 触发条件（任一）：root.height > 5000  或  root.children.length ≥ 3 且其中 ≥ 3 个 children 是 FRAME
+// 触发条件（任一）：root.height > 5000  或  ≥ 3 个 FRAME/GROUP 子项
 function isPageDoc(r) {
   if (r.height > 5000) return true
-  const kids = r.children || []
-  const frameKids = kids.filter(c => c.type === 'FRAME' || c.type === 'GROUP')
-  return frameKids.length >= 3 && kids.length >= 3
+  const frameKids = (r.children || []).filter(c => c.type === 'FRAME' || c.type === 'GROUP')
+  return frameKids.length >= 3
 }
 const pageDocMode = isPageDoc(root)
+
+// v0.4.1: 缓存 root.children 的 id Set，chapterOf 走 parent 链时 O(1) 命中即停
+const rootChildIds = new Set((root.children || []).map(c => c.id))
 
 // ⚠️ v0.1.1 修复：root.findAll() 默认不包括 root 自身。
 // 把 root 和所有 descendants 合在一起，避免漏掉 root 节点的属性（特别是 cornerRadius/fills/layout）
@@ -65,9 +67,10 @@ function chapterOf(n) {
   // v0.4 fix: root 自身没有章节，直接 short-circuit。
   // 否则 while 循环会上爬到 root.parent (PAGE/DOCUMENT) 然后返回错章节。
   if (n.id === root.id) return null
+  // v0.4.1: rootChildIds Set O(1) 命中，避免每条 walk 时反复对比 root.id
   let cur = n
-  while (cur.parent && cur.parent.id !== root.id) cur = cur.parent
-  // 此时 cur.parent === root，即 cur 是 root.children 之一
+  while (cur.parent && !rootChildIds.has(cur.id)) cur = cur.parent
+  if (!rootChildIds.has(cur.id)) return null  // 安全兜底：n 不在 root 子树
   return { id: cur.id, name: cur.name }
 }
 

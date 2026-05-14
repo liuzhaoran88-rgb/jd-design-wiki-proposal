@@ -226,6 +226,13 @@ frontmatter 必填字段见 [references/frontmatter-spec.md](./references/frontm
 
 其他全自动填。
 
+#### v0.4.1 模板占位符补充
+
+| 占位符 | 替换值 |
+|---|---|
+| `{{skill_version}}` | 当前 skill 版本号字符串（如 `v0.4.1`、`v0.5`），从 SKILL.md 版本历史最新一行取 |
+| `{{todo_count}}` | 实际剩余 TODO 数（基础 5，page-doc 模式 + Donts 自动填 → 4） |
+
 ### Step 9: 更新 INDEX.md
 
 [references/traceability.md](./references/traceability.md) 第 1 节"INDEX.md 维护"。读 `.claude/skills/relay-to-design-md/INDEX.md`，按 BG 分组追加新条目（如已存在 slug → 更新 last_synced 行不是追加）。
@@ -271,15 +278,17 @@ return { keys: node.getSharedPluginDataKeys('jd-design-wiki') }
    ├─ level: {自动推断} {如走兜底 → 加 ⚠️}
    ├─ bg:    {自动推断} {同上}
    ├─ slug:  {自动推断} {同上}
-   └─ 5 处 <TODO: 设计师补充> 待填空
+   └─ {N} 处 <TODO: 设计师补充> 待填空
 
 📎 已附 screenshot: {path}/preview.png  {或 ⚠️ 未导出}
 📚 已更新 INDEX.md
 🔗 双向追溯 OK: frontmatter.relay_source ↔ INDEX.md
 
 {如有 token-miss / 半步间距 / 未录入子组件等}
-⚠️ 检测到 {N} 个需要 review 的问题，详见 design.md 末尾 "本次自动同步发现的待办" 段
+⚠️ 检测到 {M} 个需要 review 的问题，详见 design.md 末尾 "本次自动同步发现的待办" 段
 ```
+
+**TODO 计数 N 动态计算**：基础 5 处（一句话定义 / 应用场景 / 视觉预览 / 交互 / Donts / AI Schema 中无数据 placeholder）— 本次实际自动填上的（v0.4：page-doc 模式扫到 ≥1 条 dont_rule 时 Donts 自动填，N 减 1）。最少 4 处，最多 5 处。
 
 ---
 
@@ -338,4 +347,13 @@ return { keys: node.getSharedPluginDataKeys('jd-design-wiki') }
   - **④ instance 加 size**：absoluteBoundingBox 抽 width/height，专治"灵动岛 131×44 DP"这类只在 instance 上的尺寸
   - **⑤ limit 全面提升**：textStyles 30→200，instances 30→150，layouts 20→50，text chars 80→200（page-doc 节点数据量大）
   - **⑥ 章节归属**：所有 text/instance/layout 加 `chapter` 字段（root.children 第 1 层），模板新增 `## 设计规范细节（按章节）` 段
+- **v0.4.1** (2026-05-14) issue #20 follow-up — review 找到的 should-fix 集中收口：
+  - **① chapterOf 修 root 边界 bug**：`if (n.id === root.id) return null` short-circuit（已在 PR #19 二次提交里修；本版加 rootChildIds Set 缓存优化性能）
+  - **② pageDocMode 删冗余条件** `&& kids.length >= 3`（frameKids ⊆ kids，必然成立）
+  - **③ text-pattern-rules.md 与 classifyText 1:1 对齐**：删英文 chapter 措辞、dimension_spec regex 加 `/`、章节聚合改为渲染层 group-by（抽取层只挂 `chapter` 字段）
+  - **④ SKILL.md TODO 计数动态化**：原"5 处 TODO 待填空" → "{N} 处"，page-doc 模式 Donts 自动填时 N=4
+  - **⑤ 模板加 `{{skill_version}}` / `{{todo_count}}` 占位符**：消除 `skill v0.1` 硬编码
+  - **⑥ Radius token 改 T-shirt size**：tabbar design.md `Radius_6/8/12/16` (atom) → `radius_base/l/xl/xxl` (token)，与 V16 tokens.json `radius.*` 命名对齐
+  - **⑦ frontmatter spacing list 类型规整**：`- TODO: xxx` (map) → `- "TODO: xxx"` (string)
+  - **⑧ frontmatter 长行注释拆出独立块**：auto_detected.level 行内 100 字符注释 → 上方独立 # 块
 - v0.5 (planned) 加 page.md / flow.md 模板 + batch 模式 + 多 md bundle 拆分 (visual.md / interaction.md / donts.md) + Diff 模式（只更新机器抽取段，保留人写段）
