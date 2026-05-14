@@ -104,9 +104,11 @@ used_by: []
 
 {{section_variants_or_none}}
 
+{{section_chapter_details_or_empty}}
+
 ## Donts
 
-<!-- TODO: 设计师列举常见误用 -->
+{{section_donts_auto_or_todo}}
 
 ## AI Schema
 

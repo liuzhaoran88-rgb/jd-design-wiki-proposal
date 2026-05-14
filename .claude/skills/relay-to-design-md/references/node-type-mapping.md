@@ -44,9 +44,48 @@ function rgbHex({r, g, b}) {
   return '#' + t(r) + t(g) + t(b)
 }
 
+// v0.4: page-doc 模式判定
+// 触发条件（任一）：root.height > 5000  或  root.children.length ≥ 3 且其中 ≥ 3 个 children 是 FRAME
+function isPageDoc(r) {
+  if (r.height > 5000) return true
+  const kids = r.children || []
+  const frameKids = kids.filter(c => c.type === 'FRAME' || c.type === 'GROUP')
+  return frameKids.length >= 3 && kids.length >= 3
+}
+const pageDocMode = isPageDoc(root)
+
 // ⚠️ v0.1.1 修复：root.findAll() 默认不包括 root 自身。
 // 把 root 和所有 descendants 合在一起，避免漏掉 root 节点的属性（特别是 cornerRadius/fills/layout）
 const all = [root, ...root.findAll(() => true)]
+
+// v0.4: 章节归属 — 找每个节点的第 1 层 ancestor (root.children 之一)
+//   如果不是 page-doc 模式，所有节点章节统一是 null（章节细分不渲染）
+function chapterOf(n) {
+  if (!pageDocMode) return null
+  let cur = n
+  while (cur.parent && cur.parent.id !== root.id) cur = cur.parent
+  // 此时 cur.parent === root；若 cur === root（n 是 root 自身），章节为 null
+  if (cur.id === root.id) return null
+  return { id: cur.id, name: cur.name }
+}
+
+// v0.4: text pattern 分类 — 见 references/text-pattern-rules.md
+function classifyText(chars, fontSize) {
+  const s = (chars || '').trim()
+  if (!s) return null
+  // chapter_title
+  if (fontSize >= 32 && /^\s*\d{1,2}[\.、 ]?\s*[一-龥]/.test(s)) return 'chapter_title'
+  // figure_label
+  if (/^图\s*\d+[\.：:]?\s*.{0,40}$/.test(s)) return 'figure_label'
+  // dont_rule
+  if (/^(禁止|不可|不要|不能|不允许)/.test(s) || s.includes('❌')) return 'dont_rule'
+  // dimension_spec
+  if (/^\s*\d+(\.\d+)?\s*(DP|dp|px|PX|%)(\s|$|×|x|\*|\/)/i.test(s) ||
+      /^\s*\d+\s*[×x\*]\s*\d+\s*(DP|dp|px|PX)?/i.test(s)) return 'dimension_spec'
+  // description（长度 ≥ 6 且不是纯英数字/纯符号）
+  if (s.length >= 6 && /[一-龥]/.test(s)) return 'description'
+  return null
+}
 
 // (a) 所有 SOLID fills + opacity
 const fills = new Set()
@@ -61,30 +100,29 @@ for (const n of all) {
   }
 }
 
-// (b) 文字样式
+// (b) 文字样式 + v0.4 pattern 分类 + 章节归属
 const textStyles = []
 for (const n of all) {
   if (n.type === 'TEXT' && typeof n.fontSize === 'number') {
+    const chars = (n.characters || '').slice(0, 200)   // v0.4: 80 → 200
+    const bucket = classifyText(chars, n.fontSize)
     textStyles.push({
-      chars: (n.characters || '').slice(0, 80),
+      chars,
       fontSize: n.fontSize,
       family: n.fontName?.family || null,
       style: n.fontName?.style || null,
+      bucket,                          // v0.4
+      chapter: chapterOf(n),           // v0.4
     })
   }
 }
 
 // (c) 圆角 — v0.1.1 修：处理 4 种情况
-//   ① cornerRadius 是 number（4 角统一） → 直接收
-//   ② cornerRadius 是 relay.mixed（4 角不同） → 看个体 topLeftRadius 等
-//   ③ cornerRadius 是 0 → 跳过（直角）
-//   ④ 节点无 cornerRadius 字段 → 跳过
 const radii = new Set()
 for (const n of all) {
   if (!('cornerRadius' in n)) continue
   const cr = n.cornerRadius
   if (cr === relay.mixed) {
-    // mixed: 读 4 个角，每个 > 0 都收
     for (const corner of ['topLeftRadius', 'topRightRadius', 'bottomLeftRadius', 'bottomRightRadius']) {
       const v = n[corner]
       if (typeof v === 'number' && v > 0) radii.add(v)
@@ -94,11 +132,18 @@ for (const n of all) {
   }
 }
 
-// (d) INSTANCE 引用（不含 root 自身 — root 是文档主题，不算子组件引用）
+// (d) INSTANCE 引用 + v0.4 absoluteBoundingBox + 章节归属
 const instances = []
 for (const n of all) {
   if (n.type === 'INSTANCE' && n.id !== root.id) {
-    instances.push({ id: n.id, name: n.name })
+    const bb = n.absoluteBoundingBox || null
+    instances.push({
+      id: n.id,
+      name: n.name,
+      // v0.4: 加 size（相对自身，绝对坐标减 root.x/y 不靠谱因为有 nested transform）
+      size: bb ? { w: Math.round(bb.width), h: Math.round(bb.height) } : null,
+      chapter: chapterOf(n),
+    })
   }
 }
 
@@ -111,29 +156,37 @@ for (const n of all) {
       mode: n.layoutMode,
       padding: { l: n.paddingLeft, r: n.paddingRight, t: n.paddingTop, b: n.paddingBottom },
       spacing: n.itemSpacing,
+      chapter: chapterOf(n),         // v0.4
     })
   }
 }
 
-// (f) 变体 — 两种来源：
-//   ① root 是 COMPONENT_SET → children 即所有变体
-//   ② root 是 INSTANCE/COMPONENT → componentProperties (v0.2 加)
+// (f) 变体 — 两种来源
 let variants = []
 let variantProps = null
 if (root.type === 'COMPONENT_SET') {
   variants = (root.children || []).map(c => ({ id: c.id, name: c.name }))
 }
-// v0.2: 抽 componentProperties (VARIANT type) 用于 slug 后缀
 if (root.type === 'INSTANCE' || root.type === 'COMPONENT') {
   const cp = root.componentProperties || {}
   variantProps = {}
   for (const [key, prop] of Object.entries(cp)) {
     if (prop?.type === 'VARIANT' && typeof prop.value === 'string') {
-      // key 形如 "样式" 或 "样式#676:0"，去掉 ID 后缀
       const cleanKey = key.split('#')[0]
       variantProps[cleanKey] = prop.value
     }
   }
+}
+
+// v0.4: chapters 元数据（page-doc 模式）
+let chapters = null
+if (pageDocMode) {
+  chapters = (root.children || []).map(c => ({
+    id: c.id,
+    name: c.name,
+    type: c.type,
+    bounds: c.width && c.height ? { w: Math.round(c.width), h: Math.round(c.height) } : null,
+  }))
 }
 
 return {
@@ -142,15 +195,17 @@ return {
     page_name: pg?.name, page_id: pg?.id,
     w: Math.round(root.width), h: Math.round(root.height),
     description: root.description || null,
+    pageDocMode,                     // v0.4
   },
   fileKey: relay.fileKey,
   uniqueFills: [...fills],
-  textStyles: textStyles.slice(0, 30),    // 防溢出
+  textStyles: textStyles.slice(0, 200),    // v0.4: 30 → 200
   uniqueRadii: [...radii].sort((a, b) => a - b),
-  instances: instances.slice(0, 30),
-  layouts: layouts.slice(0, 20),
+  instances: instances.slice(0, 150),      // v0.4: 30 → 150
+  layouts: layouts.slice(0, 50),           // v0.4: 20 → 50
   variants,
-  variantProps,   // v0.2: 用于 slug 后缀推断
+  variantProps,
+  chapters,                                // v0.4: page-doc 模式才有
 }
 ```
 
@@ -159,6 +214,14 @@ return {
 > - 圆角处理新增 `relay.mixed` 分支，可抽出 4 角不同情况下的个体角值
 > - INSTANCE 引用过滤掉 root 自身（防止 root 是 INSTANCE 时被误算成"子组件引用"）
 > - 影响：所有圆角在 root 节点上的组件（按钮 / 卡片 / 弹窗 / 容器等）现在能正确抽到 radius token
+
+> **v0.4 升级（2026-05-13）** —— 支持 page-doc 大节点：
+> - 新增 `pageDocMode` 判定：root.height > 5000 **或** root.children 有 ≥ 3 个 FRAME/GROUP 子项 ⇒ page-doc
+> - text 抽取按 [text-pattern-rules.md](./text-pattern-rules.md) 分 5 类 bucket（chapter_title / figure_label / dont_rule / dimension_spec / description），写到 textStyles[].bucket
+> - 所有 text / instance / layout 加 `chapter` 字段（root.children 第 1 层归属），便于按章节归类
+> - instance 加 `size`（来自 absoluteBoundingBox），用于"灵动岛 131×44 DP"这类 DP 抽取
+> - 提升 limit：textStyles 30→200，instances 30→150，layouts 20→50，text chars 80→200
+> - 返回新增 `chapters[]` 元数据（仅 page-doc 模式）：每个章节 id / name / bounds
 
 > 返回数据结构稳定，本文档同时也是这个脚本的**契约**。
 
