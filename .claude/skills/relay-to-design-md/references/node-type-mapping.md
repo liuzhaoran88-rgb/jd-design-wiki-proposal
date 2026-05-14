@@ -62,10 +62,12 @@ const all = [root, ...root.findAll(() => true)]
 //   如果不是 page-doc 模式，所有节点章节统一是 null（章节细分不渲染）
 function chapterOf(n) {
   if (!pageDocMode) return null
+  // v0.4 fix: root 自身没有章节，直接 short-circuit。
+  // 否则 while 循环会上爬到 root.parent (PAGE/DOCUMENT) 然后返回错章节。
+  if (n.id === root.id) return null
   let cur = n
   while (cur.parent && cur.parent.id !== root.id) cur = cur.parent
-  // 此时 cur.parent === root；若 cur === root（n 是 root 自身），章节为 null
-  if (cur.id === root.id) return null
+  // 此时 cur.parent === root，即 cur 是 root.children 之一
   return { id: cur.id, name: cur.name }
 }
 
