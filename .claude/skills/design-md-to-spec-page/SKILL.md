@@ -94,6 +94,22 @@ bundle 模式下追加读取 `spec.md` / `variants.md` / `behaviors.md`，按 [r
 - 缺失数据 → 标 TBD，不留 `{{}}`
 - 段落性内容（如 `{{section_2_behavior_list}}`）由模型构造完整 HTML 字符串塞进去
 
+### Step 4c: 视图分层(v0.3)
+
+模板自带 Pro / Basic 视图切换 UI(标题旁紧凑 segmented + JS + localStorage 持久化)。**生成 7 章节内容时按 [references/view-toggle.md](./references/view-toggle.md) 给元素加 class**:
+
+- `class="pro-only"` 整段 / inline `<span class="pro-only pro-inline">` 元素 → 只在专业版显示
+- `class="basic-only"` / `class="basic-only summary"` 段 → 只在常规版显示(替代被隐藏的 pro 段)
+- 不加 class 的元素 → 两版共享
+
+典型分流:
+- token / DP 详细表(章节 4) → `<div class="pro-only">` 包,加 `<div class="basic-only summary">` info 蓝概述替代
+- ASCII / API 速查 → 整段 `pro-only`
+- 行为准则括号注 + 章节来源 → inline `<span class="pro-only pro-inline">`
+- 章节 H2/H3 标题 / 切图 / Donts / 应用场景 → 共享
+
+实战参考:`tabbar/spec-page.html` 现状 — basic 占 pro 81%,藏 ~6000 chars / 112 行(章节 3 token 表 / 4.1-4.4 token 表 / 5.2 ASCII / API)。
+
 ### Step 5: 演示 stage 处理
 
 3 种 stage 形态（按优先级）:
@@ -171,6 +187,7 @@ bundle 模式下追加读取 `spec.md` / `variants.md` / `behaviors.md`，按 [r
 | [references/section-mapping.md](./references/section-mapping.md) | 7 章节 ↔ design.md / bundle 字段映射表 |
 | [references/style-tokens.md](./references/style-tokens.md) | CSS variable ↔ V16 tokens.json 映射 |
 | [references/stage-images-export.md](./references/stage-images-export.md) | 切图导出流程（v0.2 加）— chunked b64 / sharedPluginData 中转 / jq 解 dump |
+| [references/view-toggle.md](./references/view-toggle.md) | Pro / Basic 视图切换标记规则（v0.3 加）— 元素级 / inline / 7 章节标记策略 |
 
 ## 版本历史
 
@@ -187,4 +204,13 @@ bundle 模式下追加读取 `spec.md` / `variants.md` / `behaviors.md`，按 [r
   - **④ Stage block 模板支持**:`<style>` 加 `.stage--image` 自动适配宽度,`<img>` 替代 CSS+div mockup
   - **⑤ 实战:tabbar 9 张切图入页**:章节 01-05 各章节子段 export 到 `_assets/`,spec-page.html 12 处 `<img>` 替代原 mockup,文件从 994 → 806 行(精简 188 行 mockup CSS+div)
   - **⑥ References 加 stage-images-export.md**:完整 4 步流程文档
-- v0.3 (planned) 加批量模式(一次跑多组件)+ 增量 diff(保留人写演示 mockup)+ TOC 自动嵌套(含 h3 子标题)+ 切图节点自动选择(避免每次手枚举)
+- **v0.3** (2026-05-14) Pro / Basic 视图切换 + 增强 token 分层:
+  - **① title-row + view-tabs UI**:tab 紧凑 segmented 放标题旁,h1 占主区,4px gap,localStorage 持久化偏好(默认 basic)
+  - **② CSS class 控制可见性**:`body.mode-basic .pro-only { display: none }` / `body.mode-pro .basic-only { display: none }`,无段落复制
+  - **③ 元素级 + inline 双粒度**:`<div class="pro-only">` 包整段 token 表,`<span class="pro-only pro-inline">` 包段内 token / DP 标注;`.pro-inline` 视觉淡化(灰小字)
+  - **④ basic-only summary 替代段**:章节内整段 pro-only 时,加 `<div class="basic-only summary">` info 蓝引用块给常规版概述
+  - **⑤ 23 行 vanilla JS**:无依赖,localStorage `spec-page-view-mode` 存偏好,setMode 切 body class
+  - **⑥ 模板沉淀**:CSS / HTML title-row / JS 全部进 [templates/spec-page.html](./templates/spec-page.html)
+  - **⑦ References 加 view-toggle.md**:7 章节标记策略 + Class 决策表 + 失败模式
+  - 实战:tabbar 现状 basic 占 pro 81%(藏 6000 chars / 112 行)
+- v0.4 (planned) 加批量模式(一次跑多组件)+ 增量 diff(保留人写演示 mockup)+ TOC 自动嵌套(含 h3 子标题)+ 切图节点自动选择(避免每次手枚举)

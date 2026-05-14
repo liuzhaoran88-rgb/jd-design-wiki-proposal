@@ -349,12 +349,82 @@
     table { font-size: 12px; }
     th, td { padding: 8px 10px; }
   }
+
+  /* ========== v0.3: 视图切换 (Pro / Basic) — 标题旁紧凑 segmented ========== */
+  .title-row {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    gap: 24px; flex-wrap: wrap;
+    border-bottom: 2px solid var(--c-text);
+    padding-bottom: 16px;
+    margin-bottom: 8px;
+  }
+  .title-row h1 {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin: 0;
+    flex: 1 1 auto;
+  }
+  .view-tabs {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px;
+    background: var(--c-bg-sunken);
+    border-radius: var(--r-base);
+    flex-shrink: 0;
+  }
+  .view-tab {
+    background: transparent; border: none;
+    padding: 6px 14px;
+    font-family: inherit; font-size: 12px; font-weight: 500;
+    color: var(--c-text-2);
+    cursor: pointer; border-radius: 4px;
+    transition: all 150ms;
+    line-height: 1.4;
+  }
+  .view-tab:hover { color: var(--c-text); }
+  .view-tab.is-active {
+    background: var(--c-bg);
+    color: var(--c-text);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    font-weight: 600;
+  }
+  /* 取消 h1 自身下划线,改 .title-row 接管 */
+  h1 { border-bottom: none !important; padding-bottom: 0 !important; }
+
+  /* ========== Pro / Basic 内容显隐 ========== */
+  body.mode-basic .pro-only { display: none !important; }
+  body.mode-pro .basic-only { display: none !important; }
+  /* JS 没跑前默认隐藏两类,避免闪烁 */
+  body:not(.mode-basic):not(.mode-pro) .pro-only,
+  body:not(.mode-basic):not(.mode-pro) .basic-only {
+    display: none;
+  }
+  /* basic-only 段落用 info 蓝引用块包,容易认出 */
+  .basic-only.summary {
+    margin: 16px 0;
+    padding: 12px 20px;
+    background: var(--c-info-bg);
+    border-left: 3px solid var(--c-info);
+    border-radius: 0 var(--r-base) var(--r-base) 0;
+    color: var(--c-text-2);
+    font-size: 14px;
+  }
+  .basic-only.summary strong { color: var(--c-text); }
+  /* inline pro-only 用 .pro-inline 视觉淡化(避免在 pro 模式过抢) */
+  body.mode-pro .pro-inline { display: inline; }
+  .pro-inline { color: var(--c-text-3); font-size: 12px; margin-left: 6px; }
 </style>
 </head>
 <body>
 <div class="doc">
 
-<h1>{{name_zh}} · {{name_en}} 组件规范</h1>
+<div class="title-row">
+  <h1>{{name_zh}} · {{name_en}} 组件规范</h1>
+  <!-- v0.3 视图切换 (Pro / Basic),JS 在 body 末尾 -->
+  <div class="view-tabs" role="tablist" aria-label="视图切换">
+    <button class="view-tab is-active" role="tab" data-view="basic" aria-selected="true">常规版</button>
+    <button class="view-tab" role="tab" data-view="pro" aria-selected="false">专业版</button>
+  </div>
+</div>
 <div class="meta">
   {{meta_scope_line}}<br>
   样式来源:Relay V16.0 GUIDELINE 节点 <code>{{relay_node_id}}</code> · Token 版本:<code>tokens.json {{token_version}}</code><br>
@@ -419,6 +489,34 @@
      结构类组件留空，stage 用静态 mockup）
      ========================================== -->
 {{embedded_demo_script_or_empty}}
+
+<!-- v0.3: 视图切换 JS (轻量,无依赖,localStorage 持久化偏好) -->
+<script>
+(function () {
+  var STORAGE_KEY = 'spec-page-view-mode';
+  var body = document.body;
+  var tabs = document.querySelectorAll('.view-tab');
+  function setMode(mode) {
+    body.classList.remove('mode-basic', 'mode-pro');
+    body.classList.add('mode-' + mode);
+    tabs.forEach(function (t) {
+      var on = t.dataset.view === mode;
+      t.classList.toggle('is-active', on);
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    try { localStorage.setItem(STORAGE_KEY, mode); } catch (e) {}
+  }
+  var initial = 'basic';
+  try {
+    var saved = localStorage.getItem(STORAGE_KEY);
+    if (saved === 'pro' || saved === 'basic') initial = saved;
+  } catch (e) {}
+  setMode(initial);
+  tabs.forEach(function (t) {
+    t.addEventListener('click', function () { setMode(t.dataset.view); });
+  });
+})();
+</script>
 
 </body>
 </html>
