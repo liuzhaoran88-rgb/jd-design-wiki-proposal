@@ -369,15 +369,13 @@
 </div>
 
 <div class="toc">
-  <h3>目录</h3>
+  <h3>目录(对齐 Relay 章节结构)</h3>
   <ol>
-    <li><a href="#sec-1">定义</a></li>
-    <li><a href="#sec-2">行为准则</a></li>
-    <li><a href="#sec-3">类型</a></li>
-    <li><a href="#sec-4">结构</a></li>
-    <li><a href="#sec-5">布局</a></li>
-    <li><a href="#sec-6">正反案例</a></li>
-    <li><a href="#sec-7">典型场景</a></li>
+    <li><a href="#ch-1">设计原则</a><span style="color:var(--c-text-3);font-size:12px;"> · 含 1.1 行为准则</span></li>
+    <li><a href="#ch-2">组件设计属性</a><span style="color:var(--c-text-3);font-size:12px;"> · 形态 / 结构 / 布局 / 形态原稿</span></li>
+    <li><a href="#ch-3">灵动岛运营资源位</a><span style="color:var(--c-text-3);font-size:12px;"> · 三型规范 + 原稿</span></li>
+    <li><a href="#ch-4">应用场景</a><span style="color:var(--c-text-3);font-size:12px;"> · 典型场景 + 正反案例</span></li>
+    <li><a href="#ch-5">多端适配</a><span style="color:var(--c-text-3);font-size:12px;"> · 材质 + 动效</span></li>
   </ol>
 </div>
 
@@ -385,9 +383,9 @@
 <div class="basic-only summary" style="background:#fff5e6;border-left-color:#f59f00;">
   <p style="margin:0 0 8px;"><strong>📖 这页文档怎么读?</strong></p>
   <ul style="margin:0;">
-    <li><strong>第一次看</strong>(产品 / 跨职能 / 老板) → 当前是<strong>常规版</strong>,7 章节按数字依次读,每节有「👉」开头的入门解读。重点关注 <a href="#sec-1">章节 1 定义</a> + <a href="#sec-3">章节 3 类型</a> + <a href="#sec-6">章节 6 正反案例</a> + <a href="#sec-7">章节 7 典型场景</a>。</li>
-    <li><strong>已经熟悉</strong>(资深设计师 / 工程师 / 走查) → 切到右上 <strong>专业版</strong>,展开 <a href="#sec-4">章节 4 结构</a> 完整 token 表 + <a href="#sec-5">章节 5 ASCII 布局</a> + 底部 API 速查。</li>
-    <li><strong>想看原稿</strong> → 章节 3.3 / 4.5 / 4.6 / 5.3 都有 Relay 切图,直接<strong>点图新 tab 看 1426px 原稿</strong>。</li>
+    <li><strong>第一次看</strong>(产品 / 跨职能 / 老板) → 当前是<strong>常规版</strong>,5 章节按 Relay 原稿结构组织,每节有「👉」开头的入门解读。重点关注 <a href="#ch-1">设计原则</a> + <a href="#ch-3">灵动岛</a> + <a href="#ch-4">应用场景(含正反案例)</a>。</li>
+    <li><strong>已经熟悉</strong>(资深设计师 / 工程师 / 走查) → 切到右上 <strong>专业版</strong>,展开 <a href="#ch-2">组件设计属性</a> 完整 token / DP 表 + 内部布局 ASCII + 底部 API 速查。</li>
+    <li><strong>想看原稿</strong> → <a href="#ch-2">章节 2.4(形态原稿)</a> / <a href="#ch-3">章节 3.2(灵动岛原稿)</a> / <a href="#ch-2">章节 2.2.5-2.2.6(实体预览)</a> / <a href="#ch-5">章节 5(多端适配)</a> 都有 Relay 切图,<strong>点图新 tab 看 1426px 原稿</strong>。</li>
   </ul>
 </div>
 
@@ -523,7 +521,9 @@
            + _assets/*.png (Relay 节点 export)
      ========================================== -->
 
-<h2 id="sec-1"><span class="num">1</span>定义</h2>
+
+<!-- ============ ch-1 Relay 章节 01 设计原则 ============ -->
+<h2 id="ch-1"><span class="num">1</span>设计原则</h2>
 
 <div class="basic-only summary">
   <p><strong>👉 一句话理解</strong>:打开 JD App,屏幕最底下永远在那条小条 —— 装着「首页 / 分类 / 购物车 / 消息 / 我的」这种最重要的几个图标 —— 这就是 Tabbar(底部导航栏)。</p>
@@ -555,7 +555,8 @@
 </div>
 <div class="stage-label">📖 Relay 章节 01 设计原则原稿(节点 312:46895,1426×304)</div>
 
-<h2 id="sec-2"><span class="num">2</span>行为准则</h2>
+
+<h3>1.1 行为准则</h3>
 
 <ol>
   <li><strong>建议 2 ~ 5 坑位</strong>,超过 5 个时应在内容层重新组织<span class="pro-only pro-inline">(章节 01 设计原则)</span></li>
@@ -568,28 +569,22 @@
   <li><strong>底导材质按 OS 版本差异化</strong><span class="basic-only">(液态玻璃 vs 毛玻璃)</span><span class="pro-only pro-inline">:iOS 26+ 液态玻璃 / iOS 26 以下 + Android 毛玻璃 fallback(章节 05)</span></li>
 </ol>
 
-<h2 id="sec-3"><span class="num">3</span>类型</h2>
 
-<p>V16 共定义 <strong>2 种形态</strong>(常规 / Joy Agent 组合) + <strong>3 种灵动岛运营资源位</strong>(常规型 / 运营型 / 大促型)。</p>
+<!-- ============ ch-2 Relay 章节 02 组件设计属性 ============ -->
+<h2 id="ch-2"><span class="num">2</span>组件设计属性</h2>
+
+<p>本章覆盖 Tabbar 的<strong>形态分类</strong>、<strong>容器/坑位/文字结构</strong>,以及<strong>位置布局规则</strong>。灵动岛运营资源位单独成章,见 <a href="#ch-3">章节 3</a>。</p>
 
 <div class="basic-only summary">
-  <p><strong>👉 怎么选?</strong> 一张决策树:</p>
-  <p style="margin-top:8px;margin-left:8px;"><strong>① 这个页面需要 AI 助手入口吗?</strong> </p>
+  <p><strong>👉 怎么选形态?</strong> 一张决策树:</p>
+  <p style="margin-top:8px;margin-left:8px;"><strong>这个页面需要 AI 助手入口吗?</strong></p>
   <ul style="margin-top:0;">
-    <li>需要 → <strong>Joy Agent 组合底导</strong>(首页 / 大会场常用,左边固定一个 Agent)</li>
+    <li>需要 → <strong>Joy Agent 组合底导</strong>(首页 / 大会场常用,左边固定一个 52×52 圆形 Agent 按钮)</li>
     <li>不需要 → <strong>常规底导</strong>(其它所有业务页)</li>
   </ul>
-  <p style="margin-top:8px;margin-left:8px;"><strong>② 想插一条运营资源位 / 大促展示位吗?</strong></p>
-  <ul style="margin-top:0;">
-    <li>纯日常商品推荐 → 用 <strong>常规型灵动岛</strong>(占消息位,纯色背景,简洁)</li>
-    <li>有运营会场要导流 → 用 <strong>运营型灵动岛</strong>(同频色,有背景动效,灵活)</li>
-    <li>大促核心展示 → 用 <strong>大促型灵动岛</strong>(尺寸更大、异型背板,最抓眼球)</li>
-  </ul>
-  <p style="margin-top:12px;color:var(--c-text-3);">📐 具体尺寸(131×44 / 144×52)/ 字号 / 材质 / 颜色规则,切到 <strong>专业版</strong> 看完整表格;<strong>下方 3.3</strong> 直接看 5 张原稿。</p>
+  <p style="margin-top:12px;color:var(--c-text-3);">📐 完整 token / DP / 字号 表见 <strong>专业版</strong>。📖 下方 2.3 形态原稿展示直接看 2 张原图。</p>
 </div>
-
-<div class="pro-only">
-
+<h3>2.1 形态维度</h3>
 <h3>3.1 形态维度</h3>
 
 <table>
@@ -600,51 +595,8 @@
 </tbody>
 </table>
 
-<h3>3.2 灵动岛运营资源位维度</h3>
 
-<table>
-<thead><tr><th>类型</th><th>标识</th><th>尺寸</th><th>商品/运营图</th><th>字号</th><th>材质</th><th>颜色规则</th><th>适用</th></tr></thead>
-<tbody>
-<tr><td>常规型</td><td><code>regular</code></td><td>131×44 DP</td><td>32 DP</td><td>主 14pt / 副 14pt / 小 10pt</td><td>纯色 <code>gray_6</code>,无描边</td><td>背景 <code>gray_6</code>,商品图底 <code>white</code>(PNG 透明底)</td><td>日常商品推荐</td></tr>
-<tr><td>运营型</td><td><code>operation</code></td><td>131×44 DP</td><td>32 DP</td><td>gif 文本按规范字号</td><td>渐变描边 100% + 85% 灰阶叠加</td><td>同频色 / 浅色背景 + 深色字</td><td>运营会场推广</td></tr>
-<tr><td>大促型</td><td><code>promotion</code></td><td>144×52 DP</td><td>34 DP</td><td>gif 文本 + 京东正黑强调</td><td>渐变描边 0~60% + 异型背板</td><td>同频色 / 浅色背景 + 深色字</td><td>重点大促活动</td></tr>
-</tbody>
-</table>
-
-</div><!-- /pro-only 3.1-3.2 -->
-
-<h3>3.3 各形态原稿展示</h3>
-
-<div class="stage stage--image">
-  <img src="./_assets/sec-2-regular-layout.png?v=2" alt="常规底导布局原稿">
-</div>
-<div class="stage-label">📖 常规底导布局(总高 69 / 导航 52 / 安全区 17 DP, 2-5 坑位 + 灵动岛)— 节点 312:46904, 1426×1476</div>
-
-<div class="stage stage--image">
-  <img src="./_assets/sec-2-agent-layout.png?v=2" alt="Agent + 底导布局原稿">
-</div>
-<div class="stage-label">📖 Agent + 底导布局(Joy Agent 52×52 + 右侧 319 DP)— 节点 312:47132, 1426×1460</div>
-
-<div class="stage stage--image">
-  <img src="./_assets/sec-3-island-regular.png?v=2" alt="常规灵动岛">
-</div>
-<div class="stage-label">📖 常规灵动岛(131×44, gray_6 纯色,商品图 32 DP)— 节点 312:47480, 1426×1856</div>
-
-<div class="stage stage--image">
-  <img src="./_assets/sec-3-island-operation.png?v=2" alt="运营灵动岛">
-</div>
-<div class="stage-label">📖 运营灵动岛(131×44, 渐变描边 100% + 85% 灰阶叠加,推荐同频色)— 节点 312:47617, 1426×1419</div>
-
-<div class="stage stage--image">
-  <img src="./_assets/sec-3-island-promo.png?v=2" alt="大促灵动岛">
-</div>
-<div class="stage-label">📖 大促灵动岛(144×52, 渐变描边 0~60% + 异型背板,运营图 34 DP)— 节点 312:47747, 1426×2154</div>
-
-<blockquote class="danger">
-<p><strong>不允许</strong>新增 Tabbar 形态。运营 / 大促诉求由灵动岛(占用消息位)承载,不允许新增第 5+ 坑位或将 Tabbar 整条改色。</p>
-</blockquote>
-
-<h2 id="sec-4"><span class="num">4</span>结构</h2>
+<h3>2.2 容器与坑位结构</h3>
 
 <p>Tabbar 由<strong>容器 + N 个坑位(可选 Joy Agent + 可选灵动岛)</strong>组成,其中<strong>容器和至少 2 个坑位为必要元素</strong>。</p>
 
@@ -664,7 +616,7 @@
 
 <div class="pro-only">
 
-<h3>4.1 容器</h3>
+<h4>2.2.1 容器</h4>
 
 <table>
 <thead><tr><th>属性</th><th>值</th><th>对应 Token</th></tr></thead>
@@ -680,7 +632,7 @@
 </tbody>
 </table>
 
-<h3>4.2 坑位</h3>
+<h4>2.2.2 坑位</h4>
 
 <table>
 <thead><tr><th>属性</th><th>值</th><th>对应 Token</th></tr></thead>
@@ -697,7 +649,7 @@
 </tbody>
 </table>
 
-<h3>4.3 文字</h3>
+<h4>2.2.3 文字</h4>
 
 <table>
 <thead><tr><th>层级</th><th>字号</th><th>字重</th><th>行高</th><th>对应 Token</th></tr></thead>
@@ -710,7 +662,7 @@
 </tbody>
 </table>
 
-<h3>4.4 Joy Agent(仅 agent_combo 形态)</h3>
+<h4>2.2.4 Joy Agent(仅 agent_combo 形态)</h4>
 
 <table>
 <thead><tr><th>属性</th><th>值</th></tr></thead>
@@ -728,23 +680,24 @@
 
 </div><!-- /pro-only 4.1-4.4 -->
 
-<h3>4.5 状态 + 招手实体预览</h3>
+<h4>2.2.5 状态 + 招手实体预览</h4>
 
 <div class="stage stage--image">
   <img src="./_assets/sec-2-states-badges.png?v=2" alt="交互状态 + 4 型招手原稿">
 </div>
 <div class="stage-label">📖 默认 / 选中 / 营销 三态 + 红点 / 数字 / 文字 / 灵动岛展开 4 型招手 — 节点 312:47337, 1426×1942</div>
 
-<h3>4.6 Joy Agent 实体预览</h3>
+<h4>2.2.6 Joy Agent 实体预览</h4>
 
 <div class="stage stage--image">
   <img src="./_assets/sec-2-joy-agent.png?v=2" alt="Joy Agent 形态原稿">
 </div>
 <div class="stage-label">📖 Joy Agent 基础布局 + 招手气泡 + 灵动岛态 — 节点 312:47431, 1426×902</div>
 
-<h2 id="sec-5"><span class="num">5</span>布局</h2>
 
-<h3>5.1 位置</h3>
+<h3>2.3 布局位置 + 内部结构</h3>
+
+<h4>2.3.1 位置</h4>
 
 <table>
 <thead><tr><th>位置</th><th>用途</th><th>距屏幕底部</th></tr></thead>
@@ -757,7 +710,7 @@
 <p><strong>不允许 center / top 位</strong>:Tabbar 是全局常驻导航,只能在屏幕底部。center / top 区域留给 Toast、NavBar、Banner 等其它组件。</p>
 </blockquote>
 
-<h3 class="pro-only">5.2 内部布局示意</h3>
+<h3 class="pro-only">5.2 内部布局示意</h4>
 
 <pre class="pro-only"><code>常规底导:                              Joy Agent 组合底导:
 ┌─────────────────────────────┐        ┌───┐  ┌──────────────────────┐
@@ -774,24 +727,108 @@
 灵动岛在消息位嵌入,131×44 (日常/运营) 或 144×52 (大促)
 距底部安全区 4 DP</code></pre>
 
-<h3>5.3 多端材质适配</h3>
+
+<h3>2.4 各形态原稿展示</h3>
+<h3>3.3 各形态原稿展示</h3>
 
 <div class="stage stage--image">
-  <img src="./_assets/sec-5-multi-platform.png?v=2" alt="多端材质适配原稿">
+  <img src="./_assets/sec-2-regular-layout.png?v=2" alt="常规底导布局原稿">
 </div>
-<div class="stage-label">📖 iOS 26+ 液态玻璃 vs iOS 26 以下 + Android 毛玻璃 fallback — 节点 312:52986, 1426×1374</div>
+<div class="stage-label">📖 常规底导布局(总高 69 / 导航 52 / 安全区 17 DP, 2-5 坑位 + 灵动岛)— 节点 312:46904, 1426×1476</div>
 
-<h3>5.4 动效</h3>
+<div class="stage stage--image">
+  <img src="./_assets/sec-2-agent-layout.png?v=2" alt="Agent + 底导布局原稿">
+</div>
+<div class="stage-label">📖 Agent + 底导布局(Joy Agent 52×52 + 右侧 319 DP)— 节点 312:47132, 1426×1460</div>
 
-<blockquote class="warn">
-<p>⚠️ <strong>TBD</strong>:本组件 design.md 暂未提供 motion / transition 参数。建议补充:
-  ① Tab 切换的内容入场动效(<code>page-transition</code>?)
-  ② 选中态色 + 背景的过渡时长 / easing
-  ③ 灵动岛展开/收起动效参数(对应 V16 motion token <code>role.island-expand</code> / <code>role.island-collapse</code>)
-  ④ Joy Agent 抽缩(16 → 28 DP)的过渡参数</p>
+
+<!-- ============ ch-3 Relay 章节 03 灵动岛运营资源位 ============ -->
+<h2 id="ch-3"><span class="num">3</span>灵动岛运营资源位</h2>
+
+<p>灵动岛是嵌入 Tabbar <strong>消息坑位</strong>的运营展示位,3 种形态承载日常 / 运营 / 大促不同诉求。同时只能展示 1 条,展开期间消息坑位选中态背景消失。</p>
+
+<div class="basic-only summary">
+  <p><strong>👉 想插一条运营资源位 / 大促展示位吗?</strong></p>
+  <ul style="margin-top:8px;">
+    <li>纯日常商品推荐 → <strong>常规型灵动岛</strong>(占消息位,纯色背景,简洁)</li>
+    <li>有运营会场要导流 → <strong>运营型灵动岛</strong>(同频色,有背景动效,灵活)</li>
+    <li>大促核心展示 → <strong>大促型灵动岛</strong>(尺寸更大、异型背板,最抓眼球)</li>
+  </ul>
+  <p style="margin-top:12px;color:var(--c-text-3);">📐 具体尺寸(131×44 / 144×52)/ 字号 / 材质规则,切到 <strong>专业版</strong> 看 3.1 完整表;<strong>下方 3.2</strong> 直接看 3 张原稿。</p>
+</div>
+<h3>3.1 灵动岛三型规范</h3>
+<h3>3.2 灵动岛运营资源位维度</h3>
+
+<table>
+<thead><tr><th>类型</th><th>标识</th><th>尺寸</th><th>商品/运营图</th><th>字号</th><th>材质</th><th>颜色规则</th><th>适用</th></tr></thead>
+<tbody>
+<tr><td>常规型</td><td><code>regular</code></td><td>131×44 DP</td><td>32 DP</td><td>主 14pt / 副 14pt / 小 10pt</td><td>纯色 <code>gray_6</code>,无描边</td><td>背景 <code>gray_6</code>,商品图底 <code>white</code>(PNG 透明底)</td><td>日常商品推荐</td></tr>
+<tr><td>运营型</td><td><code>operation</code></td><td>131×44 DP</td><td>32 DP</td><td>gif 文本按规范字号</td><td>渐变描边 100% + 85% 灰阶叠加</td><td>同频色 / 浅色背景 + 深色字</td><td>运营会场推广</td></tr>
+<tr><td>大促型</td><td><code>promotion</code></td><td>144×52 DP</td><td>34 DP</td><td>gif 文本 + 京东正黑强调</td><td>渐变描边 0~60% + 异型背板</td><td>同频色 / 浅色背景 + 深色字</td><td>重点大促活动</td></tr>
+</tbody>
+</table>
+
+</div><!-- /pro-only 3.1-3.2 -->
+
+
+<h3>3.2 灵动岛三型原稿</h3>
+<div class="stage stage--image">
+  <img src="./_assets/sec-3-island-regular.png?v=2" alt="常规灵动岛">
+</div>
+<div class="stage-label">📖 常规灵动岛(131×44, gray_6 纯色,商品图 32 DP)— 节点 312:47480, 1426×1856</div>
+
+<div class="stage stage--image">
+  <img src="./_assets/sec-3-island-operation.png?v=2" alt="运营灵动岛">
+</div>
+<div class="stage-label">📖 运营灵动岛(131×44, 渐变描边 100% + 85% 灰阶叠加,推荐同频色)— 节点 312:47617, 1426×1419</div>
+
+<div class="stage stage--image">
+  <img src="./_assets/sec-3-island-promo.png?v=2" alt="大促灵动岛">
+</div>
+<div class="stage-label">📖 大促灵动岛(144×52, 渐变描边 0~60% + 异型背板,运营图 34 DP)— 节点 312:47747, 1426×2154</div>
+
+<blockquote class="danger">
+<p><strong>不允许</strong>新增 Tabbar 形态。运营 / 大促诉求由灵动岛(占用消息位)承载,不允许新增第 5+ 坑位或将 Tabbar 整条改色。</p>
 </blockquote>
 
-<h2 id="sec-6"><span class="num">6</span>正反案例</h2>
+
+<!-- ============ ch-4 Relay 章节 04 应用场景 ============ -->
+<h2 id="ch-4"><span class="num">4</span>应用场景</h2>
+
+<p>本章覆盖 Tabbar 的<strong>典型业务场景配置</strong>(典型场景表)+ <strong>正反案例</strong>(展示规范边界,违反时的视觉后果)。</p>
+
+<h3>4.1 典型场景</h3>
+
+<table>
+<thead><tr><th>场景</th><th>形态</th><th>坑位数</th><th>灵动岛</th><th>招手</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>JD 首页(无 Agent)</td><td><code>regular</code></td><td>5</td><td>常规型(消息位)</td><td>红点 / 数字</td><td>购物车 / 消息常驻角标</td></tr>
+<tr><td>JD 首页(Agent 组合)</td><td><code>agent_combo</code></td><td>4</td><td>常规型 / 运营型</td><td>红点 / 数字 / 文字</td><td>左侧 Joy Agent 入口</td></tr>
+<tr><td>会场页 / 大促首页</td><td><code>regular</code></td><td>4 / 5</td><td>大促型(144×52)</td><td>无 / 文字</td><td>大促灵动岛占用消息位</td></tr>
+<tr><td>京喜 / 极速版独立 BG</td><td><code>regular</code></td><td>3</td><td>常规型</td><td>红点</td><td>3 坑位精简结构</td></tr>
+<tr><td>消息中心展开态</td><td><code>regular</code> / <code>agent_combo</code></td><td>5 / 4</td><td>展开(选中态背景消失)</td><td>降级红点</td><td>灵动岛展开期间招手降级</td></tr>
+<tr><td>客服 / Agent 入口</td><td><code>agent_combo</code></td><td>4</td><td>—</td><td>气泡(≤ 18 汉字)</td><td>点击进入对话中心场景弹层</td></tr>
+<tr><td>沉浸式视频 / 详情</td><td><code>regular</code></td><td>5</td><td>—</td><td>—</td><td>深底材质(iOS 26+ 液态 / 老系统毛玻璃)</td></tr>
+<tr><td>购物车数字提醒</td><td><code>regular</code></td><td>5</td><td>—</td><td>数字(≤ 99+)</td><td>购物车角标</td></tr>
+</tbody>
+</table>
+
+<h3>7.1 不该用 Tabbar 的场景</h3>
+
+<table>
+<thead><tr><th>反场景</th><th>应改用</th></tr></thead>
+<tbody>
+<tr><td>二级页面导航(详情页 Tab)</td><td>页面内 SegmentControl / TabBar(轻量)</td></tr>
+<tr><td>账户 / 偏好 / 长尾入口</td><td>Drawer / 「我的」二级页</td></tr>
+<tr><td>临时操作反馈(成功 / 失败)</td><td>Toast(center / top 位)</td></tr>
+<tr><td>跨页内容浮窗</td><td>Banner / Sheet</td></tr>
+<tr><td>需要超过 5 个一级功能的场景</td><td>在内容层重新组织(并入 / 拆 BG)</td></tr>
+<tr><td>临时强提醒</td><td>Dialog / Modal</td></tr>
+</tbody>
+</table>
+
+
+<h3>4.2 正反案例</h3>
 
 <div class="case good">
   <h4><span class="badge">✓ 正例 A</span> 标准 5 坑位常规底导</h4>
@@ -869,35 +906,27 @@
   <p><strong>问题</strong>:坑位均分布局是 V16 强约束(章节 02 各坑位均分)。中部留空破坏均分。如要嵌入灵动岛,应使用灵动岛占用消息位规则(见 sec-3),不要直接留白。</p>
 </div>
 
-<h2 id="sec-7"><span class="num">7</span>典型场景</h2>
 
-<table>
-<thead><tr><th>场景</th><th>形态</th><th>坑位数</th><th>灵动岛</th><th>招手</th><th>说明</th></tr></thead>
-<tbody>
-<tr><td>JD 首页(无 Agent)</td><td><code>regular</code></td><td>5</td><td>常规型(消息位)</td><td>红点 / 数字</td><td>购物车 / 消息常驻角标</td></tr>
-<tr><td>JD 首页(Agent 组合)</td><td><code>agent_combo</code></td><td>4</td><td>常规型 / 运营型</td><td>红点 / 数字 / 文字</td><td>左侧 Joy Agent 入口</td></tr>
-<tr><td>会场页 / 大促首页</td><td><code>regular</code></td><td>4 / 5</td><td>大促型(144×52)</td><td>无 / 文字</td><td>大促灵动岛占用消息位</td></tr>
-<tr><td>京喜 / 极速版独立 BG</td><td><code>regular</code></td><td>3</td><td>常规型</td><td>红点</td><td>3 坑位精简结构</td></tr>
-<tr><td>消息中心展开态</td><td><code>regular</code> / <code>agent_combo</code></td><td>5 / 4</td><td>展开(选中态背景消失)</td><td>降级红点</td><td>灵动岛展开期间招手降级</td></tr>
-<tr><td>客服 / Agent 入口</td><td><code>agent_combo</code></td><td>4</td><td>—</td><td>气泡(≤ 18 汉字)</td><td>点击进入对话中心场景弹层</td></tr>
-<tr><td>沉浸式视频 / 详情</td><td><code>regular</code></td><td>5</td><td>—</td><td>—</td><td>深底材质(iOS 26+ 液态 / 老系统毛玻璃)</td></tr>
-<tr><td>购物车数字提醒</td><td><code>regular</code></td><td>5</td><td>—</td><td>数字(≤ 99+)</td><td>购物车角标</td></tr>
-</tbody>
-</table>
+<!-- ============ ch-5 Relay 章节 05 多端适配 ============ -->
+<h2 id="ch-5"><span class="num">5</span>多端适配</h2>
 
-<h3>7.1 不该用 Tabbar 的场景</h3>
+<p>底导背景材质按 <strong>OS 端 + 版本</strong>差异化适配,保证跨平台视觉一致性。同时记录组件动效规范(motion / transition)。</p>
+<h3>5.1 多端材质适配</h3>
 
-<table>
-<thead><tr><th>反场景</th><th>应改用</th></tr></thead>
-<tbody>
-<tr><td>二级页面导航(详情页 Tab)</td><td>页面内 SegmentControl / TabBar(轻量)</td></tr>
-<tr><td>账户 / 偏好 / 长尾入口</td><td>Drawer / 「我的」二级页</td></tr>
-<tr><td>临时操作反馈(成功 / 失败)</td><td>Toast(center / top 位)</td></tr>
-<tr><td>跨页内容浮窗</td><td>Banner / Sheet</td></tr>
-<tr><td>需要超过 5 个一级功能的场景</td><td>在内容层重新组织(并入 / 拆 BG)</td></tr>
-<tr><td>临时强提醒</td><td>Dialog / Modal</td></tr>
-</tbody>
-</table>
+<div class="stage stage--image">
+  <img src="./_assets/sec-5-multi-platform.png?v=2" alt="多端材质适配原稿">
+</div>
+<div class="stage-label">📖 iOS 26+ 液态玻璃 vs iOS 26 以下 + Android 毛玻璃 fallback — 节点 312:52986, 1426×1374</div>
+
+<h3>5.2 动效</h3>
+
+<blockquote class="warn">
+<p>⚠️ <strong>TBD</strong>:本组件 design.md 暂未提供 motion / transition 参数。建议补充:
+  ① Tab 切换的内容入场动效(<code>page-transition</code>?)
+  ② 选中态色 + 背景的过渡时长 / easing
+  ③ 灵动岛展开/收起动效参数(对应 V16 motion token <code>role.island-expand</code> / <code>role.island-collapse</code>)
+  ④ Joy Agent 抽缩(16 → 28 DP)的过渡参数</p>
+</blockquote>
 
 <hr>
 
