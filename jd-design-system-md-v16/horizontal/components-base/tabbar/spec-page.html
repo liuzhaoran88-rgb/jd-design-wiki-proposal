@@ -416,9 +416,20 @@
   @media (max-width: 720px) {
     .stage--image { margin-left: -8px; margin-right: -8px; }
   }
-  /* case 容器内 stage 不要跨出 case 边界(否则溢出)*/
-  .case .stage--image { margin-left: 0; margin-right: 0; padding: 0; }
-  .case .stage img { max-width: 100%; }
+  /* case 容器内 stage 不要跨出 case 边界(否则溢出),保留小气息 */
+  .case .stage--image {
+    margin-left: 0;
+    margin-right: 0;
+    padding: 12px 0;
+    background: transparent;
+  }
+  .case .stage img { max-width: 100%; height: auto; }
+  /* case 内的 stage--mini-mock(反例 D/E/H 用)收紧间距 */
+  .case .stage--mini-mock {
+    margin-left: 0;
+    margin-right: 0;
+    padding: 16px;
+  }
   .stage--image a.zoom-link {
     display: inline-block;
     margin-top: 8px;
@@ -813,7 +824,7 @@
 </tbody>
 </table>
 
-<h3>7.1 不该用 Tabbar 的场景</h3>
+<h4>4.1.1 不该用 Tabbar 的场景</h4>
 
 <table>
 <thead><tr><th>反场景</th><th>应改用</th></tr></thead>
@@ -838,7 +849,7 @@
   <ul>
     <li>形态 <code>regular</code>,5 坑位均分,坑位文本 ≤ 4 汉字</li>
     <li>选中态 <code>jdred</code>,默认态 <code>gray_1</code>,符合所有规则</li>
-    <li>📖 见上方 sec-3 常规底导布局原稿展示具体细节</li>
+    <li>📖 见 <a href="#ch-2">章节 2.4 形态原稿展示</a> 看完整细节</li>
   </ul>
 </div>
 
@@ -850,7 +861,7 @@
   <ul>
     <li>形态 <code>agent_combo</code>,Joy Agent 52×52,右侧 319 DP</li>
     <li>距 Agent 间距 8 DP,Agent 距底部 17 DP</li>
-    <li>📖 完整 Joy Agent 行为见 4.6 实体预览</li>
+    <li>📖 完整 Joy Agent 行为见 <a href="#ch-2">章节 2.2.6 Joy Agent 实体预览</a></li>
   </ul>
 </div>
 
