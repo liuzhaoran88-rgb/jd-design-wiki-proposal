@@ -480,6 +480,67 @@
   body.mode-pro .pro-inline { display: inline; }
   .pro-inline { color: var(--c-text-3); font-size: 12px; margin-left: 6px; }
 </style>
+
+<style>
+  /* token 实物展示 */
+  .token-grid { display: grid; gap: 12px; margin: 16px 0; }
+  .color-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+  .color-card {
+    padding: 20px 16px;
+    border-radius: var(--r-base);
+    border: 1px solid var(--c-line);
+    min-height: 88px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .color-card__hex { font-family: "JetBrains Mono", monospace; font-size: 13px; font-weight: 600; }
+  .color-card__name { font-size: 11px; opacity: 0.85; }
+
+  .typo-list { display: flex; flex-direction: column; gap: 12px; margin: 16px 0; }
+  .typo-row {
+    display: flex; align-items: baseline; gap: 16px;
+    padding: 12px 16px;
+    background: var(--c-bg-sunken);
+    border-radius: var(--r-base);
+  }
+  .typo-sample { color: var(--c-text); flex: 1; }
+  .typo-name { color: var(--c-text-3); font-size: 11px; flex-shrink: 0; }
+
+  .radius-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+  .radius-card {
+    background: var(--c-bg-sunken);
+    padding: 20px 16px;
+    text-align: center;
+    border-radius: var(--r-base);
+  }
+  .radius-box { width: 64px; height: 64px; margin: 0 auto 12px; background: var(--c-brand); }
+  .radius-name { font-family: monospace; font-size: 12px; font-weight: 600; color: var(--c-text); }
+  .radius-val { font-size: 11px; color: var(--c-text-3); margin-top: 4px; }
+
+  .spacing-row { display: flex; align-items: center; gap: 16px; padding: 12px; background: var(--c-bg-sunken); border-radius: var(--r-base); margin-bottom: 8px; }
+  .spacing-bar { height: 24px; background: var(--c-brand); border-radius: 3px; min-width: 1px; }
+  .spacing-info { font-size: 13px; }
+  .spacing-info code { font-size: 12px; }
+
+  .icon-size-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+  .icon-card { background: var(--c-bg-sunken); padding: 16px; text-align: center; border-radius: var(--r-base); }
+  .icon-box { background: var(--c-text); border-radius: 4px; margin: 0 auto 8px; }
+  .icon-name { font-family: monospace; font-size: 11px; color: var(--c-text); }
+  .icon-val { font-size: 11px; color: var(--c-text-3); }
+
+  .lines-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+  .lines-card { background: var(--c-bg-sunken); padding: 16px; border-radius: var(--r-base); }
+  .lines-bar { width: 100%; margin-bottom: 8px; }
+  .lines-name { font-family: monospace; font-size: 12px; color: var(--c-text); }
+  .lines-val { font-size: 11px; color: var(--c-text-3); }
+
+  .materials-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+  .material-card { height: 140px; border-radius: var(--r-l, 8px); overflow: hidden; position: relative; background: linear-gradient(135deg, #ff0f23, #ff8c00, #ffd700, #00aaff); }
+  .material-card__inner { position: absolute; inset: 16px; padding: 12px; color: var(--c-text); display: flex; flex-direction: column; justify-content: flex-end; border-radius: var(--r-base); font-weight: 600; }
+  .material--liquid .material-card__inner { background: rgba(255,255,255,0.55); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); }
+  .material--frosted .material-card__inner { background: rgba(255,255,255,0.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+  .material-card small { font-weight: 400; color: var(--c-text-3); font-size: 11px; }
+</style>
+
 </head>
 <body>
 <div class="doc">
@@ -493,8 +554,8 @@
 </div>
 <div class="meta">
   适用范围:JD APP V16.0 设计系统的所有组件 / 页面共享基础规范<br>
-  来源:Relay V16.0 GUIDELINE 多节点 + <code>jd-design-system-md-v16/foundations/</code> 9 份 md<br>
-  覆盖 token 类别:<code>color</code> / <code>typography</code> / <code>radius</code> / <code>spacing</code> / <code>icon</code> / <code>lines</code> / <code>layout</code> / <code>materials</code>
+  来源:Relay V16.0 GUIDELINE 多节点 + <code>jd-design-system-md-v16/foundations/</code> 9 份 md + <code>tokens/tokens.json</code> 真实数据<br>
+  覆盖 token 类别:<code>color</code>(34)/ <code>typography</code>(26 组合)/ <code>radius</code>(7)/ <code>spacing</code> / <code>icon</code> / <code>lines</code> / <code>layout</code> / <code>materials</code>
 </div>
 
 <div class="toc">
@@ -514,8 +575,8 @@
 <div class="basic-only summary" style="background:#fff5e6;border-left-color:#f59f00;">
   <p style="margin:0 0 8px;"><strong>📖 这页文档怎么读?</strong></p>
   <ul style="margin:0;">
-    <li><strong>第一次看</strong>(产品 / 跨职能 / 老板) → 当前是<strong>常规版</strong>,8 个 token 类别按数字依次浏览,每节有「👉」开头的简介。</li>
-    <li><strong>已经熟悉</strong>(设计师 / 工程师) → 切到右上 <strong>专业版</strong>,展开每节的完整 token 表(摘录第一张关键表;详细规范点 GitHub 链接)。</li>
+    <li><strong>第一次看</strong>(产品 / 跨职能 / 老板) → 8 个 token 类别按数字浏览,每节有视觉示例(色块 / 字样 / 圆角方块 / 间距条 等)。</li>
+    <li><strong>设计师 / 工程师</strong> → 鼠标 hover token 卡片看具体值;点 GitHub 链接看完整命名规则 / V15 升级映射。</li>
     <li><strong>跨章节查 token</strong> → 用浏览器 <code>Cmd+F</code> 搜 token 名(如 <code>color_primary</code> / <code>radius_xxl</code>)。</li>
     <li><strong>组件落地示例</strong> → 见 <a href="../horizontal/components-base/tabbar/spec-page.html">tabbar/spec-page.html</a>(组件如何引用本 Foundation 的 token)。</li>
   </ul>
@@ -525,337 +586,380 @@
 <!-- ============ ch-1 颜色 ============ -->
 <h2 id="ch-1"><span class="num">1</span>🎨 颜色</h2>
 
-<p><strong>色彩 token 体系 — 中性 / 品牌 / 反馈 / 服务等 9 类</strong></p>
+<p><strong>色彩 token 体系 — 9 大语义组(主色/服务/文字/背景/边框/反馈/Info)</strong></p>
 
 <div class="basic-only summary">
-  <p><strong>👉 这一类 token 是干什么的?</strong></p>
-  <h1>色彩 Token · V16.0</h1>
-<blockquote>
-<p>V16.0 色彩体系是 <strong>3 层架构</strong>：组件 → Token（语义） → Atom（原子色板）→ Hex/Dark variant。</p>
-<p>本文档定义 <strong>L2 Token 层</strong>（34 个语义 token，10 大组）。L1 Atom 层在 <code>tokens.json#atom</code> 维护；hex 与 dark 值待从平台色板批量提取。</p>
-</blockquote>
-<hr />
-  <p style="margin-top:12px;color:var(--c-text-3);">📖 完整 token 列表 / 命名规则 / 使用边界 → <a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/tokens/color.md" target="_blank" rel="noopener">tokens/color.md (GitHub)</a></p>
+  <p style="margin:0;">📖 完整 token 列表 / 命名规则 / V15 升级映射 → <a href="https://github.com/ShuaiMXu/xMu-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/tokens/color.md" target="_blank" rel="noopener">color.md (GitHub)</a></p>
 </div>
 
-<div class="pro-only">
-
-<h3>1.1 完整 token 表(摘录第一张关键表)</h3>
-
-<table>
-<thead>
-<tr>
-<th>变化</th>
-<th>V15.0</th>
-<th>V16.0</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>架构</strong></td>
-<td>Token → Hex 直给（混层）</td>
-<td>Token → Atom → Hex（3 层解耦）</td>
-</tr>
-<tr>
-<td><strong>命名</strong></td>
-<td><code>color.brand.primary</code>（dot 层级）</td>
-<td><code>color_primary</code>（snake 平铺）</td>
-</tr>
-<tr>
-<td><strong>Error/Danger</strong></td>
-<td><code>semantic.danger = brand.primary = #ff0f23</code>（共色，wash 区分）</td>
-<td><strong><code>color_error</code> 独立色族 errorred</strong>（彻底拆开）</td>
-</tr>
-<tr>
-<td><strong>Service</strong></td>
-<td><code>functional.service-gold-{1..7,subtle,strong}</code> 9 个零散</td>
-<td><strong><code>color_service{,_bground,_border,_text}</code> 四件套</strong></td>
-</tr>
-<tr>
-<td><strong>镂空背景体系</strong></td>
-<td>无</td>
-<td><strong>新增</strong>：<code>color_primary_light</code> / <code>_light_pressed</code></td>
-</tr>
-<tr>
-<td><strong>点击态</strong></td>
-<td>V15 标记 TODO "Relay 暂未规范"</td>
-<td><strong>覆盖</strong>：<code>*_pressed</code> 系列</td>
-</tr>
-<tr>
-<td><strong>容错蒙层</strong></td>
-<td>无</td>
-<td><strong>新增</strong>：<code>color_mask_fault_toleran</code></td>
-</tr>
-</tbody>
-</table>
-
-<p style="margin-top:8px;"><strong>📖 完整规范</strong>:<a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/tokens/color.md" target="_blank" rel="noopener">tokens/color.md</a> · 包含本章节剩余表格、Atom 命名、用法示例、与 V15 升级映射等。</p>
-
-</div><!-- /pro-only ch-1 -->
+<h4>主色 Primary</h4>
+<div class="token-grid color-grid">
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_primary</div>
+</div>
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_primary_text</div>
+</div>
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_primary_pressed</div>
+</div>
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_primary_disabled</div>
+</div>
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_primary_disabled_special</div>
+</div>
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_primary_light</div>
+</div>
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_primary_light_pressed</div>
+</div>
+</div>
+<h4>服务 Service</h4>
+<div class="token-grid color-grid">
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_service</div>
+</div>
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_service_bground</div>
+</div>
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_service_border</div>
+</div>
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_service_text</div>
+</div>
+</div>
+<h4>文字 Text</h4>
+<div class="token-grid color-grid">
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_title</div>
+</div>
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_text</div>
+</div>
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_text_help</div>
+</div>
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_text_disabled</div>
+</div>
+</div>
+<h4>背景 Background</h4>
+<div class="token-grid color-grid">
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_background</div>
+</div>
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_background_overlay</div>
+</div>
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_background_component</div>
+</div>
+</div>
+<h4>边框 / 蒙层</h4>
+<div class="token-grid color-grid">
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_border</div>
+</div>
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_mask</div>
+</div>
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_mask_part</div>
+</div>
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_mask_fault_toleran</div>
+</div>
+</div>
+<h4>成功 Success</h4>
+<div class="token-grid color-grid">
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_success</div>
+</div>
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_success_light</div>
+</div>
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_success_pressed</div>
+</div>
+</div>
+<h4>错误 Error</h4>
+<div class="token-grid color-grid">
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_error</div>
+</div>
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_error_light</div>
+</div>
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_error_pressed</div>
+</div>
+</div>
+<h4>警告 Warning</h4>
+<div class="token-grid color-grid">
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_warning</div>
+</div>
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_warning_light</div>
+</div>
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_warning_pressed</div>
+</div>
+</div>
+<h4>信息 Info</h4>
+<div class="token-grid color-grid">
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_Info</div>
+</div>
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_Info_light</div>
+</div>
+<div class="color-card" style="background:?;color:#171a26">
+  <div class="color-card__hex">?</div>
+  <div class="color-card__name">color_Info_pressed</div>
+</div>
+</div>
 
 
 <!-- ============ ch-2 文字 ============ -->
 <h2 id="ch-2"><span class="num">2</span>✍ 文字</h2>
 
-<p><strong>字体 / 字号 / 字重 / 行高 token,基于苹方 / 京东正黑</strong></p>
+<p><strong>字体 token 体系 — Family × Size × Weight 三层组合</strong></p>
 
 <div class="basic-only summary">
-  <p><strong>👉 这一类 token 是干什么的?</strong></p>
-  <h1>字体 Token · V16.0</h1>
-<blockquote>
-<p>V16.0 字体 token 三层：<strong>Family</strong>（字族）× <strong>Size</strong>（字阶）× <strong>Weight</strong>（字重）。组件层引用 <strong>Role 组合 token</strong>（如 <code>font_size_14_400</code> = pingfang 14pt regular）。</p>
-</blockquote>
-<hr />
-  <p style="margin-top:12px;color:var(--c-text-3);">📖 完整 token 列表 / 命名规则 / 使用边界 → <a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/tokens/typography.md" target="_blank" rel="noopener">tokens/typography.md (GitHub)</a></p>
+  <p style="margin:0;">📖 完整 token 列表 / 命名规则 / V15 升级映射 → <a href="https://github.com/ShuaiMXu/xMu-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/tokens/typography.md" target="_blank" rel="noopener">typography.md (GitHub)</a></p>
 </div>
 
-<div class="pro-only">
-
-<h3>2.1 完整 token 表(摘录第一张关键表)</h3>
-
-<table>
-<thead>
-<tr>
-<th>维度</th>
-<th>V15.0</th>
-<th>V16.0</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>字阶</strong></td>
-<td>5 通用（10/12/14/15/18）+ 3 价格专用（24/18/15）</td>
-<td><strong>7 通用（10/11/13/14/16/18/24）</strong>，价格融入通用字阶</td>
-</tr>
-<tr>
-<td><strong>删除字号</strong></td>
-<td>—</td>
-<td>❌ 12pt、15pt（被 11/13 / 16 替代）</td>
-</tr>
-<tr>
-<td><strong>新增字号</strong></td>
-<td>—</td>
-<td>✅ <strong>11pt、13pt、16pt</strong>（更细粒度）</td>
-</tr>
-<tr>
-<td><strong>T-shirt size 语义</strong></td>
-<td>无</td>
-<td><strong>新增</strong> <code>font_size_{xxs,xs,s,base,l,xl,xxl}</code> 7 级</td>
-</tr>
-<tr>
-<td><strong>字族命名</strong></td>
-<td><code>brand</code> / <code>sans</code> / <code>number</code></td>
-<td><strong><code>pingfang</code> / <code>zhenghei</code></strong>（直用字体名）</td>
-</tr>
-<tr>
-<td><strong>品牌字体</strong></td>
-<td>京东朗正体 V2.0</td>
-<td>❌ 文字变量页未出现，疑似 V16 移除</td>
-</tr>
-<tr>
-<td><strong>字重</strong></td>
-<td>regular(400) / semibold(600) / <strong>bold(700)</strong></td>
-<td>regular(400) / semibold(600)；<strong>bold 700 移除</strong></td>
-</tr>
-<tr>
-<td><strong>role 命名</strong></td>
-<td><code>typography.role.heading-page</code> 等 9 个</td>
-<td><strong><code>{family}_{size}_{weight}</code> 组合 token</strong>（26 组）</td>
-</tr>
-<tr>
-<td><strong>行高规则</strong></td>
-<td>"字号 × 1.5，奇数 -1"（loose）</td>
-<td><strong>"向下取整偶数"</strong>（2026-04-17 改）</td>
-</tr>
-</tbody>
-</table>
-
-<p style="margin-top:8px;"><strong>📖 完整规范</strong>:<a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/tokens/typography.md" target="_blank" rel="noopener">tokens/typography.md</a> · 包含本章节剩余表格、Atom 命名、用法示例、与 V15 升级映射等。</p>
-
-</div><!-- /pro-only ch-2 -->
+<h4>PingFang Regular</h4>
+<div class="typo-list">
+<div class="typo-row">
+  <span class="typo-sample" style="font-family:"PingFang SC", system-ui, sans-serif;font-weight:400;font-size:13px;">京东设计 JD Design 0123 — 10pt</span>
+  <code class="typo-name">pingfang_regular/font_size_10_400</code>
+</div>
+<div class="typo-row">
+  <span class="typo-sample" style="font-family:"PingFang SC", system-ui, sans-serif;font-weight:400;font-size:14px;">京东设计 JD Design 0123 — 11pt</span>
+  <code class="typo-name">pingfang_regular/font_size_11_400</code>
+</div>
+<div class="typo-row">
+  <span class="typo-sample" style="font-family:"PingFang SC", system-ui, sans-serif;font-weight:400;font-size:17px;">京东设计 JD Design 0123 — 13pt</span>
+  <code class="typo-name">pingfang_regular/font_size_13_400</code>
+</div>
+<div class="typo-row">
+  <span class="typo-sample" style="font-family:"PingFang SC", system-ui, sans-serif;font-weight:400;font-size:18px;">京东设计 JD Design 0123 — 14pt</span>
+  <code class="typo-name">pingfang_regular/font_size_14_400</code>
+</div>
+<div class="typo-row">
+  <span class="typo-sample" style="font-family:"PingFang SC", system-ui, sans-serif;font-weight:400;font-size:21px;">京东设计 JD Design 0123 — 16pt</span>
+  <code class="typo-name">pingfang_regular/font_size_16_400</code>
+</div>
+<div class="typo-row">
+  <span class="typo-sample" style="font-family:"PingFang SC", system-ui, sans-serif;font-weight:400;font-size:23px;">京东设计 JD Design 0123 — 18pt</span>
+  <code class="typo-name">pingfang_regular/font_size_18_400</code>
+</div>
+</div>
+<h4>PingFang SemiBold</h4>
+<div class="typo-list">
+<div class="typo-row">
+  <span class="typo-sample" style="font-family:"PingFang SC", system-ui, sans-serif;font-weight:600;font-size:13px;">京东设计 JD Design 0123 — 10pt</span>
+  <code class="typo-name">pingfang_semibold/font_size_10_600</code>
+</div>
+<div class="typo-row">
+  <span class="typo-sample" style="font-family:"PingFang SC", system-ui, sans-serif;font-weight:600;font-size:14px;">京东设计 JD Design 0123 — 11pt</span>
+  <code class="typo-name">pingfang_semibold/font_size_11_600</code>
+</div>
+<div class="typo-row">
+  <span class="typo-sample" style="font-family:"PingFang SC", system-ui, sans-serif;font-weight:600;font-size:17px;">京东设计 JD Design 0123 — 13pt</span>
+  <code class="typo-name">pingfang_semibold/font_size_13_600</code>
+</div>
+<div class="typo-row">
+  <span class="typo-sample" style="font-family:"PingFang SC", system-ui, sans-serif;font-weight:600;font-size:18px;">京东设计 JD Design 0123 — 14pt</span>
+  <code class="typo-name">pingfang_semibold/font_size_14_600</code>
+</div>
+<div class="typo-row">
+  <span class="typo-sample" style="font-family:"PingFang SC", system-ui, sans-serif;font-weight:600;font-size:21px;">京东设计 JD Design 0123 — 16pt</span>
+  <code class="typo-name">pingfang_semibold/font_size_16_600</code>
+</div>
+<div class="typo-row">
+  <span class="typo-sample" style="font-family:"PingFang SC", system-ui, sans-serif;font-weight:600;font-size:23px;">京东设计 JD Design 0123 — 18pt</span>
+  <code class="typo-name">pingfang_semibold/font_size_18_600</code>
+</div>
+</div>
+<h4>京东正黑 Regular(实际渲染用 PingFang fallback)</h4>
+<div class="typo-list">
+<div class="typo-row">
+  <span class="typo-sample" style="font-family:"PingFang SC", system-ui, sans-serif;font-weight:400;font-size:13px;">京东设计 JD Design 0123 — 10pt</span>
+  <code class="typo-name">zhenghei_regular/font_size_10_400</code>
+</div>
+<div class="typo-row">
+  <span class="typo-sample" style="font-family:"PingFang SC", system-ui, sans-serif;font-weight:400;font-size:14px;">京东设计 JD Design 0123 — 11pt</span>
+  <code class="typo-name">zhenghei_regular/font_size_11_400</code>
+</div>
+<div class="typo-row">
+  <span class="typo-sample" style="font-family:"PingFang SC", system-ui, sans-serif;font-weight:400;font-size:17px;">京东设计 JD Design 0123 — 13pt</span>
+  <code class="typo-name">zhenghei_regular/font_size_13_400</code>
+</div>
+<div class="typo-row">
+  <span class="typo-sample" style="font-family:"PingFang SC", system-ui, sans-serif;font-weight:400;font-size:18px;">京东设计 JD Design 0123 — 14pt</span>
+  <code class="typo-name">zhenghei_regular/font_size_14_400</code>
+</div>
+<div class="typo-row">
+  <span class="typo-sample" style="font-family:"PingFang SC", system-ui, sans-serif;font-weight:400;font-size:21px;">京东设计 JD Design 0123 — 16pt</span>
+  <code class="typo-name">zhenghei_regular/font_size_16_400</code>
+</div>
+<div class="typo-row">
+  <span class="typo-sample" style="font-family:"PingFang SC", system-ui, sans-serif;font-weight:400;font-size:23px;">京东设计 JD Design 0123 — 18pt</span>
+  <code class="typo-name">zhenghei_regular/font_size_18_400</code>
+</div>
+<div class="typo-row">
+  <span class="typo-sample" style="font-family:"PingFang SC", system-ui, sans-serif;font-weight:400;font-size:31px;">京东设计 JD Design 0123 — 24pt</span>
+  <code class="typo-name">zhenghei_regular/font_size_24_400</code>
+</div>
+</div>
+<h4>京东正黑 Bold(实际渲染用 PingFang fallback)</h4>
+<div class="typo-list">
+<div class="typo-row">
+  <span class="typo-sample" style="font-family:"PingFang SC", system-ui, sans-serif;font-weight:700;font-size:13px;">京东设计 JD Design 0123 — 10pt</span>
+  <code class="typo-name">zhenghei_bold/font_size_10_600</code>
+</div>
+<div class="typo-row">
+  <span class="typo-sample" style="font-family:"PingFang SC", system-ui, sans-serif;font-weight:700;font-size:14px;">京东设计 JD Design 0123 — 11pt</span>
+  <code class="typo-name">zhenghei_bold/font_size_11_600</code>
+</div>
+<div class="typo-row">
+  <span class="typo-sample" style="font-family:"PingFang SC", system-ui, sans-serif;font-weight:700;font-size:17px;">京东设计 JD Design 0123 — 13pt</span>
+  <code class="typo-name">zhenghei_bold/font_size_13_600</code>
+</div>
+<div class="typo-row">
+  <span class="typo-sample" style="font-family:"PingFang SC", system-ui, sans-serif;font-weight:700;font-size:18px;">京东设计 JD Design 0123 — 14pt</span>
+  <code class="typo-name">zhenghei_bold/font_size_14_600</code>
+</div>
+<div class="typo-row">
+  <span class="typo-sample" style="font-family:"PingFang SC", system-ui, sans-serif;font-weight:700;font-size:21px;">京东设计 JD Design 0123 — 16pt</span>
+  <code class="typo-name">zhenghei_bold/font_size_16_600</code>
+</div>
+<div class="typo-row">
+  <span class="typo-sample" style="font-family:"PingFang SC", system-ui, sans-serif;font-weight:700;font-size:23px;">京东设计 JD Design 0123 — 18pt</span>
+  <code class="typo-name">zhenghei_bold/font_size_18_600</code>
+</div>
+<div class="typo-row">
+  <span class="typo-sample" style="font-family:"PingFang SC", system-ui, sans-serif;font-weight:700;font-size:31px;">京东设计 JD Design 0123 — 24pt</span>
+  <code class="typo-name">zhenghei_bold/font_size_24_600</code>
+</div>
+</div>
 
 
 <!-- ============ ch-3 圆角 ============ -->
 <h2 id="ch-3"><span class="num">3</span>⬜ 圆角</h2>
 
-<p><strong>T-shirt size 命名(xxs / xs / s / base / l / xl / xxl)</strong></p>
+<p><strong>T-shirt size 命名 7 阶(xxs / xs / s / base / l / xl / xxl)</strong></p>
 
 <div class="basic-only summary">
-  <p><strong>👉 这一类 token 是干什么的?</strong></p>
-  <h1>圆角 Token · V16.0</h1>
-<blockquote>
-<p>V16.0 圆角 token 7 阶（T-shirt size），按<strong>单行高度 / 组件类型</strong>精确分配。</p>
-</blockquote>
-<hr />
-  <p style="margin-top:12px;color:var(--c-text-3);">📖 完整 token 列表 / 命名规则 / 使用边界 → <a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/tokens/radius.md" target="_blank" rel="noopener">tokens/radius.md (GitHub)</a></p>
+  <p style="margin:0;">📖 完整 token 列表 / 命名规则 / V15 升级映射 → <a href="https://github.com/ShuaiMXu/xMu-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/tokens/radius.md" target="_blank" rel="noopener">radius.md (GitHub)</a></p>
 </div>
 
-<div class="pro-only">
-
-<h3>3.1 完整 token 表(摘录第一张关键表)</h3>
-
-<table>
-<thead>
-<tr>
-<th>V15 token</th>
-<th>V15 值</th>
-<th>V16 token</th>
-<th>V16 值</th>
-<th>状态</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>radius.0</code></td>
-<td>0</td>
-<td><code>radius_xxs</code></td>
-<td>0</td>
-<td><strong>upgraded</strong>（语义升级：V15 "直角" → V16 "平台型通栏卡片"）</td>
-</tr>
-<tr>
-<td><code>radius.xs</code></td>
-<td>2px</td>
-<td><code>radius_xs</code></td>
-<td>2</td>
-<td><strong>unchanged</strong></td>
-</tr>
-<tr>
-<td><code>radius.s</code></td>
-<td>4px</td>
-<td><code>radius_s</code></td>
-<td>4</td>
-<td><strong>unchanged</strong></td>
-</tr>
-<tr>
-<td><code>radius.base</code></td>
-<td>6px</td>
-<td><code>radius_base</code></td>
-<td>6</td>
-<td><strong>upgraded</strong>（语义精确化：V15 "默认按钮/卡片" → V16 "单行高度 28-36 组件"）</td>
-</tr>
-<tr>
-<td><code>radius.detail</code></td>
-<td>8px</td>
-<td><code>radius_l</code></td>
-<td>8</td>
-<td><strong>upgraded</strong>（重命名 detail→l）</td>
-</tr>
-<tr>
-<td>—</td>
-<td>—</td>
-<td><code>radius_xxl</code></td>
-<td>16</td>
-<td><strong>new</strong></td>
-</tr>
-<tr>
-<td><code>radius.xl</code></td>
-<td>12px</td>
-<td><code>radius_xl</code></td>
-<td>12</td>
-<td><strong>unchanged</strong>（值同，用法重定位）</td>
-</tr>
-<tr>
-<td><code>radius.structural</code></td>
-<td>24px</td>
-<td>—</td>
-<td>—</td>
-<td><strong>deprecated</strong></td>
-</tr>
-<tr>
-<td><code>radius.full</code></td>
-<td>9999px</td>
-<td>—</td>
-<td>—</td>
-<td><strong>deprecated</strong>（胶囊型整体移除？需确认）</td>
-</tr>
-</tbody>
-</table>
-
-<p style="margin-top:8px;"><strong>📖 完整规范</strong>:<a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/tokens/radius.md" target="_blank" rel="noopener">tokens/radius.md</a> · 包含本章节剩余表格、Atom 命名、用法示例、与 V15 升级映射等。</p>
-
-</div><!-- /pro-only ch-3 -->
+<div class="token-grid radius-grid">
+<div class="radius-card">
+  <div class="radius-box" style="border-radius:0px;"></div>
+  <div class="radius-name">radius_xxs</div>
+  <div class="radius-val">0px</div>
+</div>
+<div class="radius-card">
+  <div class="radius-box" style="border-radius:2px;"></div>
+  <div class="radius-name">radius_xs</div>
+  <div class="radius-val">2px</div>
+</div>
+<div class="radius-card">
+  <div class="radius-box" style="border-radius:4px;"></div>
+  <div class="radius-name">radius_s</div>
+  <div class="radius-val">4px</div>
+</div>
+<div class="radius-card">
+  <div class="radius-box" style="border-radius:6px;"></div>
+  <div class="radius-name">radius_base</div>
+  <div class="radius-val">6px</div>
+</div>
+<div class="radius-card">
+  <div class="radius-box" style="border-radius:8px;"></div>
+  <div class="radius-name">radius_l</div>
+  <div class="radius-val">8px</div>
+</div>
+<div class="radius-card">
+  <div class="radius-box" style="border-radius:12px;"></div>
+  <div class="radius-name">radius_xl</div>
+  <div class="radius-val">12px</div>
+</div>
+<div class="radius-card">
+  <div class="radius-box" style="border-radius:16px;"></div>
+  <div class="radius-name">radius_xxl</div>
+  <div class="radius-val">16px</div>
+</div>
+</div>
 
 
 <!-- ============ ch-4 间距 ============ -->
 <h2 id="ch-4"><span class="num">4</span>📏 间距</h2>
 
-<p><strong>空间布局规范(内 padding / 外 margin / 组件间距)</strong></p>
+<p><strong>空间布局 + 安全区 token</strong></p>
 
 <div class="basic-only summary">
-  <p><strong>👉 这一类 token 是干什么的?</strong></p>
-  <h1>间距 Token · V16.0</h1>
-<blockquote>
-<p>V16.0 间距体系 <strong>沿用 V15 的双梯度（导购型 / 平台型） + 基量 4</strong>，但<strong>未在「语义化统一」里出现新的 spacing token frame</strong>。空间布局 1/2/3 规范页（<code>6:3</code>）里以「DP 数值 + 用法描述」形式呈现，token 命名沿用 V15 即可。</p>
-<p><strong>重大新增</strong>：Z 轴层级模型（4 层）+ 悬浮底导起始器 17DP。</p>
-</blockquote>
-<hr />
-  <p style="margin-top:12px;color:var(--c-text-3);">📖 完整 token 列表 / 命名规则 / 使用边界 → <a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/tokens/spacing.md" target="_blank" rel="noopener">tokens/spacing.md (GitHub)</a></p>
+  <p style="margin:0;">📖 完整 token 列表 / 命名规则 / V15 升级映射 → <a href="https://github.com/ShuaiMXu/xMu-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/tokens/spacing.md" target="_blank" rel="noopener">spacing.md (GitHub)</a></p>
 </div>
 
-<div class="pro-only">
-
-<h3>4.1 完整 token 表(摘录第一张关键表)</h3>
-
-<table>
-<thead>
-<tr>
-<th>变化</th>
-<th>V15</th>
-<th>V16</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>基量</strong></td>
-<td>4</td>
-<td>4 ✅</td>
-</tr>
-<tr>
-<td><strong>双梯度</strong></td>
-<td>平台型 / 导购型</td>
-<td>平台型 / 导购型 ✅</td>
-</tr>
-<tr>
-<td><strong>基础数值</strong></td>
-<td>0/2/4/6/7/8/12/16/20/24/28/32/40</td>
-<td>沿用（未在 token frame 出现，但规范页用法一致）</td>
-</tr>
-<tr>
-<td><strong>safe-area.status-bar</strong></td>
-<td>44DP</td>
-<td>44DP ✅ unchanged</td>
-</tr>
-<tr>
-<td><strong>safe-area.home-indicator</strong></td>
-<td>34DP（常规起始器）</td>
-<td>34DP ✅ unchanged</td>
-</tr>
-<tr>
-<td><strong>safe-area.screen-edge</strong></td>
-<td>8DP（沉浸式专用）</td>
-<td>8DP ✅ unchanged</td>
-</tr>
-<tr>
-<td><strong>悬浮底导起始器</strong></td>
-<td>—</td>
-<td><strong>17DP</strong> 🆕 new</td>
-</tr>
-<tr>
-<td><strong>Z 轴层级</strong></td>
-<td>隐式（未规范）</td>
-<td><strong>4 层显式</strong>（背景/内容/全局控制/临时任务）—— 见 <a href="../visual/layout.md">layout.md</a></td>
-</tr>
-<tr>
-<td><strong>token frame</strong></td>
-<td>显式 (tokens.json)</td>
-<td>❌ V16 语义化统一未列 spacing token — 沿用 V15</td>
-</tr>
-</tbody>
-</table>
-
-<p style="margin-top:8px;"><strong>📖 完整规范</strong>:<a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/tokens/spacing.md" target="_blank" rel="noopener">tokens/spacing.md</a> · 包含本章节剩余表格、Atom 命名、用法示例、与 V15 升级映射等。</p>
-
-</div><!-- /pro-only ch-4 -->
+<div class="token-grid spacing-grid">
+<div class="spacing-row">
+  <div class="spacing-bar" style="width:44px;"></div>
+  <div class="spacing-info"><code>spacing.safe-area.status-bar</code> · 44px</div>
+</div>
+<div class="spacing-row">
+  <div class="spacing-bar" style="width:34px;"></div>
+  <div class="spacing-info"><code>spacing.safe-area.home-indicator</code> · 34px</div>
+</div>
+<div class="spacing-row">
+  <div class="spacing-bar" style="width:17px;"></div>
+  <div class="spacing-info"><code>spacing.safe-area.home-indicator-floating</code> · 17px</div>
+</div>
+<div class="spacing-row">
+  <div class="spacing-bar" style="width:8px;"></div>
+  <div class="spacing-info"><code>spacing.safe-area.screen-edge</code> · 8px</div>
+</div>
+</div>
+<p style="color:var(--c-text-3);font-size:12px;">⚠️ V16 spacing 系列还在补全(目前仅 safe-area 5 项),完整 spacing token 表见 <a href="https://github.com/ShuaiMXu/xMu-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/tokens/spacing.md" target="_blank">spacing.md</a>。组件实际用的 DP 标注详见各组件 spec page。</p>
 
 
 <!-- ============ ch-5 图标 ============ -->
@@ -864,128 +968,10 @@
 <p><strong>图标 token + 尺寸规则</strong></p>
 
 <div class="basic-only summary">
-  <p><strong>👉 这一类 token 是干什么的?</strong></p>
-  <h1>图标 Token · V16.0 🟡 WIP</h1>
-<blockquote>
-<p>V16.0 图标页 (<code>12:263</code>) 当前只列了<strong>图标清单</strong>（线性 + 填充两套），<strong>未在文件中显式定义 size/stroke/frame 等参数 token</strong>。</p>
-<p>本文档：1) 图标清单全量录入；2) 参数 token 沿用 V15.0；3) 标 WIP 等设计师补齐参数层。</p>
-</blockquote>
-<hr />
-  <p style="margin-top:12px;color:var(--c-text-3);">📖 完整 token 列表 / 命名规则 / 使用边界 → <a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/tokens/icon.md" target="_blank" rel="noopener">tokens/icon.md (GitHub)</a></p>
+  <p style="margin:0;">📖 完整 token 列表 / 命名规则 / V15 升级映射 → <a href="https://github.com/ShuaiMXu/xMu-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/tokens/icon.md" target="_blank" rel="noopener">icon.md (GitHub)</a></p>
 </div>
 
-<div class="pro-only">
-
-<h3>5.1 完整 token 表(摘录第一张关键表)</h3>
-
-<table>
-<thead>
-<tr>
-<th>Token</th>
-<th>V15 值</th>
-<th>V16 值</th>
-<th>用法</th>
-<th>v16 status</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>icon.size.s</code></td>
-<td>16px</td>
-<td>(待 V16 确认)</td>
-<td>列表项 / 表单 / 嵌入文字行内</td>
-<td>inherited from V15</td>
-</tr>
-<tr>
-<td><code>icon.size.m</code></td>
-<td>20px</td>
-<td>(待 V16 确认)</td>
-<td>工具栏 / 卡片操作</td>
-<td>inherited from V15</td>
-</tr>
-<tr>
-<td><code>icon.size.l</code></td>
-<td>24px</td>
-<td>(待 V16 确认)</td>
-<td>Tab Bar / 标题栏</td>
-<td>inherited from V15</td>
-</tr>
-<tr>
-<td><code>icon.stroke.s</code></td>
-<td>1px</td>
-<td>(待 V16 确认)</td>
-<td>16DP 笔触</td>
-<td>inherited from V15</td>
-</tr>
-<tr>
-<td><code>icon.stroke.m</code></td>
-<td>1.5px</td>
-<td>(待 V16 确认)</td>
-<td>20DP 笔触</td>
-<td>inherited from V15</td>
-</tr>
-<tr>
-<td><code>icon.stroke.l</code></td>
-<td>1.5px</td>
-<td>(待 V16 确认)</td>
-<td>24DP 笔触</td>
-<td>inherited from V15</td>
-</tr>
-<tr>
-<td><code>icon.frame</code></td>
-<td>26px</td>
-<td>(待 V16 确认)</td>
-<td>字身框</td>
-<td>inherited from V15</td>
-</tr>
-<tr>
-<td><code>icon.padding</code></td>
-<td>3px</td>
-<td>(待 V16 确认)</td>
-<td>字身框内留白</td>
-<td>inherited from V15</td>
-</tr>
-<tr>
-<td><code>icon.balance-ratio.circle</code></td>
-<td>1:1</td>
-<td>(待 V16 确认)</td>
-<td>—</td>
-<td>inherited from V15</td>
-</tr>
-<tr>
-<td><code>icon.balance-ratio.square</code></td>
-<td>8:9</td>
-<td>(待 V16 确认)</td>
-<td>—</td>
-<td>inherited from V15</td>
-</tr>
-<tr>
-<td><code>icon.balance-ratio.rounded-square</code></td>
-<td>9:10</td>
-<td>(待 V16 确认)</td>
-<td>—</td>
-<td>inherited from V15</td>
-</tr>
-<tr>
-<td><code>icon.balance-ratio.triangle</code></td>
-<td>10:11</td>
-<td>(待 V16 确认)</td>
-<td>—</td>
-<td>inherited from V15</td>
-</tr>
-<tr>
-<td><code>icon.max-corner-radius</code></td>
-<td>2px</td>
-<td>(待 V16 确认)</td>
-<td>锐角倒圆角不超过 2DP</td>
-<td>inherited from V15</td>
-</tr>
-</tbody>
-</table>
-
-<p style="margin-top:8px;"><strong>📖 完整规范</strong>:<a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/tokens/icon.md" target="_blank" rel="noopener">tokens/icon.md</a> · 包含本章节剩余表格、Atom 命名、用法示例、与 V15 升级映射等。</p>
-
-</div><!-- /pro-only ch-5 -->
+<p><em>icon token 表详见 <a href="https://github.com/ShuaiMXu/xMu-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/tokens/icon.md" target="_blank">icon.md</a></em></p>
 
 
 <!-- ============ ch-6 线条 ============ -->
@@ -994,104 +980,33 @@
 <p><strong>分割线 / 描边 token</strong></p>
 
 <div class="basic-only summary">
-  <p><strong>👉 这一类 token 是干什么的?</strong></p>
-  <h1>线 Token · V16.0 🚩 全新独立 foundation</h1>
-<blockquote>
-<p>V16.0 <strong>新增「线」作为独立 foundation</strong>。V15.0 没有线宽 token —— 只有 <code>color.neutral.border.default = #00000014</code>（颜色），线宽靠 CSS 默认 1px。</p>
-<p>V16 把线宽显式 token 化，针对高密屏（2x/3x）做了精细化处理。</p>
-</blockquote>
-<hr />
-  <p style="margin-top:12px;color:var(--c-text-3);">📖 完整 token 列表 / 命名规则 / 使用边界 → <a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/tokens/lines.md" target="_blank" rel="noopener">tokens/lines.md (GitHub)</a></p>
+  <p style="margin:0;">📖 完整 token 列表 / 命名规则 / V15 升级映射 → <a href="https://github.com/ShuaiMXu/xMu-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/tokens/lines.md" target="_blank" rel="noopener">lines.md (GitHub)</a></p>
 </div>
 
-<div class="pro-only">
-
-<h3>6.1 完整 token 表(摘录第一张关键表)</h3>
-
-<table>
-<thead>
-<tr>
-<th>V15 状态</th>
-<th>V16 新增</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>❌ 无线宽 token，靠 CSS 默认 1px</td>
-<td>✅ 2 个线宽 token：0.33px / 0.5px</td>
-</tr>
-<tr>
-<td>只有线色 <code>border.default = #00000014</code></td>
-<td>颜色仍走 <code>color_border</code> → <code>gray_9</code>（见 <a href="./color.md">color.md</a>）</td>
-</tr>
-</tbody>
-</table>
-
-<p style="margin-top:8px;"><strong>📖 完整规范</strong>:<a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/tokens/lines.md" target="_blank" rel="noopener">tokens/lines.md</a> · 包含本章节剩余表格、Atom 命名、用法示例、与 V15 升级映射等。</p>
-
-</div><!-- /pro-only ch-6 -->
+<h4>线条 / 描边 token</h4><div class="token-grid lines-grid">
+<div class="lines-card">
+  <div class="lines-bar" style="border-top:0.33px solid var(--c-text);"></div>
+  <div class="lines-name">lines.tag</div>
+  <div class="lines-val">0.33px</div>
+</div>
+<div class="lines-card">
+  <div class="lines-bar" style="border-top:0.5px solid var(--c-text);"></div>
+  <div class="lines-name">lines.component</div>
+  <div class="lines-val">0.5px</div>
+</div>
+</div>
 
 
 <!-- ============ ch-7 布局 ============ -->
 <h2 id="ch-7"><span class="num">7</span>📐 布局</h2>
 
-<p><strong>页面布局规范(空间布局 1/2/3)</strong></p>
+<p><strong>页面布局规范(3 套空间布局)</strong></p>
 
 <div class="basic-only summary">
-  <p><strong>👉 这一类 token 是干什么的?</strong></p>
-  <h1>布局 · V16.0</h1>
-<blockquote>
-<p>V16 布局 = <strong>Z 轴 4 层级</strong> + <strong>2 种页面框架</strong>（卡片式 / 平铺式） + <strong>双梯度间距</strong>（导购型 / 平台型）。</p>
-<p>数值规范见 <a href="../tokens/spacing.md">spacing.md</a>；本文档讲<strong>用法 / 决策依据</strong>。</p>
-</blockquote>
-<hr />
-  <p style="margin-top:12px;color:var(--c-text-3);">📖 完整 token 列表 / 命名规则 / 使用边界 → <a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/visual/layout.md" target="_blank" rel="noopener">visual/layout.md (GitHub)</a></p>
+  <p style="margin:0;">📖 完整 token 列表 / 命名规则 / V15 升级映射 → <a href="https://github.com/ShuaiMXu/xMu-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/visual/layout.md" target="_blank" rel="noopener">layout.md (GitHub)</a></p>
 </div>
 
-<div class="pro-only">
-
-<h3>7.1 完整 token 表(摘录第一张关键表)</h3>
-
-<table>
-<thead>
-<tr>
-<th>层级</th>
-<th>用途</th>
-<th>交互特征</th>
-<th>视觉特征</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>背景层</strong></td>
-<td>氛围 / 大促换肤</td>
-<td><strong>无交互</strong>，不可被位移</td>
-<td>常态：中性背景色；大促：换肤烘托氛围；上滑后氛围适应</td>
-</tr>
-<tr>
-<td><strong>内容层</strong></td>
-<td>当前场景核心信息 + 核心任务</td>
-<td>滑动、操作；被全局控制层覆盖</td>
-<td>容器结构与背景层边界清晰；滑动符合物理运动逻辑</td>
-</tr>
-<tr>
-<td><strong>全局控制层</strong></td>
-<td>全局操作 + 导航功能</td>
-<td>始终可见 / 浮于内容之上</td>
-<td>顶导 / 底导 / 悬浮按钮</td>
-</tr>
-<tr>
-<td><strong>临时任务层</strong></td>
-<td>弹层 / 弹窗 / Toast</td>
-<td>进入时遮挡下层</td>
-<td>用材质（Liquid / Frosted Glass）做层级感 — 见 <a href="./materials.md">materials.md</a></td>
-</tr>
-</tbody>
-</table>
-
-<p style="margin-top:8px;"><strong>📖 完整规范</strong>:<a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/visual/layout.md" target="_blank" rel="noopener">visual/layout.md</a> · 包含本章节剩余表格、Atom 命名、用法示例、与 V15 升级映射等。</p>
-
-</div><!-- /pro-only ch-7 -->
+<p>📐 V16 布局规范包含 <strong>3 套空间布局</strong>(空间布局 1 / 2 / 3)。详细规则见 <a href="https://github.com/ShuaiMXu/xMu-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/visual/layout.md" target="_blank">layout.md</a>。</p>
 
 
 <!-- ============ ch-8 材质 ============ -->
@@ -1100,42 +1015,19 @@
 <p><strong>液态玻璃 / 毛玻璃等材质 token</strong></p>
 
 <div class="basic-only summary">
-  <p><strong>👉 这一类 token 是干什么的?</strong></p>
-  <h1>材质 Materials · V16.0 🚩 全新独立 foundation</h1>
-<blockquote>
-<p>V16.0 新增「材质」作为独立 foundation。V15.0 没有 materials 概念，shadow 也只是 TODO（"Relay 15.0 暂未规范"）。</p>
-<p>V16 材质 = 多层背景渐变 + 混合模式 + 阴影的组合规则，<strong>平台差异化实现</strong>。</p>
-</blockquote>
-<hr />
-  <p style="margin-top:12px;color:var(--c-text-3);">📖 完整 token 列表 / 命名规则 / 使用边界 → <a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/visual/materials.md" target="_blank" rel="noopener">visual/materials.md (GitHub)</a></p>
+  <p style="margin:0;">📖 完整 token 列表 / 命名规则 / V15 升级映射 → <a href="https://github.com/ShuaiMXu/xMu-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/visual/materials.md" target="_blank" rel="noopener">materials.md (GitHub)</a></p>
 </div>
 
-<div class="pro-only">
-
-<h3>8.1 完整 token 表(摘录第一张关键表)</h3>
-
-<table>
-<thead>
-<tr>
-<th>平台 / 系统</th>
-<th>使用</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>iOS 高版本（17+）</strong></td>
-<td><strong>Liquid Glass</strong>（系统级液态玻璃，原生 API）</td>
-</tr>
-<tr>
-<td>iOS 低版本 / Android / HarmonyOS</td>
-<td><strong>Frosted Glass</strong>（毛玻璃，CSS <code>backdrop-filter: blur(50px)</code> 兜底）</td>
-</tr>
-</tbody>
-</table>
-
-<p style="margin-top:8px;"><strong>📖 完整规范</strong>:<a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/visual/materials.md" target="_blank" rel="noopener">visual/materials.md</a> · 包含本章节剩余表格、Atom 命名、用法示例、与 V15 升级映射等。</p>
-
-</div><!-- /pro-only ch-8 -->
+<h4>材质示例</h4>
+<div class="token-grid materials-grid">
+  <div class="material-card material--liquid">
+    <div class="material-card__inner">液态玻璃<br><small>Liquid Glass · iOS 26+</small></div>
+  </div>
+  <div class="material-card material--frosted">
+    <div class="material-card__inner">毛玻璃<br><small>Frosted Glass · 老系统 fallback</small></div>
+  </div>
+</div>
+<p style="color:var(--c-text-3);font-size:12px;margin-top:16px;">⚠️ V16 materials token 表还在建立中,详见 <a href="https://github.com/ShuaiMXu/xMu-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/visual/materials.md" target="_blank">materials.md</a>。</p>
 
 
 <hr>
@@ -1144,12 +1036,12 @@
 <ul>
   <li>本页 8 个 token md 源:<a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/tree/main/jd-design-system-md-v16/foundations" target="_blank">jd-design-system-md-v16/foundations/</a></li>
   <li>tokens.json(机器可读):<a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/tokens/tokens.json" target="_blank">foundations/tokens/tokens.json</a></li>
-  <li>组件落地范例:<a href="../horizontal/components-base/tabbar/spec-page.html">tabbar/spec-page.html</a> · 一个 page-doc bundle 完整组件规范</li>
+  <li>组件落地范例:<a href="../horizontal/components-base/tabbar/spec-page.html">tabbar/spec-page.html</a></li>
   <li>Relay 文档:<a href="https://relay.jd.com/file/design?id=2029484645871009793" target="_blank">JD APP V16.0 GUIDELINE</a></li>
 </ul>
 
 <div style="margin-top:60px; padding-top:20px; border-top:1px solid var(--c-line); color:var(--c-text-3); font-size:12px; text-align:center;">
-  JD APP V16.0 Design System · Foundation 总览 · 生成于 2026-05-15 · 8 个 token 类别 · skill design-md-to-spec-page (foundation 版,实验性)
+  JD APP V16.0 Design System · Foundation 总览 · 生成于 2026-05-15 · 8 个 token 类别 · 实物视觉展示版
 </div>
 
 </div>
