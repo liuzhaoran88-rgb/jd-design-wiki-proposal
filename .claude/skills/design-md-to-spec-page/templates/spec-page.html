@@ -412,6 +412,36 @@
   /* inline pro-only 用 .pro-inline 视觉淡化(避免在 pro 模式过抢) */
   body.mode-pro .pro-inline { display: inline; }
   .pro-inline { color: var(--c-text-3); font-size: 12px; margin-left: 6px; }
+
+  /* ========== v0.4: 切图 stage — 跟页面底色融合,无沙盒装饰 ========== */
+  .stage img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    cursor: zoom-in;
+  }
+  .stage--image {
+    background: transparent;
+    border: none;
+    padding: 0;
+    min-height: auto;
+    /* 跳出 doc padding,显示宽 880 → 1024(约 +16%)*/
+    margin-left: -48px;
+    margin-right: -48px;
+    margin-top: 16px;
+    margin-bottom: 4px;
+  }
+  @media (max-width: 720px) {
+    .stage--image { margin-left: -8px; margin-right: -8px; }
+  }
+  .stage--image a.zoom-link {
+    display: inline-block;
+    margin-top: 8px;
+    color: var(--c-text-3);
+    font-size: 12px;
+    border-bottom: 1px dashed var(--c-line);
+  }
+  .stage--image a.zoom-link:hover { color: var(--c-brand); border-bottom-color: var(--c-brand); }
 </style>
 </head>
 <body>
@@ -514,6 +544,23 @@
   setMode(initial);
   tabs.forEach(function (t) {
     t.addEventListener('click', function () { setMode(t.dataset.view); });
+  });
+
+  // ========== v0.4: 切图点击在新 tab 看原图(原稿 1426px+ 宽,doc 缩到 1024 后字会小)==========
+  document.querySelectorAll('.stage--image img').forEach(function (img) {
+    img.addEventListener('click', function () {
+      window.open(img.src, '_blank', 'noopener');
+    });
+    var label = img.parentElement.nextElementSibling;
+    if (label && label.classList.contains('stage-label')) {
+      var link = document.createElement('a');
+      link.className = 'zoom-link';
+      link.href = img.src;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.textContent = '🔍 点图或本链接看原稿(' + (img.naturalWidth || '?') + '×' + (img.naturalHeight || '?') + ')';
+      img.parentElement.appendChild(link);
+    }
   });
 })();
 </script>

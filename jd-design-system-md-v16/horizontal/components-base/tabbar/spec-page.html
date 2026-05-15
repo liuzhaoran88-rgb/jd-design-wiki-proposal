@@ -387,25 +387,23 @@
      切图来源: tabbar/_assets/ (skill 自动 export 自 Relay 节点)
      ========================================== -->
 <style>
-  /* image-only stage：响应式适配 max-width，保持比例 */
+  /* image-only stage：跟页面底色融合,无沙盒视觉装饰 */
   .stage img {
     display: block;
     max-width: 100%;
     height: auto;
-    border-radius: var(--r-base);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
     cursor: zoom-in;
-    transition: box-shadow 150ms;
-  }
-  .stage img:hover {
-    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
   }
   .stage--image {
-    padding: 24px;
+    background: transparent;
+    border: none;
+    padding: 0;
     min-height: auto;
     /* 让切图跳出 doc 64px+72px padding,占更宽显示区(880 → 1024)*/
     margin-left: -48px;
     margin-right: -48px;
+    margin-top: 16px;
+    margin-bottom: 4px;
   }
   @media (max-width: 720px) {
     .stage--image { margin-left: -8px; margin-right: -8px; }

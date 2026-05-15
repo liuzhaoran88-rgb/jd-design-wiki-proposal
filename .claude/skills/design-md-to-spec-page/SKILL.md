@@ -151,13 +151,116 @@ bundle 模式下追加读取 `spec.md` / `variants.md` / `behaviors.md`，按 [r
 3. Bash `wc -l` + `head -10 / tail -10` 抽查
 4. **不要**自动打开浏览器（对外发布物，由用户决定何时 publish）
 
-### Step 8: 终端输出
+### Step 7b: HTML 自动 cache-bust(v0.4)
+
+渲染 spec-page.html 时,**所有 `<img src="./_assets/...png">` 自动追加 `?v={today_iso}`**(如 `?v=2026-05-15`),避免 GitHub Pages CDN 缓存旧 404 / 旧文件。
+
+实现:Step 4 字符串替换 + 后处理 sed:
+
+```bash
+# 在 Write spec-page.html 之前
+TODAY=$(date +%Y-%m-%d)
+sed -i '' "s|src=\"\./_assets/\([^\"]*\)\.png\"|src=\"./_assets/\1.png?v=$TODAY\"|g" "$OUTPUT_PATH"
+```
+
+或者 model 渲染 stage block 时直接构造带 query 的 src。
+
+详见 [references/deploy-notes.md](./references/deploy-notes.md) 坑 2。
+
+### Step 9: 部署自动化(v0.4 新)
+
+文件写完后,如果 user 调用时带 `--deploy`(默认开启),自动跑 git ops + Pages 部署:
+
+#### Step 9a: 检测仓库根 .nojekyll
+
+```bash
+REPO_ROOT=$(git rev-parse --show-toplevel)
+if [ ! -f "$REPO_ROOT/.nojekyll" ]; then
+  touch "$REPO_ROOT/.nojekyll"
+  echo "✓ 创建仓库根 .nojekyll(Jekyll 默认滤 _ 开头目录,不加 spec-page 切图全 404)"
+fi
+```
+
+`.nojekyll` 一次性,后续部署都受用。
+
+详见 [references/deploy-notes.md](./references/deploy-notes.md) 坑 1。
+
+#### Step 9b: git add + commit
+
+```bash
+cd "$REPO_ROOT"
+git add "$BUNDLE_DIR/spec-page.html" "$BUNDLE_DIR/_assets/" .nojekyll
+git status --short  # 检查 stage 列表
+
+if git diff --cached --quiet; then
+  echo "✓ 没有变更,跳过 commit / push"
+else
+  git commit -m "deploy(spec-page): $SLUG updated $(date +%Y-%m-%d)"
+  echo "✓ commit 完成"
+fi
+```
+
+> 不带 `--deploy` 标志时,在终端输出"已生成,执行 git push 后 Pages 自动重 build"。
+
+#### Step 9c: push
+
+```bash
+git push 2>&1 | tail -3
+```
+
+如果 push 失败(权限 / 上游不同步),terminal warn 让 user 自己解。
+
+#### Step 9d: 等 Pages 重 build(可选)
+
+```bash
+# 检测仓库 Pages 是否启用
+PAGES_INFO=$(gh api "repos/$OWNER/$REPO/pages" 2>/dev/null)
+if [ -z "$PAGES_INFO" ]; then
+  echo "⚠️ 仓库未启用 GitHub Pages。手动启用:gh api -X POST repos/$OWNER/$REPO/pages -f 'source[branch]=main' -f 'source[path]=/'"
+  exit 0
+fi
+
+# 等到最新 build 完成
+until s=$(gh api "repos/$OWNER/$REPO/pages/builds/latest" --jq '.status' 2>/dev/null); [ "$s" = "built" ] || [ "$s" = "errored" ]; do sleep 5; done
+echo "✓ Pages 重 build 完成: $s"
+```
+
+不阻塞用户(可选,user 也能 Ctrl+C 退出等待)。
+
+#### Step 9e: 输出最终 URL
+
+```
+🚀 已部署
+   ├─ 本地: <bundle-dir>/spec-page.html
+   ├─ Git commit: <hash>
+   ├─ 公网 URL: https://<owner>.github.io/<repo>/<bundle-dir>/spec-page.html
+   └─ 切图: <bundle-dir>/_assets/*.png?v=<today_iso>(N 张)
+
+⚠️ 私有仓提醒(如果 visibility=PRIVATE):GitHub Pages 默认不支持私有仓,需先改 Public 或升级 Pro
+⚠️ CDN 缓存:页面打开如果切图未加载,强刷 Cmd+Shift+R 或等 5-10 min
+```
+
+#### --no-deploy 选项
+
+调用时若带 `--no-deploy`,跳过 Step 9a-9e,只本地写文件,等 user 自己 git push:
+
+```
+/design-md-to-spec-page tabbar --no-deploy
+```
+
+适用场景:CI 跑、批量生成、user 想 review HTML 后再决定是否 push。
+
+---
+
+### Step 8: 终端输出（生成阶段）
 
 ```
 ✅ 已生成: {output_path}
    ├─ 章节齐全度: 7/7
    ├─ TBD 段: {N} 个（详见 HTML 内 blockquote.warn）
    ├─ 演示 stage: {static-mockup | js-engine}
+   ├─ 切图: {N} 张 / _assets/ {总 KB}
+   ├─ Cache-bust: <img> src 自动加 ?v={today_iso}
    └─ 字数: {N} 字 / 行数: {M}
 
 📎 来源: {bundle 或 single design.md path}
@@ -165,6 +268,9 @@ bundle 模式下追加读取 `spec.md` / `variants.md` / `behaviors.md`，按 [r
 
 {如有 TBD / 字段缺失}
 ⚠️ 检测到 {K} 处来源 design.md 数据缺失，已在 HTML 内标 ⚠️ TBD，建议回补 design.md 后重跑
+
+{若启用 --deploy（默认开），紧接着输出 Step 9e 的"🚀 已部署"段}
+{若 --no-deploy，输出: 💡 已禁用 --deploy。git push 后 GitHub Pages 自动重 build}
 ```
 
 ---
@@ -220,4 +326,15 @@ bundle 模式下追加读取 `spec.md` / `variants.md` / `behaviors.md`，按 [r
   - **③ 撞 CDN cache 坑**:GitHub Pages Fastly CDN 默认 10 分钟 cache,旧 404 被缓存。修法 HTML 内 `<img>` 加 `?v=N` query string 强制 cache-bust
   - **④ 私有仓限制**:GitHub Pages 不支持私有仓(除 Pro)。整理 5 个备选(临时 Public / Cloudflare Pages / R2 / Surge / GitHub Pro)
   - **⑤ 新增 [references/deploy-notes.md](./references/deploy-notes.md)** 完整记录 + 部署后 6 项 checklist
-- v0.4 (planned) 加批量模式(一次跑多组件)+ 增量 diff(避免每次全量重导切图)+ HTML 自动给 `<img>` 加 `?v={today_iso}` cache-bust + TOC 自动嵌套(含 h3 子标题)+ 切图节点自动选择(避免每次手枚举)
+- **v0.4** (2026-05-15) 部署自动化 + cache-bust + 切图融合度:
+  - **① Step 7b: HTML 自动 cache-bust**:渲染时所有 `<img src="./_assets/...png">` 自动加 `?v={today_iso}`,避免 GitHub Pages CDN 缓存旧版
+  - **② Step 9: 部署自动化**(默认 `--deploy`,可 `--no-deploy` 跳过):
+    - 9a 检测仓库根 `.nojekyll`,缺失自动创建(Jekyll 滤 _ 目录的统一 fix)
+    - 9b `git add` spec-page.html + _assets/ + .nojekyll, `git commit` 带时间戳
+    - 9c `git push`(失败 warn,不阻断)
+    - 9d 等待 Pages 重 build(轮询 `gh api .../pages/builds/latest`,可 Ctrl+C 退)
+    - 9e 输出公网 URL + 私有仓提醒 + CDN cache 提示
+  - **③ 切图 stage 融合度**:模板加 `.stage--image { background: transparent; border: none; padding: 0 }`,切图直接贴页面背景,无沙盒灰底/虚线/box-shadow,边距跟页面底色融合
+  - **④ 切图 zoom JS 入模板**:click 切图新 tab 看原图,stage-label 内追加 "🔍 点图看原稿(原宽×原高)" 链接 fallback
+  - **⑤ Step 8 终端输出扩展**:加切图数 / cache-bust 字段;deploy 跑完接 Step 9e 输出
+- v0.5 (planned) 增量 diff(避免每次全量重导切图)+ 批量模式(一次跑多组件)+ TOC 自动嵌套(含 h3 子标题)+ 切图节点自动选择(避免每次手枚举)
