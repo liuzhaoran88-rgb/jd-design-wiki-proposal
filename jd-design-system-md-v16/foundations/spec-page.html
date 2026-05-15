@@ -43,50 +43,134 @@
   }
 
   .doc {
-    max-width: 880px;
+    max-width: 1120px;
     margin: 40px auto;
     background: var(--c-bg);
-    padding: 64px 72px;
+    padding: 56px 64px 72px;
     border-radius: var(--r-xl);
     box-shadow: 0 2px 12px rgba(0,0,0,0.04);
   }
 
-  h1 {
-    font-size: 32px;
-    font-weight: 600;
-    margin: 0 0 8px;
-    line-height: 1.3;
-    border-bottom: 2px solid var(--c-text);
-    padding-bottom: 16px;
+  /* ============ Relay 16.0 GUIDELINE 风格页头 ============ */
+  .guideline-header {
+    position: relative;
+    margin: -8px -8px 32px;
+    padding: 8px 12px 28px;
+    min-height: 140px;
   }
-  h1 + .meta {
+  .guideline-header .eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--c-text);
+    margin-bottom: 14px;
+  }
+  .guideline-header h1 {
+    font-size: 36px;
+    font-weight: 600;
+    margin: 0 0 10px;
+    line-height: 1.2;
+    border: none !important;
+    padding: 0 !important;
+    letter-spacing: -0.01em;
+  }
+  .guideline-header h1 .h1-en {
+    font-weight: 500;
+    color: var(--c-text);
+    margin-left: 6px;
+  }
+  .guideline-header .subtitle {
     color: var(--c-text-3);
     font-size: 13px;
-    margin-bottom: 40px;
-    line-height: 1.8;
+    line-height: 1.7;
+    max-width: 720px;
   }
-  h1 + .meta code { font-size: 12px; }
-
-  h2 {
-    font-size: 24px;
-    font-weight: 600;
-    margin: 56px 0 16px;
-    padding-bottom: 8px;
+  .guideline-header .panda-deco {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 220px;
+    height: 140px;
+    pointer-events: none;
+    user-select: none;
+  }
+  .guideline-header .panda-deco .glow {
+    position: absolute;
+    top: 22px; left: 18px;
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #ff6b8a 0%, #ff0f23 55%, #b80018 100%);
+    box-shadow: 0 8px 24px rgba(255, 15, 35, 0.35), inset -6px -8px 18px rgba(0,0,0,0.25);
+  }
+  .guideline-header .panda-deco .body {
+    position: absolute;
+    top: 18px; left: 56px;
+    width: 160px; height: 96px;
+    border: 1.5px solid rgba(23,26,38,0.45);
+    border-radius: 80px 90px 60px 70px / 60px 50px 70px 80px;
+    background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: inset 2px 4px 10px rgba(255,255,255,0.6), 0 6px 16px rgba(0,0,0,0.06);
+  }
+  .guideline-header.is-divided {
     border-bottom: 1px solid var(--c-line);
   }
-  h2 .num {
-    display: inline-block;
-    width: 32px;
-    height: 32px;
-    line-height: 32px;
-    background: var(--c-brand);
-    color: #fff;
-    border-radius: var(--r-base);
-    text-align: center;
-    font-size: 16px;
-    margin-right: 12px;
-    vertical-align: middle;
+  @media (max-width: 720px) {
+    .guideline-header { min-height: auto; }
+    .guideline-header .panda-deco { display: none; }
+    .guideline-header h1 { font-size: 26px; }
   }
+
+  /* ============ Relay 风格 section banner(替代原 h2 数字徽章)============ */
+  h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    background: var(--c-brand);
+    margin: 64px 0 0;
+    padding: 14px 24px;
+    border-radius: 2px;
+    border: none;
+    line-height: 1.5;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  h2 .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: rgba(255,255,255,0.22);
+    color: #fff;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  h2 .h2-en {
+    font-weight: 500;
+    opacity: 0.85;
+    font-size: 14px;
+    margin-left: 2px;
+  }
+  h2 .h2-desc {
+    font-size: 12px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.78);
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  /* 各章节 banner 配色:跟 token 类别匹配,主色为主、辅 6 个色调点缀 */
+  h2.banner--brand    { background: #FF0F23; }
+  h2.banner--text     { background: #171A26; }
+  h2.banner--service  { background: #B5691A; }
+  h2.banner--success  { background: #2AA32A; }
+  h2.banner--warning  { background: #B26B00; }
+  h2.banner--info     { background: #0073FF; }
+  h2.banner--neutral  { background: #3D414D; }
 
   h3 {
     font-size: 18px;
@@ -545,18 +629,22 @@
 <body>
 <div class="doc">
 
-<div class="title-row">
-  <h1>V16 Foundation · 设计系统总览</h1>
-  <div class="view-tabs" role="tablist" aria-label="视图切换">
+<header class="guideline-header is-divided">
+  <div class="eyebrow">JD APP 16.0 &nbsp;GUIDELINE</div>
+  <h1>设计系统总览<span class="h1-en">Foundation Tokens</span></h1>
+  <div class="subtitle">
+    设计与用研部 — AI 核心产品设计部 · 适用范围:JD APP V16.0 全部组件与页面共享基础规范<br>
+    来源:Relay V16.0 GUIDELINE 多节点 + <code>jd-design-system-md-v16/foundations/</code> 9 份 md + <code>tokens/tokens.json</code> 真实数据
+  </div>
+  <div class="panda-deco" aria-hidden="true">
+    <span class="glow"></span>
+    <span class="body"></span>
+  </div>
+  <div class="view-tabs" role="tablist" aria-label="视图切换" style="position:absolute;bottom:0;right:0;">
     <button class="view-tab is-active" role="tab" data-view="basic" aria-selected="true">常规版</button>
     <button class="view-tab" role="tab" data-view="pro" aria-selected="false">专业版</button>
   </div>
-</div>
-<div class="meta">
-  适用范围:JD APP V16.0 设计系统的所有组件 / 页面共享基础规范<br>
-  来源:Relay V16.0 GUIDELINE 多节点 + <code>jd-design-system-md-v16/foundations/</code> 9 份 md + <code>tokens/tokens.json</code> 真实数据<br>
-  覆盖 token 类别:<code>color</code>(34)/ <code>typography</code>(26 组合)/ <code>radius</code>(7)/ <code>spacing</code> / <code>icon</code> / <code>lines</code> / <code>layout</code> / <code>materials</code>
-</div>
+</header>
 
 <div class="toc">
   <h3>目录(8 个 token 类别)</h3>
@@ -584,7 +672,7 @@
 
 
 <!-- ============ ch-1 颜色 ============ -->
-<h2 id="ch-1"><span class="num">1</span>🎨 颜色</h2>
+<h2 id="ch-1" class="banner--brand"><span class="num">1</span>色彩变量<span class="h2-en">Colors Token</span><span class="h2-desc">9 大语义组 · 34 个 token</span></h2>
 
 <p><strong>色彩 token 体系 — 9 大语义组(主色/服务/文字/背景/边框/反馈/Info)</strong></p>
 
@@ -758,7 +846,7 @@
 
 
 <!-- ============ ch-2 文字 ============ -->
-<h2 id="ch-2"><span class="num">2</span>✍ 文字</h2>
+<h2 id="ch-2" class="banner--text"><span class="num">2</span>文字变量<span class="h2-en">Font Token</span><span class="h2-desc">Family × Size × Weight · 26 组合</span></h2>
 
 <p><strong>字体 token 体系 — Family × Size × Weight 三层组合</strong></p>
 
@@ -889,7 +977,7 @@
 
 
 <!-- ============ ch-3 圆角 ============ -->
-<h2 id="ch-3"><span class="num">3</span>⬜ 圆角</h2>
+<h2 id="ch-3" class="banner--brand"><span class="num">3</span>圆角变量<span class="h2-en">Radius Token</span><span class="h2-desc">T-shirt size 7 阶</span></h2>
 
 <p><strong>T-shirt size 命名 7 阶(xxs / xs / s / base / l / xl / xxl)</strong></p>
 
@@ -937,7 +1025,7 @@
 
 
 <!-- ============ ch-4 间距 ============ -->
-<h2 id="ch-4"><span class="num">4</span>📏 间距</h2>
+<h2 id="ch-4" class="banner--neutral"><span class="num">4</span>间距变量<span class="h2-en">Spacing Token</span><span class="h2-desc">安全区 + 空间布局</span></h2>
 
 <p><strong>空间布局 + 安全区 token</strong></p>
 
@@ -967,7 +1055,7 @@
 
 
 <!-- ============ ch-5 图标 ============ -->
-<h2 id="ch-5"><span class="num">5</span>🔖 图标</h2>
+<h2 id="ch-5" class="banner--service"><span class="num">5</span>图标变量<span class="h2-en">Icon Token</span><span class="h2-desc">尺寸规则 + 视觉栅格</span></h2>
 
 <p><strong>图标 token + 尺寸规则</strong></p>
 
@@ -979,7 +1067,7 @@
 
 
 <!-- ============ ch-6 线条 ============ -->
-<h2 id="ch-6"><span class="num">6</span>➖ 线条</h2>
+<h2 id="ch-6" class="banner--neutral"><span class="num">6</span>线条变量<span class="h2-en">Lines Token</span><span class="h2-desc">分割线 / 描边</span></h2>
 
 <p><strong>分割线 / 描边 token</strong></p>
 
@@ -1002,7 +1090,7 @@
 
 
 <!-- ============ ch-7 布局 ============ -->
-<h2 id="ch-7"><span class="num">7</span>📐 布局</h2>
+<h2 id="ch-7" class="banner--info"><span class="num">7</span>布局变量<span class="h2-en">Layout Token</span><span class="h2-desc">3 套空间布局</span></h2>
 
 <p><strong>页面布局规范(3 套空间布局)</strong></p>
 
@@ -1014,7 +1102,7 @@
 
 
 <!-- ============ ch-8 材质 ============ -->
-<h2 id="ch-8"><span class="num">8</span>💎 材质</h2>
+<h2 id="ch-8" class="banner--brand"><span class="num">8</span>材质变量<span class="h2-en">Materials Token</span><span class="h2-desc">液态玻璃 / 毛玻璃</span></h2>
 
 <p><strong>液态玻璃 / 毛玻璃等材质 token</strong></p>
 
