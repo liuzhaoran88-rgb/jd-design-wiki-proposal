@@ -87,31 +87,13 @@
   }
   .guideline-header .panda-deco {
     position: absolute;
-    top: 0;
-    right: 0;
-    width: 220px;
-    height: 140px;
+    top: -4px;
+    right: -8px;
+    width: 280px;
+    height: 130px;
     pointer-events: none;
     user-select: none;
-  }
-  .guideline-header .panda-deco .glow {
-    position: absolute;
-    top: 22px; left: 18px;
-    width: 64px; height: 64px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, #ff6b8a 0%, #ff0f23 55%, #b80018 100%);
-    box-shadow: 0 8px 24px rgba(255, 15, 35, 0.35), inset -6px -8px 18px rgba(0,0,0,0.25);
-  }
-  .guideline-header .panda-deco .body {
-    position: absolute;
-    top: 18px; left: 56px;
-    width: 160px; height: 96px;
-    border: 1.5px solid rgba(23,26,38,0.45);
-    border-radius: 80px 90px 60px 70px / 60px 50px 70px 80px;
-    background: rgba(255,255,255,0.55);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    box-shadow: inset 2px 4px 10px rgba(255,255,255,0.6), 0 6px 16px rgba(0,0,0,0.06);
+    background: url("_assets/panda-deco.png") center right / contain no-repeat;
   }
   .guideline-header.is-divided {
     border-bottom: 1px solid var(--c-line);
@@ -636,10 +618,7 @@
     设计与用研部 — AI 核心产品设计部 · 适用范围:JD APP V16.0 全部组件与页面共享基础规范<br>
     来源:Relay V16.0 GUIDELINE 多节点 + <code>jd-design-system-md-v16/foundations/</code> 9 份 md + <code>tokens/tokens.json</code> 真实数据
   </div>
-  <div class="panda-deco" aria-hidden="true">
-    <span class="glow"></span>
-    <span class="body"></span>
-  </div>
+  <div class="panda-deco" role="img" aria-label="JD 玻璃熊猫装饰"></div>
   <div class="view-tabs" role="tablist" aria-label="视图切换" style="position:absolute;bottom:0;right:0;">
     <button class="view-tab is-active" role="tab" data-view="basic" aria-selected="true">常规版</button>
     <button class="view-tab" role="tab" data-view="pro" aria-selected="false">专业版</button>
