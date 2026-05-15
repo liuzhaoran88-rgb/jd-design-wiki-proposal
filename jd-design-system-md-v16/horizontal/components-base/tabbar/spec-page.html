@@ -381,6 +381,16 @@
   </ol>
 </div>
 
+<!-- 给基础版读者的入门暖场,常规版可见,专业版自动隐藏 -->
+<div class="basic-only summary" style="background:#fff5e6;border-left-color:#f59f00;">
+  <p style="margin:0 0 8px;"><strong>📖 这页文档怎么读?</strong></p>
+  <ul style="margin:0;">
+    <li><strong>第一次看</strong>(产品 / 跨职能 / 老板) → 当前是<strong>常规版</strong>,7 章节按数字依次读,每节有「👉」开头的入门解读。重点关注 <a href="#sec-1">章节 1 定义</a> + <a href="#sec-3">章节 3 类型</a> + <a href="#sec-6">章节 6 正反案例</a> + <a href="#sec-7">章节 7 典型场景</a>。</li>
+    <li><strong>已经熟悉</strong>(资深设计师 / 工程师 / 走查) → 切到右上 <strong>专业版</strong>,展开 <a href="#sec-4">章节 4 结构</a> 完整 token 表 + <a href="#sec-5">章节 5 ASCII 布局</a> + 底部 API 速查。</li>
+    <li><strong>想看原稿</strong> → 章节 3.3 / 4.5 / 4.6 / 5.3 都有 Relay 切图,直接<strong>点图新 tab 看 1426px 原稿</strong>。</li>
+  </ul>
+</div>
+
 
 <!-- ==========================================
      spec-page v0.2: 切图为主，反例 mockup 极简
@@ -512,6 +522,12 @@
 
 <h2 id="sec-1"><span class="num">1</span>定义</h2>
 
+<div class="basic-only summary">
+  <p><strong>👉 一句话理解</strong>:打开 JD App,屏幕最底下永远在那条小条 —— 装着「首页 / 分类 / 购物车 / 消息 / 我的」这种最重要的几个图标 —— 这就是 Tabbar(底部导航栏)。</p>
+  <p style="margin-top:8px;"><strong>它解决什么</strong>:让用户在 App 里**几个最核心的功能之间一键切换**(无论你逛到第几层、看了什么内容,它永远在那等你回到一级页面)。新版还在它上面集成了 AI 助手入口(Joy Agent)和大促/活动的动态展示位(灵动岛)。</p>
+  <p style="margin-top:8px;"><strong>为什么有一套规范</strong>:Tabbar 是 App 的"门面" —— 用户每天看几十次,任何不一致(图标大小不一、文字超长、坑位数变来变去)都会让人觉得 App 廉价或迷路。所以 V16 制定了从尺寸、颜色、字号到禁止行为的全套规则。</p>
+</div>
+
 <p><strong>底部导航栏(Tabbar)</strong>是 JD APP 屏幕底部的<strong>全局导航组件</strong>,作为页面导航的<strong>最高层级</strong>管控全局,点击切换整页内容。</p>
 
 <p>它的核心边界是「<strong>切换整页内容</strong>」而非「<strong>承载子页面</strong>」:Tabbar 内的坑位是一级 Tab,各 Tab 之间无父子关系;二级及以下页面应由顶部 NavBar 或 SegmentControl 承担。当一级功能超过 5 个时,应在内容层重新组织而非给 Tabbar 加 Tab。</p>
@@ -554,18 +570,19 @@
 <p>V16 共定义 <strong>2 种形态</strong>(常规 / Joy Agent 组合) + <strong>3 种灵动岛运营资源位</strong>(常规型 / 运营型 / 大促型)。</p>
 
 <div class="basic-only summary">
-  <p><strong>形态(常规版速览)</strong>:</p>
-  <ul style="margin-top:4px;">
-    <li><strong>常规底导</strong> — 普通业务页面全局导航</li>
-    <li><strong>Joy Agent 组合底导</strong> — 左侧 AI 入口 + 右侧导航,适用首页/会场</li>
+  <p><strong>👉 怎么选?</strong> 一张决策树:</p>
+  <p style="margin-top:8px;margin-left:8px;"><strong>① 这个页面需要 AI 助手入口吗?</strong> </p>
+  <ul style="margin-top:0;">
+    <li>需要 → <strong>Joy Agent 组合底导</strong>(首页 / 大会场常用,左边固定一个 Agent)</li>
+    <li>不需要 → <strong>常规底导</strong>(其它所有业务页)</li>
   </ul>
-  <p style="margin-top:8px;"><strong>灵动岛(占消息位)</strong>:</p>
-  <ul style="margin-top:4px;">
-    <li><strong>常规型</strong> — 日常商品推荐</li>
-    <li><strong>运营型</strong> — 运营会场推广(同频色)</li>
-    <li><strong>大促型</strong> — 重点大促(异型背板)</li>
+  <p style="margin-top:8px;margin-left:8px;"><strong>② 想插一条运营资源位 / 大促展示位吗?</strong></p>
+  <ul style="margin-top:0;">
+    <li>纯日常商品推荐 → 用 <strong>常规型灵动岛</strong>(占消息位,纯色背景,简洁)</li>
+    <li>有运营会场要导流 → 用 <strong>运营型灵动岛</strong>(同频色,有背景动效,灵活)</li>
+    <li>大促核心展示 → 用 <strong>大促型灵动岛</strong>(尺寸更大、异型背板,最抓眼球)</li>
   </ul>
-  <p style="margin-top:8px;color:var(--c-text-3);">具体尺寸 / 标识 / 字号 / 材质规则,见 <strong>专业版</strong>。形态原稿可在下方 3.3 看。</p>
+  <p style="margin-top:12px;color:var(--c-text-3);">📐 具体尺寸(131×44 / 144×52)/ 字号 / 材质 / 颜色规则,切到 <strong>专业版</strong> 看完整表格;<strong>下方 3.3</strong> 直接看 5 张原稿。</p>
 </div>
 
 <div class="pro-only">
@@ -629,7 +646,17 @@
 <p>Tabbar 由<strong>容器 + N 个坑位(可选 Joy Agent + 可选灵动岛)</strong>组成,其中<strong>容器和至少 2 个坑位为必要元素</strong>。</p>
 
 <div class="basic-only summary">
-  <p><strong>基础结构(常规版概述)</strong>:容器位于屏幕底部 → N 个坑位均分占满 → 每个坑位 = 图标 + 文本(默认/选中/营销三态)→ 招手位(红点 / 数字 / 文字)→ 可选灵动岛(占消息位)→ 可选 Joy Agent(左侧固定)→ 文字 + 多端材质适配。具体 token 名 / DP 数值 / 字号 字重 见 <strong>专业版</strong>。</p>
+  <p><strong>👉 一句话拆解</strong>:Tabbar = <strong>1 个外壳</strong>(底部那条)+ <strong>N 个坑位</strong>(图标按钮)+ 可选 <strong>左侧 Agent</strong> + 可选 <strong>嵌入灵动岛</strong>。</p>
+  <p style="margin-top:8px;"><strong>每个坑位是个 4 件套</strong>:</p>
+  <ul style="margin-top:4px;">
+    <li>① 图标(20×20)</li>
+    <li>② 文字标签(<strong>最多 4 个汉字</strong>,超了截断)</li>
+    <li>③ 三态切换(默认灰 / 选中红 / 营销态可换图)</li>
+    <li>④ 可选招手位(右上角红点 / 数字角标 / 短文字气泡)</li>
+  </ul>
+  <p style="margin-top:8px;"><strong>Joy Agent 是什么?</strong> 一个 52×52 的圆形 AI 助手按钮,固定在 Tabbar 左侧。点击进入对话弹层,头顶可以飘"问问我大促攻略"那种气泡(最多 18 个汉字)。</p>
+  <p style="margin-top:8px;"><strong>灵动岛是什么?</strong> 嵌在「消息」坑位上的一条宽资源展示位,3 种形态(常规商品 / 运营 / 大促),都是 131-144 宽的圆角矩形。展开时占用消息位,所以同时只能展示一条。</p>
+  <p style="margin-top:12px;color:var(--c-text-3);">📐 完整 token 名 / 精确 DP 数 / 字号字重表,见 <strong>专业版</strong>。📖 下方 4.5 / 4.6 直接看原稿对照。</p>
 </div>
 
 <div class="pro-only">
