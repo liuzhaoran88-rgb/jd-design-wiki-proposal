@@ -337,4 +337,10 @@ echo "✓ Pages 重 build 完成: $s"
   - **③ 切图 stage 融合度**:模板加 `.stage--image { background: transparent; border: none; padding: 0 }`,切图直接贴页面背景,无沙盒灰底/虚线/box-shadow,边距跟页面底色融合
   - **④ 切图 zoom JS 入模板**:click 切图新 tab 看原图,stage-label 内追加 "🔍 点图看原稿(原宽×原高)" 链接 fallback
   - **⑤ Step 8 终端输出扩展**:加切图数 / cache-bust 字段;deploy 跑完接 Step 9e 输出
+- **v0.4.1** (2026-05-15) Basic 段写作模式沉淀(实战 + 文档,无代码改动):
+  - **① tabbar 实战:常规版增强 4 处** — 入门暖场段 + 章节 1 一句话理解 + 章节 3 决策树 + 章节 4 组件拆解
+  - **② Basic 段不是"删字版 pro"** — 是给 PM / 老板 / 跨职能的友好解读,plain 语言为主
+  - **③ 5 个 pattern 沉淀到 [view-toggle.md](./references/view-toggle.md)**:入门暖场 / 一句话理解 / 决策树 / 组件拆解 / 标记约定(👉 / 📖 / 📐)
+  - **④ "不写的事" 4 条**:basic 段不出现 token 名 / 精确 DP / 章节来源 / 嵌套 ≥ 3 层
+  - 实战:tabbar basic / pro = 88.4%(原 81%,因为 basic 加了入门内容反而更长,但绝对体验更友好)
 - v0.5 (planned) 增量 diff(避免每次全量重导切图)+ 批量模式(一次跑多组件)+ TOC 自动嵌套(含 h3 子标题)+ 切图节点自动选择(避免每次手枚举)
