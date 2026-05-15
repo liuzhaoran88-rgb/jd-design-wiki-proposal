@@ -418,6 +418,9 @@
   @media (max-width: 720px) {
     .stage--image { margin-left: -8px; margin-right: -8px; }
   }
+  /* case 容器内 stage 不要跨出 case 边界(否则溢出)*/
+  .case .stage--image { margin-left: 0; margin-right: 0; padding: 0; }
+  .case .stage img { max-width: 100%; }
   .stage--image a.zoom-link {
     display: inline-block;
     margin-top: 8px;
