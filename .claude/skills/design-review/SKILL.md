@@ -1,18 +1,23 @@
 ---
 name: design-review
-description: Audit a JD APP design from Relay (V15.0 or V16.0) against the design system wiki (color / typography / radius / spacing / motion / icon / layout tokens). Triggered by relay.jd.com URLs or node IDs together with verbs like "审核", "走查", "review", "audit", "检查规范", "符合 15.0 吗", "符合 16.0 吗". Routes to V15 or V16 token snapshot by source fileKey. Outputs a structured pass/warn/violate report with citations back to wiki rules.
+description: Audit a JD APP design (V15.0 or V16.0) — either a Relay node OR a committed `design.md` in `jd-design-wiki-proposal` — against the design system wiki (color / typography / radius / spacing / motion / icon / layout tokens, plus frontmatter compliance + token reverse-lookup + section completeness for design.md). Triggered by relay.jd.com URLs / node IDs / design.md paths together with verbs like "审核", "走查", "review", "audit", "检查规范", "符合 15.0 吗", "符合 16.0 吗", "审 design.md". Routes to V15 or V16 token snapshot by fileKey. Outputs a structured pass/warn/violate report, saved to `design-review-report.md` for design.md targets (or co-located alongside) and echoed to terminal.
 ---
 
 # /design-review · JD V15.0 / V16.0 设计稿合规走查
 
-把 Relay 节点的设计稿与 `jd-design-wiki-proposal` 仓库的 token 体系做交叉校验,**根据源 fileKey 自动选 V15 还是 V16 真相源**,输出可读 + 可复核的合规报告。
+把设计稿与 `jd-design-wiki-proposal` 仓库的 token 体系做交叉校验,**根据源 fileKey 自动选 V15 还是 V16 真相源**,输出可读 + 可复核的合规报告。
+
+**支持两种输入**:
+- **Relay 模式** — 输入 Relay URL 或 `nodeId`(`xxx:yyy`),审 Relay 节点的设计稿
+- **design.md 模式** — 输入仓库内 `**/design.md` 路径或 bundle 目录,审已落地的 design.md 文件(frontmatter 合规、token 反查正确性、章节完整性、Donts 数量)
 
 ---
 
 ## 何时触发
 
-用户给出一个 Relay 设计链接或节点 ID,并要求:
+用户给出一个 Relay 设计链接 / 节点 ID,**或**一份 `design.md` 文件路径 / 包含 design.md 的目录,并要求:
 - "审核 / 走查 / review / audit 这个设计稿"
+- "审 design.md" / "校验 design.md 是否合规" / "查 design.md 的 token 反查对不对"
 - "符合 15.0 设计规范吗" / "符合 16.0 吗"
 - "检查一下用了哪些 token"
 - "这个 token 用对了吗"
@@ -29,6 +34,18 @@ description: Audit a JD APP design from Relay (V15.0 or V16.0) against the desig
 
 ## 输入解析
 
+**先判断模式**(根据用户输入字面形态):
+
+| 输入形态 | 模式 | 转 |
+|---|---|---|
+| `https://relay.jd.com/file/design?id=...` | **Relay** | 下面"工作流(Relay 模式)" |
+| 裸 `nodeId`(`xxx:yyy` 或 `xxx-yyy`) | **Relay** | 同上 |
+| `*.md` 路径(典型:`jd-design-system-md{,-v16}/.../design.md`) | **design.md** | 下面"工作流(design.md 模式)" |
+| 含 `design.md` 的目录(bundle 模式根目录) | **design.md** | 同上,自动定位 `{dir}/design.md` |
+| glob(`jd-design-system-md-v16/**/design.md`) | **design.md(批量)** | 同上,逐文件跑 |
+
+### Relay 模式输入解析
+
 URL 形如 `https://relay.jd.com/file/design?id={fileKey}&page_id={pageId}&node_id={nodeId}`
 
 提取:
@@ -37,9 +54,16 @@ URL 形如 `https://relay.jd.com/file/design?id={fileKey}&page_id={pageId}&node_
 
 如果用户只给 `nodeId`(裸的 `xxx:yyy`),直接用。
 
+### design.md 模式输入解析
+
+- 路径必须存在且可读;否则报错退出
+- 若是目录,定位 `{dir}/design.md`;不存在报错退出
+- 若是 glob,展开为文件列表,逐份走 Step 1-4 + 落各自 `design-review-report.md`
+- 从首条 `---` ~ `---` 段提取 frontmatter(YAML),取出 `relay_source.url` → 解析出 `fileKey` 走下面 Step 2 V15/V16 路由
+
 ---
 
-## 工作流
+## 工作流(Relay 模式)
 
 ### Step 1 — 拉设计稿三件套(尽量并行)
 
@@ -183,10 +207,20 @@ V15 / V16 两套 tokens.json **结构兼容**(都是 `$value` token 树),但具�
 
 ### Step 4 — 输出报告
 
-固定 5 段式 markdown:
+**输出渠道(两个模式共用)**:
+
+| 模式 | 报告文件落点 | 终端 |
+|---|---|---|
+| Relay | 默认**不落文件**(节点不在仓库)。用户显式说"落文件"或加 `--report-file <path>` 时落到 `<path>` 或当前目录 `design-review-{nodeId}-{YYYY-MM-DD}.md` | ✅ 完整 markdown |
+| design.md(单份) | 默认落 `{design.md 同目录}/design-review-report.md`(全量覆写) | ✅ 简短摘要(✅/⚠️/❌ 计数 + 报告路径) |
+| design.md(批量 glob) | 每份各自落同目录 `design-review-report.md` | ✅ 表格汇总:文件 / ❌ / ⚠️ / ✅ 计数 + 报告路径 |
+
+`design-review-report.md` 是契约文件名,**不要**改 / 起别的名字,这样设计师 / CI 能稳定 grep 出所有 review 结果。
+
+**固定 5 段式 markdown 结构(两个模式都按此输出)**:
 
 ```
-## 设计稿 Review · `<nodeId>`
+## 设计稿 Review · `<nodeId 或 design.md 路径>`
 
 **类型识别**:<根据 screenshot 判断:页面 / 半弹层 / 弹窗 / 卡片 / etc.>
 **逻辑尺寸**:<375 / 自适应>
@@ -227,7 +261,109 @@ V16 例:
 
 ---
 
+## 工作流(design.md 模式)
+
+> 校验对象不是 Relay 节点而是仓库内已落地的 `design.md`。校验维度比 Relay 模式更宽:**frontmatter 合规 + token 反查正确性 + 章节完整性 + Donts 数量**。不调 zero-design MCP(除非反查 token 时需要回看 Relay 节点确认,通常不需要)。
+
+### Step 1 — 读 design.md + 解析 frontmatter
+
+1. `cat` design.md 全文
+2. 提取首条 `---` ~ `---` 段作为 frontmatter,YAML 解析
+3. 关键字段读取:
+   - `file` / `level` / `bg` / `slug` / `name_zh` / `name_en` / `status` / `version` / `last_synced`
+   - `bundle: page-doc` 标识(若存在) + `bundle_files: [...]`
+   - `auto_detected.*` 块
+   - `relay_source.{file_id, page_id, node_id, url}`
+   - `references.uses_tokens.{colors, typography, radius, spacing, materials}`
+   - `used_by`
+4. **若 `bundle: page-doc`**:同步读 `{dir}/spec.md` / `variants.md` / `behaviors.md` / `ai-schema.yaml` / `CHANGELOG.md`,各取 frontmatter 验 `bundle_part_of: design.md` 反向指针 + 各自正文
+
+### Step 2 — 加载 token 真相源(复用 Relay 模式 Step 2)
+
+从 `relay_source.url`(或直接 `relay_source.file_id`)拿 fileKey,按上面"工作流(Relay 模式) → Step 2"的路由表选 V15 / V16 tokens.json。
+
+无 `relay_source.url` 字段 → 标 ❌ 违规("frontmatter 缺 relay_source.url,无法定位 token 真相源版本");兜底用 V16 跑后续校验,但报告顶部标"版本未知,默认按 V16"。
+
+### Step 3 — 4 维校验
+
+#### 3a · Frontmatter 合规
+
+按 [`../relay-to-design-md/references/frontmatter-spec.md`](../relay-to-design-md/references/frontmatter-spec.md) 校验:
+
+| 维度 | 规则 | 失败级别 |
+|---|---|---|
+| 必填字段 | `file` / `level` / `bg` / `slug` / `name_zh` / `owner` / `status` / `version` / `last_synced` / `auto_detected` / `relay_source` 整块 / `used_by`(可空数组) 全部在 | 缺一项 → ❌ |
+| `file` 字段 | 固定值 `"design"` | ≠ → ❌ |
+| `level` 在词表 | 与 [`../../shared/references/level-vocab.md`](../../shared/references/level-vocab.md) 5 枚举一致 | 不在 → ❌ |
+| `bg` 在词表 | 与 frontmatter-spec.md `bg` 受控词表一致 | 不在 → ❌ |
+| `slug` 格式 | kebab-case `^[a-z0-9]+(-[a-z0-9]+)*$`,2-50 字符,不能数字开头 | 违 → ❌ |
+| `level + bg` 组合 | `component-base + bg ≠ horizontal` 或 `level ≠ component-base + bg = horizontal` | 触发 → ⚠️ |
+| `last_synced` ISO date | `YYYY-MM-DD` | 不符 → ❌ |
+| `relay_source.url` 可解析 | URL 中能提取 file_id / page_id / node_id 三者 | 不能 → ❌ |
+| `auto_detected.*` 有 ⚠️ flag | level / bg / slug 中含 `⚠️ fallback` 标记 | 有 → ⚠️ 提示"需设计师 review 推断结果" |
+| Bundle frontmatter 单点存储 | `spec.md` / `variants.md` / `behaviors.md` / `ai-schema.yaml` 顶部应**只**有 `bundle_part_of: design.md` 反向指针,**不含**重复 `relay_source` 块(v0.5.1 起契约) | 重复了 → ⚠️ "build-up drift,改回单点存储" |
+
+#### 3b · Token 反查正确性
+
+对 frontmatter `references.uses_tokens.{colors, typography, radius, spacing, materials}` 中每条 token 名:
+
+1. 在 Step 2 加载的 tokens.json 中查这个 token 名是否存在
+2. 不存在 → ❌ Off-token("design.md 声明用 X 但 V{version} tokens.json 不含此 token")
+3. 存在但**正文**用的 hex / size 值与 token `$value` 对不上 → ⚠️ Value-drift
+4. 存在且对得上 → ✅
+
+> Token 反查算法见 [`../relay-to-design-md/references/token-reverse-lookup.md`](../relay-to-design-md/references/token-reverse-lookup.md)。本模式只需做"声明的 token 是否真实存在 + 值对不对",**不**做命名风格 fingerprint 检查(那是 Relay 模式 Step 3 前置规则的职责;design.md 已脱离设计稿命名空间)。
+
+#### 3c · 章节完整性
+
+按 [`../../shared/references/section-anchors.md`](../../shared/references/section-anchors.md) 7 章节 canonical 名,检查 design.md(或 bundle 文件)是否覆盖必要章节:
+
+| 章节 | single mode 检查 | bundle mode 检查 |
+|---|---|---|
+| 1. 定义 | `## 一句话定义` 或 `## 定义` 段存在且非空 | `design.md ## 一句话定义` |
+| 2. 行为准则 | `## 交互` 段(可选,缺 → ⚠️) | `behaviors.md ## 交互` |
+| 3. 类型 | `## 变体 Variants` 段(可选) | `variants.md` 主表 |
+| 4. 结构 | `## 视觉` 段(必,缺 → ❌) | `spec.md` colors / typography / radius / spacing 表至少一张 |
+| 5. 布局 | `## 视觉 / 间距` 子段(可选) | `spec.md` 布局 / 间距段 |
+| 6. 正反案例 | `## Donts` + `## 应用场景` 段(必,缺 → ❌) | `behaviors.md Donts` + `应用场景` |
+| 7. 典型场景 | `## 应用场景` ✅ 子段 | `behaviors.md` 应用场景 ✅ 子段 |
+
+#### 3d · Donts 数量
+
+提取 6. 正反案例对应段(`## Donts` 或 bundle `behaviors.md` Donts 段)的条目数:
+
+- ≥ 3 → ✅
+- 1-2 → ⚠️ "Donts 不足 3 条,正反案例覆盖不全"
+- 0 → ❌ "缺 Donts 段或空段,典型反例无规则可循"
+- > 8 → ⚠️ "Donts 过多,建议精简到核心 8 条以内"
+
+> 数量启发参考 [`../design-md-to-spec-page/references/section-mapping.md`](../design-md-to-spec-page/references/section-mapping.md) "6. 正反案例" 段(反例 target ≥ 3,< 3 → ⚠️ TBD)。
+
+#### 3e · (可选)AI Schema 完整性
+
+若 bundle 含 `ai-schema.yaml`,基础结构检查:
+
+- YAML 可解析(语法对) → ✅;不可解析 → ❌
+- 至少含 `forms` / `slots` / `states` / `events` 4 个顶层 key 中的 1 个 → ✅;一个都没有 → ⚠️ "ai-schema.yaml 太空,可能漏填"
+
+不做语义完整性检查(那需要业务知识)。
+
+### Step 4 — 输出报告
+
+复用 Relay 模式 Step 4 同款 5 段 markdown 结构,只是:
+
+- 标题改为 `## design.md Review · \`{相对仓库根路径}\``
+- 报告文件**默认**落到 `{design.md 同目录}/design-review-report.md`(覆写)
+- 终端只打**简短摘要**:`✅ N / ⚠️ M / ❌ K · 报告:{path}`
+- 多份(glob)→ 报告各自落各自目录;终端打表格汇总
+
+报告顶部加一行:`**版本**: V{version} | **fileKey**: {fileKey} | **last_synced**: {date}`
+
+---
+
 ## 失败模式
+
+### Relay 模式
 
 | 现象 | 处置 |
 |---|---|
@@ -236,6 +372,17 @@ V16 例:
 | `get_design_metadata` 输出 > 25k tokens | grep 不要全读,模式见下面"片段提取" |
 | 用户给的 fileKey 不在已知 spec file 列表(V15 `1896756863949619202` / V16 `2029484645871009793`) | 仍可走 review:Step 2 按"其他"分支默认 V16 路径,失败回退 V15;报告顶部标注「**警告:此 fileKey 不在已知 spec file 列表,默认按 V16 真相源校验,如属其他业务文件请指明**」|
 | V16 tokens.json 缺失 + V16 fallback snapshot 未提供 | Step 2 报错退出,提示用户先 clone 仓库或 follow-up 提供 V16 fallback |
+
+### design.md 模式
+
+| 现象 | 处置 |
+|---|---|
+| design.md 路径不存在或不可读 | 报错退出,提示 "未找到 {path},请确认相对仓库根的正确路径" |
+| frontmatter YAML 解析失败 | 报错退出,在终端 echo 出有问题的几行供设计师修;不写 report 文件(避免覆盖已有 review) |
+| frontmatter 缺 `relay_source.url` | Step 2 走兜底 V16 路径;报告 ❌ 段加一条"frontmatter 缺 relay_source.url,版本路由失效" |
+| Bundle 模式有缺文件 | 缺哪个就跳过对应章节校验,❌ 段加"bundle_files 声明含 X 但文件不存在" |
+| `references.uses_tokens` 空 / 缺整段 | 跳过 3b token 反查,⚠️ "design.md 未声明 uses_tokens,无法做反查正确性校验;建议补 frontmatter" |
+| `design-review-report.md` 已存在 | 默认**全量覆写**(report 是产物,不该手改;手改的内容会被下次跑覆盖)。**写之前**报告路径放在终端摘要里,设计师如要保留旧版本应先重命名 |
 
 ### Metadata 片段提取(应对超大节点)
 
@@ -266,7 +413,8 @@ PY
 
 ## 示例
 
-见 [`examples/shop-review-half-sheet.md`](examples/shop-review-half-sheet.md) —— 对节点 `639:3394`(店铺评价半弹层)的完整走查。这是黄金参考输出。
+- **Relay 模式**:[`examples/shop-review-half-sheet.md`](examples/shop-review-half-sheet.md) —— 对节点 `639:3394`(店铺评价半弹层)的完整走查。这是黄金参考输出。
+- **design.md 模式**:TBD —— 第一份 V16 design.md(`jd-design-system-md-v16/horizontal/components-base/tabbar/design.md`)实跑完后落 `tabbar/design-review-report.md`,迁过来当黄金样例。
 
 ---
 
