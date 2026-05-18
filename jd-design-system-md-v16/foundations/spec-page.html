@@ -552,17 +552,6 @@
   /* Basic 模式:radius / lines 卡 val 隐藏后,垂直留白也跟着收 */
   body.mode-basic .radius-card { padding: 16px 12px; }
   body.mode-basic .lines-card { padding: 14px 16px; }
-  /* 视图切换器旁的小提示 — 说明 Basic / Pro 看的内容差异 */
-  .view-tabs::before {
-    content: attr(data-hint);
-    font-size: 11px;
-    color: var(--c-text-3);
-    margin-right: 10px;
-    align-self: center;
-    line-height: 1.4;
-    max-width: 200px;
-    text-align: right;
-  }
 </style>
 
 <style>
@@ -637,9 +626,9 @@
     来源:Relay V16.0 GUIDELINE 多节点 + <code>jd-design-system-md-v16/foundations/</code> 9 份 md + <code>tokens/tokens.json</code> 真实数据
   </div>
   <div class="panda-deco" role="img" aria-label="JD 玻璃熊猫装饰"></div>
-  <div class="view-tabs" role="tablist" aria-label="视图切换" data-hint="" style="position:absolute;bottom:0;right:0;">
-    <button class="view-tab is-active" role="tab" data-view="basic" aria-selected="true" data-mode-hint="纯视觉 · 跨职能 / 老板视角">常规版</button>
-    <button class="view-tab" role="tab" data-view="pro" aria-selected="false" data-mode-hint="含 hex / atom / GitHub md · 设计师 / 工程师">专业版</button>
+  <div class="view-tabs" role="tablist" aria-label="视图切换" style="position:absolute;bottom:0;right:0;">
+    <button class="view-tab is-active" role="tab" data-view="basic" aria-selected="true">常规版</button>
+    <button class="view-tab" role="tab" data-view="pro" aria-selected="false">专业版</button>
   </div>
 </header>
 
@@ -1141,7 +1130,6 @@
   var body = document.body;
   var tabs = document.querySelectorAll('.view-tab');
 
-  var tabsHost = document.querySelector('.view-tabs');
   function setMode(mode) {
     body.classList.remove('mode-basic', 'mode-pro');
     body.classList.add('mode-' + mode);
@@ -1149,7 +1137,6 @@
       var on = t.dataset.view === mode;
       t.classList.toggle('is-active', on);
       t.setAttribute('aria-selected', on ? 'true' : 'false');
-      if (on && tabsHost) tabsHost.setAttribute('data-hint', t.dataset.modeHint || '');
     });
     try { localStorage.setItem(STORAGE_KEY, mode); } catch (e) {}
   }
