@@ -545,6 +545,24 @@
   /* pro 模式下,table 行内 token / atom code 等小标记继承字号 */
   body.mode-pro .pro-inline { display: inline; }
   .pro-inline { color: var(--c-text-3); font-size: 12px; margin-left: 6px; }
+
+  /* Basic 模式:色块隐藏 hex 后,token 名贴底视觉更干净 */
+  body.mode-basic .color-card { justify-content: flex-end; min-height: 72px; }
+  body.mode-basic .color-card__name { font-size: 12px; opacity: 1; font-weight: 500; }
+  /* Basic 模式:radius / lines 卡 val 隐藏后,垂直留白也跟着收 */
+  body.mode-basic .radius-card { padding: 16px 12px; }
+  body.mode-basic .lines-card { padding: 14px 16px; }
+  /* 视图切换器旁的小提示 — 说明 Basic / Pro 看的内容差异 */
+  .view-tabs::before {
+    content: attr(data-hint);
+    font-size: 11px;
+    color: var(--c-text-3);
+    margin-right: 10px;
+    align-self: center;
+    line-height: 1.4;
+    max-width: 200px;
+    text-align: right;
+  }
 </style>
 
 <style>
@@ -619,9 +637,9 @@
     来源:Relay V16.0 GUIDELINE 多节点 + <code>jd-design-system-md-v16/foundations/</code> 9 份 md + <code>tokens/tokens.json</code> 真实数据
   </div>
   <div class="panda-deco" role="img" aria-label="JD 玻璃熊猫装饰"></div>
-  <div class="view-tabs" role="tablist" aria-label="视图切换" style="position:absolute;bottom:0;right:0;">
-    <button class="view-tab is-active" role="tab" data-view="basic" aria-selected="true">常规版</button>
-    <button class="view-tab" role="tab" data-view="pro" aria-selected="false">专业版</button>
+  <div class="view-tabs" role="tablist" aria-label="视图切换" data-hint="" style="position:absolute;bottom:0;right:0;">
+    <button class="view-tab is-active" role="tab" data-view="basic" aria-selected="true" data-mode-hint="纯视觉 · 跨职能 / 老板视角">常规版</button>
+    <button class="view-tab" role="tab" data-view="pro" aria-selected="false" data-mode-hint="含 hex / atom / GitHub md · 设计师 / 工程师">专业版</button>
   </div>
 </header>
 
@@ -655,170 +673,170 @@
 
 <p><strong>色彩 token 体系 — 9 大语义组(主色/服务/文字/背景/边框/反馈/Info)</strong></p>
 
-<div class="basic-only summary">
+<div class="pro-only summary">
   <p style="margin:0;">📖 完整 token 列表 / 命名规则 / V15 升级映射 → <a href="https://github.com/ShuaiMXu/xMu-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/tokens/color.md" target="_blank" rel="noopener">color.md (GitHub)</a></p>
 </div>
 
 <h4>主色 Primary</h4>
 <div class="token-grid color-grid">
 <div class="color-card" style="background:#FF0F23;color:#fff">
-  <div class="color-card__hex">#FF0F23</div>
+  <div class="color-card__hex pro-only">#FF0F23</div>
   <div class="color-card__name">color_primary</div>
 </div>
 <div class="color-card" style="background:#FFFFFF;color:#171a26">
-  <div class="color-card__hex">#FFFFFF</div>
+  <div class="color-card__hex pro-only">#FFFFFF</div>
   <div class="color-card__name">color_primary_text</div>
 </div>
 <div class="color-card" style="background:#E53029;color:#fff">
-  <div class="color-card__hex">#E53029</div>
+  <div class="color-card__hex pro-only">#E53029</div>
   <div class="color-card__name">color_primary_pressed</div>
 </div>
 <div class="color-card" style="background:#C2C4CC;color:#171a26">
-  <div class="color-card__hex">#C2C4CC</div>
+  <div class="color-card__hex pro-only">#C2C4CC</div>
   <div class="color-card__name">color_primary_disabled</div>
 </div>
 <div class="color-card" style="background:#828794;color:#fff">
-  <div class="color-card__hex">#828794</div>
+  <div class="color-card__hex pro-only">#828794</div>
   <div class="color-card__name">color_primary_disabled_special</div>
 </div>
 <div class="color-card" style="background:#FFF0F4;color:#171a26">
-  <div class="color-card__hex">#FFF0F4</div>
+  <div class="color-card__hex pro-only">#FFF0F4</div>
   <div class="color-card__name">color_primary_light</div>
 </div>
 <div class="color-card" style="background:#FFD6E1;color:#171a26">
-  <div class="color-card__hex">#FFD6E1</div>
+  <div class="color-card__hex pro-only">#FFD6E1</div>
   <div class="color-card__name">color_primary_light_pressed</div>
 </div>
 </div>
 <h4>服务 Service</h4>
 <div class="token-grid color-grid">
 <div class="color-card" style="background:rgba(181,105,26,0.02);color:#171a26">
-  <div class="color-card__hex">rgba(181,105,26,0.02)</div>
+  <div class="color-card__hex pro-only">rgba(181,105,26,0.02)</div>
   <div class="color-card__name">color_service</div>
 </div>
 <div class="color-card" style="background:#FFF4E8;color:#171a26">
-  <div class="color-card__hex">#FFF4E8</div>
+  <div class="color-card__hex pro-only">#FFF4E8</div>
   <div class="color-card__name">color_service_bground</div>
 </div>
 <div class="color-card" style="background:rgba(181,105,26,0.20);color:#171a26">
-  <div class="color-card__hex">rgba(181,105,26,0.20)</div>
+  <div class="color-card__hex pro-only">rgba(181,105,26,0.20)</div>
   <div class="color-card__name">color_service_border</div>
 </div>
 <div class="color-card" style="background:#B5691A;color:#fff">
-  <div class="color-card__hex">#B5691A</div>
+  <div class="color-card__hex pro-only">#B5691A</div>
   <div class="color-card__name">color_service_text</div>
 </div>
 </div>
 <h4>文字 Text</h4>
 <div class="token-grid color-grid">
 <div class="color-card" style="background:#171A26;color:#fff">
-  <div class="color-card__hex">#171A26</div>
+  <div class="color-card__hex pro-only">#171A26</div>
   <div class="color-card__name">color_title</div>
 </div>
 <div class="color-card" style="background:#3D414D;color:#fff">
-  <div class="color-card__hex">#3D414D</div>
+  <div class="color-card__hex pro-only">#3D414D</div>
   <div class="color-card__name">color_text</div>
 </div>
 <div class="color-card" style="background:#828794;color:#fff">
-  <div class="color-card__hex">#828794</div>
+  <div class="color-card__hex pro-only">#828794</div>
   <div class="color-card__name">color_text_help</div>
 </div>
 <div class="color-card" style="background:#C2C4CC;color:#171a26">
-  <div class="color-card__hex">#C2C4CC</div>
+  <div class="color-card__hex pro-only">#C2C4CC</div>
   <div class="color-card__name">color_text_disabled</div>
 </div>
 </div>
 <h4>背景 Background</h4>
 <div class="token-grid color-grid">
 <div class="color-card" style="background:#F2F3F7;color:#171a26">
-  <div class="color-card__hex">#F2F3F7</div>
+  <div class="color-card__hex pro-only">#F2F3F7</div>
   <div class="color-card__name">color_background</div>
 </div>
 <div class="color-card" style="background:#FFFFFF;color:#171a26">
-  <div class="color-card__hex">#FFFFFF</div>
+  <div class="color-card__hex pro-only">#FFFFFF</div>
   <div class="color-card__name">color_background_overlay</div>
 </div>
 <div class="color-card" style="background:#F5F6FA;color:#171a26">
-  <div class="color-card__hex">#F5F6FA</div>
+  <div class="color-card__hex pro-only">#F5F6FA</div>
   <div class="color-card__name">color_background_component</div>
 </div>
 </div>
 <h4>边框 / 蒙层</h4>
 <div class="token-grid color-grid">
 <div class="color-card" style="background:rgba(0,0,0,0.08);color:#171a26">
-  <div class="color-card__hex">rgba(0,0,0,0.08)</div>
+  <div class="color-card__hex pro-only">rgba(0,0,0,0.08)</div>
   <div class="color-card__name">color_border</div>
 </div>
 <div class="color-card" style="background:rgba(0,0,0,0.40);color:#171a26">
-  <div class="color-card__hex">rgba(0,0,0,0.40)</div>
+  <div class="color-card__hex pro-only">rgba(0,0,0,0.40)</div>
   <div class="color-card__name">color_mask</div>
 </div>
 <div class="color-card" style="background:rgba(0,0,0,0.02);color:#171a26">
-  <div class="color-card__hex">rgba(0,0,0,0.02)</div>
+  <div class="color-card__hex pro-only">rgba(0,0,0,0.02)</div>
   <div class="color-card__name">color_mask_part</div>
 </div>
 <div class="color-card" style="background:rgba(0,0,0,0.70);color:#171a26">
-  <div class="color-card__hex">rgba(0,0,0,0.70)</div>
+  <div class="color-card__hex pro-only">rgba(0,0,0,0.70)</div>
   <div class="color-card__name">color_mask_fault_toleran</div>
 </div>
 </div>
 <h4>成功 Success</h4>
 <div class="token-grid color-grid">
 <div class="color-card" style="background:#00D900;color:#fff">
-  <div class="color-card__hex">#00D900</div>
+  <div class="color-card__hex pro-only">#00D900</div>
   <div class="color-card__name">color_success</div>
 </div>
 <div class="color-card" style="background:#EBFBEB;color:#171a26">
-  <div class="color-card__hex">#EBFBEB</div>
+  <div class="color-card__hex pro-only">#EBFBEB</div>
   <div class="color-card__name">color_success_light</div>
 </div>
 <div class="color-card" style="background:#2AA32A;color:#fff">
-  <div class="color-card__hex">#2AA32A</div>
+  <div class="color-card__hex pro-only">#2AA32A</div>
   <div class="color-card__name">color_success_pressed</div>
 </div>
 </div>
 <h4>错误 Error</h4>
 <div class="token-grid color-grid">
 <div class="color-card" style="background:#FF0F23;color:#fff">
-  <div class="color-card__hex">#FF0F23</div>
+  <div class="color-card__hex pro-only">#FF0F23</div>
   <div class="color-card__name">color_error</div>
 </div>
 <div class="color-card" style="background:#FFF0F4;color:#171a26">
-  <div class="color-card__hex">#FFF0F4</div>
+  <div class="color-card__hex pro-only">#FFF0F4</div>
   <div class="color-card__name">color_error_light</div>
 </div>
 <div class="color-card" style="background:TODO;color:#171a26">
-  <div class="color-card__hex">TODO</div>
+  <div class="color-card__hex pro-only">TODO</div>
   <div class="color-card__name">color_error_pressed</div>
 </div>
 </div>
 <h4>警告 Warning</h4>
 <div class="token-grid color-grid">
 <div class="color-card" style="background:#FFBF00;color:#171a26">
-  <div class="color-card__hex">#FFBF00</div>
+  <div class="color-card__hex pro-only">#FFBF00</div>
   <div class="color-card__name">color_warning</div>
 </div>
 <div class="color-card" style="background:#FFF9E0;color:#171a26">
-  <div class="color-card__hex">#FFF9E0</div>
+  <div class="color-card__hex pro-only">#FFF9E0</div>
   <div class="color-card__name">color_warning_light</div>
 </div>
 <div class="color-card" style="background:#B26B00;color:#fff">
-  <div class="color-card__hex">#B26B00</div>
+  <div class="color-card__hex pro-only">#B26B00</div>
   <div class="color-card__name">color_warning_pressed</div>
 </div>
 </div>
 <h4>信息 Info</h4>
 <div class="token-grid color-grid">
 <div class="color-card" style="background:#0073FF;color:#fff">
-  <div class="color-card__hex">#0073FF</div>
+  <div class="color-card__hex pro-only">#0073FF</div>
   <div class="color-card__name">color_Info</div>
 </div>
 <div class="color-card" style="background:#E5F5FF;color:#171a26">
-  <div class="color-card__hex">#E5F5FF</div>
+  <div class="color-card__hex pro-only">#E5F5FF</div>
   <div class="color-card__name">color_Info_light</div>
 </div>
 <div class="color-card" style="background:TODO;color:#171a26">
-  <div class="color-card__hex">TODO</div>
+  <div class="color-card__hex pro-only">TODO</div>
   <div class="color-card__name">color_Info_pressed</div>
 </div>
 </div>
@@ -829,7 +847,7 @@
 
 <p><strong>字体 token 体系 — Family × Size × Weight 三层组合</strong></p>
 
-<div class="basic-only summary">
+<div class="pro-only summary">
   <p style="margin:0;">📖 完整 token 列表 / 命名规则 / V15 升级映射 → <a href="https://github.com/ShuaiMXu/xMu-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/tokens/typography.md" target="_blank" rel="noopener">typography.md (GitHub)</a></p>
 </div>
 
@@ -838,27 +856,27 @@
 <div class="typo-list">
 <div class="typo-row">
   <span class="typo-sample" style="font-family:"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;font-weight:400;font-size:13px;">京东设计 JD Design 0123 — 10pt</span>
-  <code class="typo-name">pingfang_regular/font_size_10_400</code>
+  <code class="typo-name pro-only">pingfang_regular/font_size_10_400</code>
 </div>
 <div class="typo-row">
   <span class="typo-sample" style="font-family:"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;font-weight:400;font-size:14px;">京东设计 JD Design 0123 — 11pt</span>
-  <code class="typo-name">pingfang_regular/font_size_11_400</code>
+  <code class="typo-name pro-only">pingfang_regular/font_size_11_400</code>
 </div>
 <div class="typo-row">
   <span class="typo-sample" style="font-family:"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;font-weight:400;font-size:17px;">京东设计 JD Design 0123 — 13pt</span>
-  <code class="typo-name">pingfang_regular/font_size_13_400</code>
+  <code class="typo-name pro-only">pingfang_regular/font_size_13_400</code>
 </div>
 <div class="typo-row">
   <span class="typo-sample" style="font-family:"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;font-weight:400;font-size:18px;">京东设计 JD Design 0123 — 14pt</span>
-  <code class="typo-name">pingfang_regular/font_size_14_400</code>
+  <code class="typo-name pro-only">pingfang_regular/font_size_14_400</code>
 </div>
 <div class="typo-row">
   <span class="typo-sample" style="font-family:"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;font-weight:400;font-size:21px;">京东设计 JD Design 0123 — 16pt</span>
-  <code class="typo-name">pingfang_regular/font_size_16_400</code>
+  <code class="typo-name pro-only">pingfang_regular/font_size_16_400</code>
 </div>
 <div class="typo-row">
   <span class="typo-sample" style="font-family:"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;font-weight:400;font-size:23px;">京东设计 JD Design 0123 — 18pt</span>
-  <code class="typo-name">pingfang_regular/font_size_18_400</code>
+  <code class="typo-name pro-only">pingfang_regular/font_size_18_400</code>
 </div>
 </div>
 <h4>PingFang SC SemiBold</h4>
@@ -866,27 +884,27 @@
 <div class="typo-list">
 <div class="typo-row">
   <span class="typo-sample" style="font-family:"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;font-weight:600;font-size:13px;">京东设计 JD Design 0123 — 10pt</span>
-  <code class="typo-name">pingfang_semibold/font_size_10_600</code>
+  <code class="typo-name pro-only">pingfang_semibold/font_size_10_600</code>
 </div>
 <div class="typo-row">
   <span class="typo-sample" style="font-family:"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;font-weight:600;font-size:14px;">京东设计 JD Design 0123 — 11pt</span>
-  <code class="typo-name">pingfang_semibold/font_size_11_600</code>
+  <code class="typo-name pro-only">pingfang_semibold/font_size_11_600</code>
 </div>
 <div class="typo-row">
   <span class="typo-sample" style="font-family:"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;font-weight:600;font-size:17px;">京东设计 JD Design 0123 — 13pt</span>
-  <code class="typo-name">pingfang_semibold/font_size_13_600</code>
+  <code class="typo-name pro-only">pingfang_semibold/font_size_13_600</code>
 </div>
 <div class="typo-row">
   <span class="typo-sample" style="font-family:"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;font-weight:600;font-size:18px;">京东设计 JD Design 0123 — 14pt</span>
-  <code class="typo-name">pingfang_semibold/font_size_14_600</code>
+  <code class="typo-name pro-only">pingfang_semibold/font_size_14_600</code>
 </div>
 <div class="typo-row">
   <span class="typo-sample" style="font-family:"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;font-weight:600;font-size:21px;">京东设计 JD Design 0123 — 16pt</span>
-  <code class="typo-name">pingfang_semibold/font_size_16_600</code>
+  <code class="typo-name pro-only">pingfang_semibold/font_size_16_600</code>
 </div>
 <div class="typo-row">
   <span class="typo-sample" style="font-family:"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;font-weight:600;font-size:23px;">京东设计 JD Design 0123 — 18pt</span>
-  <code class="typo-name">pingfang_semibold/font_size_18_600</code>
+  <code class="typo-name pro-only">pingfang_semibold/font_size_18_600</code>
 </div>
 </div>
 <h4>京东正黑 Regular</h4>
@@ -894,31 +912,31 @@
 <div class="typo-list">
 <div class="typo-row">
   <span class="typo-sample" style="font-family:"JD-ZhengHei", "JDLangZhengTi", "PingFang SC", system-ui, sans-serif;font-weight:400;font-size:13px;">京东设计 JD Design 0123 — 10pt</span>
-  <code class="typo-name">zhenghei_regular/font_size_10_400</code>
+  <code class="typo-name pro-only">zhenghei_regular/font_size_10_400</code>
 </div>
 <div class="typo-row">
   <span class="typo-sample" style="font-family:"JD-ZhengHei", "JDLangZhengTi", "PingFang SC", system-ui, sans-serif;font-weight:400;font-size:14px;">京东设计 JD Design 0123 — 11pt</span>
-  <code class="typo-name">zhenghei_regular/font_size_11_400</code>
+  <code class="typo-name pro-only">zhenghei_regular/font_size_11_400</code>
 </div>
 <div class="typo-row">
   <span class="typo-sample" style="font-family:"JD-ZhengHei", "JDLangZhengTi", "PingFang SC", system-ui, sans-serif;font-weight:400;font-size:17px;">京东设计 JD Design 0123 — 13pt</span>
-  <code class="typo-name">zhenghei_regular/font_size_13_400</code>
+  <code class="typo-name pro-only">zhenghei_regular/font_size_13_400</code>
 </div>
 <div class="typo-row">
   <span class="typo-sample" style="font-family:"JD-ZhengHei", "JDLangZhengTi", "PingFang SC", system-ui, sans-serif;font-weight:400;font-size:18px;">京东设计 JD Design 0123 — 14pt</span>
-  <code class="typo-name">zhenghei_regular/font_size_14_400</code>
+  <code class="typo-name pro-only">zhenghei_regular/font_size_14_400</code>
 </div>
 <div class="typo-row">
   <span class="typo-sample" style="font-family:"JD-ZhengHei", "JDLangZhengTi", "PingFang SC", system-ui, sans-serif;font-weight:400;font-size:21px;">京东设计 JD Design 0123 — 16pt</span>
-  <code class="typo-name">zhenghei_regular/font_size_16_400</code>
+  <code class="typo-name pro-only">zhenghei_regular/font_size_16_400</code>
 </div>
 <div class="typo-row">
   <span class="typo-sample" style="font-family:"JD-ZhengHei", "JDLangZhengTi", "PingFang SC", system-ui, sans-serif;font-weight:400;font-size:23px;">京东设计 JD Design 0123 — 18pt</span>
-  <code class="typo-name">zhenghei_regular/font_size_18_400</code>
+  <code class="typo-name pro-only">zhenghei_regular/font_size_18_400</code>
 </div>
 <div class="typo-row">
   <span class="typo-sample" style="font-family:"JD-ZhengHei", "JDLangZhengTi", "PingFang SC", system-ui, sans-serif;font-weight:400;font-size:31px;">京东设计 JD Design 0123 — 24pt</span>
-  <code class="typo-name">zhenghei_regular/font_size_24_400</code>
+  <code class="typo-name pro-only">zhenghei_regular/font_size_24_400</code>
 </div>
 </div>
 <h4>京东正黑 Bold</h4>
@@ -926,31 +944,31 @@
 <div class="typo-list">
 <div class="typo-row">
   <span class="typo-sample" style="font-family:"JD-ZhengHei", "JDLangZhengTi", "PingFang SC", system-ui, sans-serif;font-weight:700;font-size:13px;">京东设计 JD Design 0123 — 10pt</span>
-  <code class="typo-name">zhenghei_bold/font_size_10_600</code>
+  <code class="typo-name pro-only">zhenghei_bold/font_size_10_600</code>
 </div>
 <div class="typo-row">
   <span class="typo-sample" style="font-family:"JD-ZhengHei", "JDLangZhengTi", "PingFang SC", system-ui, sans-serif;font-weight:700;font-size:14px;">京东设计 JD Design 0123 — 11pt</span>
-  <code class="typo-name">zhenghei_bold/font_size_11_600</code>
+  <code class="typo-name pro-only">zhenghei_bold/font_size_11_600</code>
 </div>
 <div class="typo-row">
   <span class="typo-sample" style="font-family:"JD-ZhengHei", "JDLangZhengTi", "PingFang SC", system-ui, sans-serif;font-weight:700;font-size:17px;">京东设计 JD Design 0123 — 13pt</span>
-  <code class="typo-name">zhenghei_bold/font_size_13_600</code>
+  <code class="typo-name pro-only">zhenghei_bold/font_size_13_600</code>
 </div>
 <div class="typo-row">
   <span class="typo-sample" style="font-family:"JD-ZhengHei", "JDLangZhengTi", "PingFang SC", system-ui, sans-serif;font-weight:700;font-size:18px;">京东设计 JD Design 0123 — 14pt</span>
-  <code class="typo-name">zhenghei_bold/font_size_14_600</code>
+  <code class="typo-name pro-only">zhenghei_bold/font_size_14_600</code>
 </div>
 <div class="typo-row">
   <span class="typo-sample" style="font-family:"JD-ZhengHei", "JDLangZhengTi", "PingFang SC", system-ui, sans-serif;font-weight:700;font-size:21px;">京东设计 JD Design 0123 — 16pt</span>
-  <code class="typo-name">zhenghei_bold/font_size_16_600</code>
+  <code class="typo-name pro-only">zhenghei_bold/font_size_16_600</code>
 </div>
 <div class="typo-row">
   <span class="typo-sample" style="font-family:"JD-ZhengHei", "JDLangZhengTi", "PingFang SC", system-ui, sans-serif;font-weight:700;font-size:23px;">京东设计 JD Design 0123 — 18pt</span>
-  <code class="typo-name">zhenghei_bold/font_size_18_600</code>
+  <code class="typo-name pro-only">zhenghei_bold/font_size_18_600</code>
 </div>
 <div class="typo-row">
   <span class="typo-sample" style="font-family:"JD-ZhengHei", "JDLangZhengTi", "PingFang SC", system-ui, sans-serif;font-weight:700;font-size:31px;">京东设计 JD Design 0123 — 24pt</span>
-  <code class="typo-name">zhenghei_bold/font_size_24_600</code>
+  <code class="typo-name pro-only">zhenghei_bold/font_size_24_600</code>
 </div>
 </div>
 
@@ -960,7 +978,7 @@
 
 <p><strong>T-shirt size 命名 7 阶(xxs / xs / s / base / l / xl / xxl)</strong></p>
 
-<div class="basic-only summary">
+<div class="pro-only summary">
   <p style="margin:0;">📖 完整 token 列表 / 命名规则 / V15 升级映射 → <a href="https://github.com/ShuaiMXu/xMu-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/tokens/radius.md" target="_blank" rel="noopener">radius.md (GitHub)</a></p>
 </div>
 
@@ -968,37 +986,37 @@
 <div class="radius-card">
   <div class="radius-box" style="border-radius:0px;"></div>
   <div class="radius-name">radius_xxs</div>
-  <div class="radius-val">0px</div>
+  <div class="radius-val pro-only">0px</div>
 </div>
 <div class="radius-card">
   <div class="radius-box" style="border-radius:2px;"></div>
   <div class="radius-name">radius_xs</div>
-  <div class="radius-val">2px</div>
+  <div class="radius-val pro-only">2px</div>
 </div>
 <div class="radius-card">
   <div class="radius-box" style="border-radius:4px;"></div>
   <div class="radius-name">radius_s</div>
-  <div class="radius-val">4px</div>
+  <div class="radius-val pro-only">4px</div>
 </div>
 <div class="radius-card">
   <div class="radius-box" style="border-radius:6px;"></div>
   <div class="radius-name">radius_base</div>
-  <div class="radius-val">6px</div>
+  <div class="radius-val pro-only">6px</div>
 </div>
 <div class="radius-card">
   <div class="radius-box" style="border-radius:8px;"></div>
   <div class="radius-name">radius_l</div>
-  <div class="radius-val">8px</div>
+  <div class="radius-val pro-only">8px</div>
 </div>
 <div class="radius-card">
   <div class="radius-box" style="border-radius:12px;"></div>
   <div class="radius-name">radius_xl</div>
-  <div class="radius-val">12px</div>
+  <div class="radius-val pro-only">12px</div>
 </div>
 <div class="radius-card">
   <div class="radius-box" style="border-radius:16px;"></div>
   <div class="radius-name">radius_xxl</div>
-  <div class="radius-val">16px</div>
+  <div class="radius-val pro-only">16px</div>
 </div>
 </div>
 
@@ -1008,7 +1026,7 @@
 
 <p><strong>空间布局 + 安全区 token</strong></p>
 
-<div class="basic-only summary">
+<div class="pro-only summary">
   <p style="margin:0;">📖 完整 token 列表 / 命名规则 / V15 升级映射 → <a href="https://github.com/ShuaiMXu/xMu-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/tokens/spacing.md" target="_blank" rel="noopener">spacing.md (GitHub)</a></p>
 </div>
 
@@ -1038,7 +1056,7 @@
 
 <p><strong>图标 token + 尺寸规则</strong></p>
 
-<div class="basic-only summary">
+<div class="pro-only summary">
   <p style="margin:0;">📖 完整 token 列表 / 命名规则 / V15 升级映射 → <a href="https://github.com/ShuaiMXu/xMu-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/tokens/icon.md" target="_blank" rel="noopener">icon.md (GitHub)</a></p>
 </div>
 
@@ -1050,7 +1068,7 @@
 
 <p><strong>分割线 / 描边 token</strong></p>
 
-<div class="basic-only summary">
+<div class="pro-only summary">
   <p style="margin:0;">📖 完整 token 列表 / 命名规则 / V15 升级映射 → <a href="https://github.com/ShuaiMXu/xMu-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/tokens/lines.md" target="_blank" rel="noopener">lines.md (GitHub)</a></p>
 </div>
 
@@ -1058,12 +1076,12 @@
 <div class="lines-card">
   <div class="lines-bar" style="border-top:0.33px solid var(--c-text);"></div>
   <div class="lines-name">lines.tag</div>
-  <div class="lines-val">0.33px</div>
+  <div class="lines-val pro-only">0.33px</div>
 </div>
 <div class="lines-card">
   <div class="lines-bar" style="border-top:0.5px solid var(--c-text);"></div>
   <div class="lines-name">lines.component</div>
-  <div class="lines-val">0.5px</div>
+  <div class="lines-val pro-only">0.5px</div>
 </div>
 </div>
 
@@ -1073,7 +1091,7 @@
 
 <p><strong>页面布局规范(3 套空间布局)</strong></p>
 
-<div class="basic-only summary">
+<div class="pro-only summary">
   <p style="margin:0;">📖 完整 token 列表 / 命名规则 / V15 升级映射 → <a href="https://github.com/ShuaiMXu/xMu-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/visual/layout.md" target="_blank" rel="noopener">layout.md (GitHub)</a></p>
 </div>
 
@@ -1085,7 +1103,7 @@
 
 <p><strong>液态玻璃 / 毛玻璃等材质 token</strong></p>
 
-<div class="basic-only summary">
+<div class="pro-only summary">
   <p style="margin:0;">📖 完整 token 列表 / 命名规则 / V15 升级映射 → <a href="https://github.com/ShuaiMXu/xMu-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/visual/materials.md" target="_blank" rel="noopener">materials.md (GitHub)</a></p>
 </div>
 
@@ -1123,6 +1141,7 @@
   var body = document.body;
   var tabs = document.querySelectorAll('.view-tab');
 
+  var tabsHost = document.querySelector('.view-tabs');
   function setMode(mode) {
     body.classList.remove('mode-basic', 'mode-pro');
     body.classList.add('mode-' + mode);
@@ -1130,6 +1149,7 @@
       var on = t.dataset.view === mode;
       t.classList.toggle('is-active', on);
       t.setAttribute('aria-selected', on ? 'true' : 'false');
+      if (on && tabsHost) tabsHost.setAttribute('data-hint', t.dataset.modeHint || '');
     });
     try { localStorage.setItem(STORAGE_KEY, mode); } catch (e) {}
   }
