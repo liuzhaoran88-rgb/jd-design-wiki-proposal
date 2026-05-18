@@ -1,6 +1,8 @@
 # 7 章节 ↔ design.md / bundle 字段映射
 
 > SKILL.md Step 3 调用。把 design.md / page-doc bundle 的内容映射到 jd-toast-spec(1).html 7 章节模板。
+>
+> **章节名 / anchor slug 真相源在 [`../../../shared/references/section-anchors.md`](../../../shared/references/section-anchors.md)**(跨 skill 共享)。本文件只描述详情页字段→章节内容的具体映射,不再单独维护章节名 / id。
 
 ---
 

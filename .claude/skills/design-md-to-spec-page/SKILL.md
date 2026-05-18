@@ -83,7 +83,7 @@ bundle 模式下追加读取 `spec.md` / `variants.md` / `behaviors.md`，按 [r
 
 ### Step 3: 映射到 7 章节
 
-按 [references/section-mapping.md](./references/section-mapping.md) 把 design.md / bundle 字段塞进 7 章节的对应位置。**严禁编造**：
+章节名 / anchor slug 真相源在 [`../../shared/references/section-anchors.md`](../../shared/references/section-anchors.md)(与总站 design.html 共用,slug 不许漂)。详细字段→章节映射按 [references/section-mapping.md](./references/section-mapping.md) 把 design.md / bundle 字段塞进 7 章节的对应位置。**严禁编造**：
 
 | HTML 章节 | 来源（single） | 来源（bundle） |
 |---|---|---|
@@ -213,10 +213,10 @@ fi
 
 走 [references/stage-images-export.md](./references/stage-images-export.md) 4 步流程:
 
-1. **chunked b64 export 到 sharedPluginData**（use_design_script）:必须 chunkedB64 helper 避免栈溢出;namespace 固定 `jd-spec-page-assets`;一次脚本可批 export 7-12 张
+1. **chunked b64 export 到 sharedPluginData**（use_design_script）:必须 chunkedB64 helper 避免栈溢出;namespace 固定 `jd-spec-page-assets`(注册见 [`../../shared/references/relay-namespaces.md`](../../shared/references/relay-namespaces.md));一次脚本可批 export 7-12 张
 2. **批量 readback 触发 dump**（use_design_script）:MCP 自动把 result 落到磁盘文件,不污染 LLM context
 3. **jq + base64 -d 写 PNG**（Bash）:`jq -r '.[0].text | fromjson | to_entries[] | "\(.key)\n\(.value)"' "$SRC" | while ...`
-4. **清理 sharedPluginData**（use_design_script,可选）:避免 Relay 文件膨胀
+4. **清理 sharedPluginData**（use_design_script,可选）:避免 Relay 文件膨胀(临时 namespace 清理契约见上述注册表)
 
 切图统一存 `<bundle-dir>/_assets/`,命名 `sec-{N}-{slug}.png`（如 `sec-3-island-promo.png`)。模板 `<style>` 已有 `.stage--image` class 自动适配宽度。
 
@@ -392,10 +392,19 @@ echo "✓ Pages 重 build 完成: $s"
 
 ## References
 
+跨 skill 共享(`../../shared/references/`):
+
+| 文件 | 作用 |
+|---|---|
+| [section-anchors.md](../../shared/references/section-anchors.md) | 7 章节 canonical 名称 + anchor slug,与总站 design.html 共用 |
+| [relay-namespaces.md](../../shared/references/relay-namespaces.md) | `jd-spec-page-assets` 临时 namespace 注册 + 清理契约 |
+
+本 skill 私有(`templates/`, `references/`):
+
 | 文件 | 作用 |
 |---|---|
 | [templates/spec-page.html](./templates/spec-page.html) | 7 章节单页 HTML 模板（基于 jd-toast-spec(1).html v0.1） |
-| [references/section-mapping.md](./references/section-mapping.md) | 7 章节 ↔ design.md / bundle 字段映射表 |
+| [references/section-mapping.md](./references/section-mapping.md) | 7 章节 ↔ design.md / bundle 字段详细映射表(章节 slug 取自上方 shared section-anchors.md) |
 | [references/style-tokens.md](./references/style-tokens.md) | CSS variable ↔ V16 tokens.json 映射 |
 | [references/stage-images-export.md](./references/stage-images-export.md) | 切图导出流程（v0.2 加）— chunked b64 / sharedPluginData 中转 / jq 解 dump |
 | [references/view-toggle.md](./references/view-toggle.md) | Pro / Basic 视图切换标记规则（v0.3 加）— 元素级 / inline / 7 章节标记策略 |

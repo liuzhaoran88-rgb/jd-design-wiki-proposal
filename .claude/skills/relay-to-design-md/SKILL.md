@@ -329,7 +329,7 @@ frontmatter 必填字段见 [references/frontmatter-spec.md](./references/frontm
 
 ### Step 10.5: 回写 Relay sharedPluginData (v0.3 新加)
 
-成功写完 design.md 后，把元数据回写到 Relay 节点。**namespace 固定 `jd-design-wiki`**。
+成功写完 design.md 后，把元数据回写到 Relay 节点。**namespace 固定 `jd-design-wiki`**(注册表与生命周期见 [`../../shared/references/relay-namespaces.md`](../../shared/references/relay-namespaces.md))。
 
 通过 `use_design_script`：
 
@@ -380,6 +380,15 @@ return { keys: node.getSharedPluginDataKeys('jd-design-wiki') }
 6. **5 处 TODO 模板**保留原样，不要尝试帮设计师填。
 
 ## References
+
+跨 skill 共享(`../../shared/references/`):
+
+| 文件 | 作用 |
+|---|---|
+| [level-vocab.md](../../shared/references/level-vocab.md) | `level` 枚举词表 + 与 `bg` 边界(本 skill 写,site/spec-page 消费) |
+| [relay-namespaces.md](../../shared/references/relay-namespaces.md) | `jd-design-wiki` namespace 注册 + 生命周期 |
+
+本 skill 私有(`templates/`, `references/`):
 
 | 文件 | 作用 |
 |---|---|

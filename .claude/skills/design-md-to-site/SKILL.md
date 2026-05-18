@@ -47,7 +47,7 @@ allowed-tools: [Bash, Read, Write, Edit, Glob]
 | `slug` | section id + TOC 锚点 | 从文件路径推断 |
 | `name_zh` | section 标题 + TOC 文案 | `slug` |
 | `name_en` | section 副标题 | 空 |
-| `level` | section 分组（component-base / foundation / ...） | `uncategorized` |
+| `level` | section 分组（枚举见 [`../../shared/references/level-vocab.md`](../../shared/references/level-vocab.md)） | `uncategorized` |
 | `bg` | 业务背景标签 | 空 |
 | `status` | 角标（draft / wip / stable） | `draft` |
 | `relay_source.url` | 源链接 | 空 |
@@ -88,7 +88,7 @@ find jd-design-system-md-v16 -name "design.md" -type f
 
 ### Step 3 · 按 PDF 范式渲染 sections
 
-每份 spec 按「design.html 范式」（见 `docs/design.html` v0.2）输出**示意黄头 + 7 圆点章节**：
+每份 spec 按「design.html 范式」（见 `docs/design.html` v0.2）输出**示意黄头 + 7 圆点章节**。章节 anchor slug **必须**对齐 [`../../shared/references/section-anchors.md`](../../shared/references/section-anchors.md)（与详情页 spec-page.html 共用,允许章节渲染深度差异化,但 `id=` 不许漂）。
 
 | 章节（PDF 顺位） | 必/选 | 数据源 |
 |---|---|---|
@@ -108,7 +108,7 @@ find jd-design-system-md-v16 -name "design.md" -type f
 
 ### Step 4 · 拼接 sections
 
-- `{{spec_sections}}`：所有 spec sections 串联，按 frontmatter `level` 分组（component-base / foundation / horizontal）
+- `{{spec_sections}}`：所有 spec sections 串联，按 frontmatter `level` 分组 —— 词表见 [`../../shared/references/level-vocab.md`](../../shared/references/level-vocab.md)（`foundation` / `component-base` / `component-business` / `page` / `flow`，**不要**把 `bg` 值如 `horizontal` 当 level 用）
 - `{{generated_at}}`：ISO 时间戳
 - **顶部 banner 和「规范要素参考」蓝框是固定的**，已写在 site-template.html 主体内，不需替换
 
@@ -155,6 +155,11 @@ find jd-design-system-md-v16 -name "design.md" -type f
 
 ## 参考资源
 
-- `references/header-template.md` —— 16.0 GUIDELINE banner 板式（HTML 块 + 占位符 + 设计参数）
-- `references/site-template.html` —— 完整站点 HTML 骨架 + SPEC_SECTION 模板 + 所有 TBD 占位
-- `references/design-html-paradigm.pdf` —— **范式真相源**：design.html 文档范式 PDF（顶部 banner + 规范要素参考蓝框 + 示意黄头 + 7 圆点章节）。改板式结构前先重读这份 PDF。
+跨 skill 共享(`../../shared/references/`):
+- [`level-vocab.md`](../../shared/references/level-vocab.md) —— `level` 枚举词表 + 与 `bg` 边界
+- [`section-anchors.md`](../../shared/references/section-anchors.md) —— 7 章节 canonical anchor slug,与详情页 spec-page.html 共用
+
+本 skill 私有(`references/`):
+- `header-template.md` —— 16.0 GUIDELINE banner 板式（HTML 块 + 占位符 + 设计参数）
+- `site-template.html` —— 完整站点 HTML 骨架 + SPEC_SECTION 模板 + 所有 TBD 占位
+- `design-html-paradigm.pdf` —— **范式真相源**：design.html 文档范式 PDF（顶部 banner + 规范要素参考蓝框 + 示意黄头 + 7 圆点章节）。改板式结构前先重读这份 PDF。
