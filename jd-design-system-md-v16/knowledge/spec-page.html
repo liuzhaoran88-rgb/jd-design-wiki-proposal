@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zone 01 · 📚 Design 知识 — JD V16 设计系统</title>
+<style>
+  :root {
+    --c-text: #171a26;
+    --c-text-2: #3d414d;
+    --c-text-3: #828794;
+    --c-line: #00000014;
+    --c-bg: #ffffff;
+    --c-bg-sunken: #f5f6fa;
+    --c-brand: #ff0f23;
+    --c-info: #0073ff;
+    --c-info-bg: #e5f5ff;
+    --r-base: 6px;
+    --r-xl: 12px;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--c-bg-sunken);
+    color: var(--c-text);
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+    font-size: 15px; line-height: 1.7;
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  }
+  a { color: var(--c-info); }
+
+  /* 顶部 sticky bar */
+  .top-bar {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; gap: 16px;
+    padding: 0 24px;
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+    flex-wrap: wrap;
+  }
+  .top-bar__brand {
+    padding: 14px 0; margin-right: 12px;
+    font-size: 13px; font-weight: 600;
+    color: var(--c-text); text-decoration: none;
+    letter-spacing: 0.02em;
+  }
+  .top-bar__brand small { color: var(--c-text-3); font-weight: 500; margin-left: 6px; }
+  .top-bar__nav { display: flex; align-items: stretch; gap: 4px; flex-wrap: wrap; }
+  .top-bar__nav-link {
+    padding: 14px 14px 12px; font-size: 13px;
+    color: var(--c-text-2); text-decoration: none;
+    font-weight: 500; line-height: 1.4;
+    white-space: nowrap; position: relative;
+    transition: color 150ms;
+  }
+  .top-bar__nav-link:hover { color: var(--c-text); }
+  .top-bar__nav-link.is-current { color: var(--c-text); font-weight: 600; }
+  .top-bar__nav-link.is-placeholder { color: var(--c-text-3); cursor: default; font-style: italic; }
+  .top-bar__nav-link.is-placeholder:hover { color: var(--c-text-3); }
+  .top-bar__spacer { flex: 1; }
+
+  /* 2 列 layout */
+  .layout {
+    max-width: 1400px; margin: 0 auto;
+    padding: 24px 24px 80px;
+    display: grid; grid-template-columns: 240px 1fr;
+    gap: 24px; align-items: start;
+  }
+  .sidebar {
+    position: sticky; top: 64px;
+    align-self: start;
+    max-height: calc(100vh - 88px);
+    overflow-y: auto;
+    background: var(--c-bg);
+    padding: 20px 12px;
+    border-radius: var(--r-xl);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  }
+  .sidebar__zone-tag {
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--c-text-3);
+    padding: 6px 12px 12px;
+    border-bottom: 1px solid var(--c-line);
+    margin-bottom: 12px;
+  }
+  .sidebar__group { margin-bottom: 14px; }
+  .sidebar__link {
+    display: block; padding: 7px 12px;
+    font-size: 13px; color: var(--c-text-2);
+    text-decoration: none; border-radius: var(--r-base);
+    font-weight: 500; line-height: 1.5;
+    transition: background 150ms, color 150ms;
+  }
+  .sidebar__link:hover { background: rgba(0, 0, 0, 0.04); color: var(--c-text); }
+  .sidebar__link.is-current { background: var(--c-text); color: var(--c-bg); }
+  .sidebar__link.is-placeholder { color: var(--c-text-3); cursor: default; font-style: italic; }
+  .sidebar__sub-link {
+    display: block; padding: 4px 10px 4px 22px;
+    font-size: 12px; color: var(--c-text-3);
+    text-decoration: none; border-radius: 4px;
+    line-height: 1.6;
+  }
+  .sidebar__sub-link:hover { background: rgba(0, 0, 0, 0.03); color: var(--c-text-2); }
+
+  /* 主体内容卡 + 占位 hero */
+  .main {
+    background: var(--c-bg);
+    padding: 64px 64px 72px;
+    border-radius: var(--r-xl);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    min-width: 0;
+  }
+  .placeholder-hero { max-width: 720px; }
+  .placeholder-hero__eyebrow {
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--c-text-3);
+    margin-bottom: 14px;
+  }
+  .placeholder-hero__icon { font-size: 48px; line-height: 1; margin-bottom: 24px; }
+  .placeholder-hero h1 {
+    font-size: 36px; font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0 0 18px;
+  }
+  .placeholder-hero__subtitle {
+    color: var(--c-text-3); font-size: 16px;
+    line-height: 1.65; max-width: 580px;
+    margin: 0 0 36px;
+  }
+  .placeholder-hero__what {
+    background: var(--c-bg-sunken);
+    border-radius: var(--r-xl);
+    padding: 28px 32px;
+    margin: 0 0 28px;
+  }
+  .placeholder-hero__what h3 {
+    margin: 0 0 14px; font-size: 16px; font-weight: 600;
+  }
+  .placeholder-hero__what ul {
+    margin: 0; padding-left: 22px; color: var(--c-text-2);
+  }
+  .placeholder-hero__what li { margin: 8px 0; line-height: 1.7; }
+  .placeholder-hero__what li strong { color: var(--c-text); }
+  .placeholder-hero__cta {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    margin-top: 32px;
+  }
+  .placeholder-hero__cta a {
+    display: inline-block;
+    padding: 10px 18px;
+    background: var(--c-text);
+    color: var(--c-bg);
+    text-decoration: none;
+    border-radius: var(--r-base);
+    font-size: 13px; font-weight: 500;
+    transition: opacity 150ms;
+  }
+  .placeholder-hero__cta a:hover { opacity: 0.85; }
+  .placeholder-hero__cta a.is-secondary {
+    background: transparent; color: var(--c-text-2);
+    border: 1px solid var(--c-line);
+  }
+
+  @media (max-width: 960px) {
+    .layout { grid-template-columns: 1fr; gap: 16px; padding: 16px 12px 32px; }
+    .sidebar { position: static; max-height: none; }
+    .main { padding: 32px 24px 40px; }
+    .placeholder-hero h1 { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a href="../../docs/jd-design-wiki-knowledge-tree.html" class="top-bar__brand">JD Design Wiki <small>· V16</small></a>
+  <nav class="top-bar__nav" aria-label="5 大分区导航">
+    <a href="./spec-page.html" class="top-bar__nav-link is-current">📚 Design 知识</a>
+    <a href="../foundations/spec-page.html" class="top-bar__nav-link">🎨 Design 基础</a>
+    <a href="../ai-mechanism/spec-page.html" class="top-bar__nav-link">🤖 AI 机制</a>
+    <a href="../product-architecture/spec-page.html" class="top-bar__nav-link">🏗 产品架构</a>
+    <a href="../../docs/jd-design-wiki-master-diagram.html" class="top-bar__nav-link is-placeholder" title="V16 Zone 05 暂未建页">🚀 横向专项</a>
+  </nav>
+  <span class="top-bar__spacer"></span>
+</div>
+
+<div class="layout">
+
+<aside class="sidebar" aria-label="📚 Design 知识 - 子目录">
+  <div class="sidebar__zone-tag">ZONE 01 · 📚 Design 知识</div>
+
+  <div class="sidebar__group">
+    <span class="sidebar__link is-placeholder" title="内部知识库:京东设计师研究/决策/案例">内部知识库</span>
+    <a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/tree/main/jd-design-system-md-v16/knowledge/philosophy" target="_blank" rel="noopener" class="sidebar__sub-link">📖 philosophy/ (已建子目录)</a>
+  </div>
+
+  <div class="sidebar__group">
+    <span class="sidebar__link is-placeholder" title="通识设计原则:行业经验/设计哲学转译">通识设计原则</span>
+  </div>
+
+  <div class="sidebar__group">
+    <span class="sidebar__link is-placeholder" title="资源索引:外部参考/友商对标/Figma 链接">资源索引</span>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="placeholder-hero">
+    <div class="placeholder-hero__eyebrow">ZONE 01</div>
+    <div class="placeholder-hero__icon">📚</div>
+    <h1>Design 知识</h1>
+    <p class="placeholder-hero__subtitle">
+      "我想学一个概念 / 找一个研究 / 看外部参考"<br>
+      京东设计师的研究、决策案例、行业通识、外部资源的索引集中地。本分区目前在录入中,先建好骨架占位。
+    </p>
+
+    <div class="placeholder-hero__what">
+      <h3>这里会有什么</h3>
+      <ul>
+        <li><strong>内部知识库</strong> — 京东设计师的研究、决策、案例沉淀(按部门切分)</li>
+        <li><strong>通识设计原则</strong> — 行业经验 / 设计哲学的本地转译,跨部门可用</li>
+        <li><strong>资源索引</strong> — 外部参考、友商对标、Figma 链接的精选清单</li>
+      </ul>
+    </div>
+
+    <div class="placeholder-hero__cta">
+      <a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/tree/main/jd-design-system-md-v16/knowledge" target="_blank" rel="noopener">↗ GitHub 源目录</a>
+      <a href="../../docs/jd-design-wiki-knowledge-tree.html" class="is-secondary">↗ 知识树总览</a>
+    </div>
+  </div>
+</main>
+
+</div><!-- /layout -->
+</body>
+</html>

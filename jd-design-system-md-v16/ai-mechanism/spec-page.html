@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zone 03 · 🤖 AI 机制 — JD V16 设计系统</title>
+<style>
+  :root {
+    --c-text: #171a26;
+    --c-text-2: #3d414d;
+    --c-text-3: #828794;
+    --c-line: #00000014;
+    --c-bg: #ffffff;
+    --c-bg-sunken: #f5f6fa;
+    --c-brand: #ff0f23;
+    --c-info: #0073ff;
+    --c-info-bg: #e5f5ff;
+    --r-base: 6px;
+    --r-xl: 12px;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--c-bg-sunken);
+    color: var(--c-text);
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+    font-size: 15px; line-height: 1.7;
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  }
+  a { color: var(--c-info); }
+  code {
+    font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+    font-size: 13px; background: var(--c-bg-sunken);
+    padding: 2px 6px; border-radius: 4px;
+    color: var(--c-brand);
+  }
+
+  /* 顶部 sticky bar */
+  .top-bar {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; gap: 16px;
+    padding: 0 24px;
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+    flex-wrap: wrap;
+  }
+  .top-bar__brand {
+    padding: 14px 0; margin-right: 12px;
+    font-size: 13px; font-weight: 600;
+    color: var(--c-text); text-decoration: none;
+    letter-spacing: 0.02em;
+  }
+  .top-bar__brand small { color: var(--c-text-3); font-weight: 500; margin-left: 6px; }
+  .top-bar__nav { display: flex; align-items: stretch; gap: 4px; flex-wrap: wrap; }
+  .top-bar__nav-link {
+    padding: 14px 14px 12px; font-size: 13px;
+    color: var(--c-text-2); text-decoration: none;
+    font-weight: 500; line-height: 1.4;
+    white-space: nowrap; position: relative;
+    transition: color 150ms;
+  }
+  .top-bar__nav-link:hover { color: var(--c-text); }
+  .top-bar__nav-link.is-current { color: var(--c-text); font-weight: 600; }
+  .top-bar__nav-link.is-placeholder { color: var(--c-text-3); cursor: default; font-style: italic; }
+  .top-bar__nav-link.is-placeholder:hover { color: var(--c-text-3); }
+  .top-bar__spacer { flex: 1; }
+
+  /* 2 列 layout */
+  .layout {
+    max-width: 1400px; margin: 0 auto;
+    padding: 24px 24px 80px;
+    display: grid; grid-template-columns: 240px 1fr;
+    gap: 24px; align-items: start;
+  }
+  .sidebar {
+    position: sticky; top: 64px;
+    align-self: start;
+    max-height: calc(100vh - 88px);
+    overflow-y: auto;
+    background: var(--c-bg);
+    padding: 20px 12px;
+    border-radius: var(--r-xl);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  }
+  .sidebar__zone-tag {
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--c-text-3);
+    padding: 6px 12px 12px;
+    border-bottom: 1px solid var(--c-line);
+    margin-bottom: 12px;
+  }
+  .sidebar__group { margin-bottom: 14px; }
+  .sidebar__link {
+    display: block; padding: 7px 12px;
+    font-size: 13px; color: var(--c-text-2);
+    text-decoration: none; border-radius: var(--r-base);
+    font-weight: 500; line-height: 1.5;
+    transition: background 150ms, color 150ms;
+  }
+  .sidebar__link:hover { background: rgba(0, 0, 0, 0.04); color: var(--c-text); }
+  .sidebar__link.is-current { background: var(--c-text); color: var(--c-bg); }
+  .sidebar__link.is-placeholder { color: var(--c-text-3); cursor: default; font-style: italic; }
+  .sidebar__sub {
+    margin: 4px 0 8px 12px; padding-left: 8px;
+    border-left: 1px solid var(--c-line);
+  }
+  .sidebar__sub-link {
+    display: block; padding: 4px 10px;
+    font-size: 12px; color: var(--c-text-3);
+    text-decoration: none; border-radius: 4px;
+    line-height: 1.6;
+  }
+  .sidebar__sub-link:hover { background: rgba(0, 0, 0, 0.03); color: var(--c-text-2); }
+
+  .main {
+    background: var(--c-bg);
+    padding: 56px 64px 64px;
+    border-radius: var(--r-xl);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    min-width: 0;
+  }
+  .main h1 {
+    font-size: 32px; font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0 0 12px;
+  }
+  .main h1 small {
+    font-size: 14px; font-weight: 500;
+    color: var(--c-text-3); margin-left: 12px;
+  }
+  .main > p:first-of-type {
+    color: var(--c-text-2); font-size: 16px; line-height: 1.7;
+    max-width: 720px;
+    margin: 0 0 36px;
+  }
+  .main h2 {
+    font-size: 20px; font-weight: 600;
+    margin: 36px 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--c-line);
+  }
+
+  .skill-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin: 16px 0 32px;
+  }
+  .skill-card {
+    background: var(--c-bg-sunken);
+    border-radius: var(--r-xl);
+    padding: 20px 22px;
+    transition: box-shadow 200ms, transform 200ms;
+    text-decoration: none; color: inherit;
+    display: block;
+  }
+  .skill-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
+  }
+  .skill-card__head {
+    display: flex; align-items: baseline; gap: 8px;
+    margin-bottom: 6px;
+  }
+  .skill-card__name {
+    font-size: 15px; font-weight: 600;
+    color: var(--c-text);
+  }
+  .skill-card__version {
+    font-size: 11px; color: var(--c-text-3);
+    font-family: "JetBrains Mono", monospace;
+  }
+  .skill-card__desc {
+    font-size: 13px; color: var(--c-text-2);
+    margin: 0; line-height: 1.6;
+  }
+
+  @media (max-width: 960px) {
+    .layout { grid-template-columns: 1fr; gap: 16px; padding: 16px 12px 32px; }
+    .sidebar { position: static; max-height: none; }
+    .main { padding: 32px 24px 40px; }
+    .main h1 { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a href="../../docs/jd-design-wiki-knowledge-tree.html" class="top-bar__brand">JD Design Wiki <small>· V16</small></a>
+  <nav class="top-bar__nav" aria-label="5 大分区导航">
+    <a href="../knowledge/spec-page.html" class="top-bar__nav-link">📚 Design 知识</a>
+    <a href="../foundations/spec-page.html" class="top-bar__nav-link">🎨 Design 基础</a>
+    <a href="./spec-page.html" class="top-bar__nav-link is-current">🤖 AI 机制</a>
+    <a href="../product-architecture/spec-page.html" class="top-bar__nav-link">🏗 产品架构</a>
+    <a href="../../docs/jd-design-wiki-master-diagram.html" class="top-bar__nav-link is-placeholder" title="V16 Zone 05 暂未建页">🚀 横向专项</a>
+  </nav>
+  <span class="top-bar__spacer"></span>
+</div>
+
+<div class="layout">
+
+<aside class="sidebar" aria-label="🤖 AI 机制 - 子目录">
+  <div class="sidebar__zone-tag">ZONE 03 · 🤖 AI-NATIVE</div>
+
+  <div class="sidebar__group">
+    <span class="sidebar__link is-placeholder" title="Skill 规范 META.md / 如何写 Skill,待录入">Skill 规范</span>
+  </div>
+
+  <div class="sidebar__group">
+    <a href="#skill-registry" class="sidebar__link is-current">Skill Registry</a>
+    <div class="sidebar__sub">
+      <a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md-v16/ai-mechanism/relay-to-design-md.md" target="_blank" rel="noopener" class="sidebar__sub-link">📥 relay-to-design-md</a>
+      <a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md-v16/ai-mechanism/design-md-to-portal.md" target="_blank" rel="noopener" class="sidebar__sub-link">🏛 design-md-to-portal</a>
+      <a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md-v16/ai-mechanism/design-md-to-spec-page.md" target="_blank" rel="noopener" class="sidebar__sub-link">📐 design-md-to-spec-page</a>
+      <a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md/ai-mechanism/design-review.md" target="_blank" rel="noopener" class="sidebar__sub-link">🛡 design-review (V15)</a>
+    </div>
+  </div>
+
+  <div class="sidebar__group">
+    <span class="sidebar__link is-placeholder" title="消费协议:Figma / Stitch / Cursor 等接入,待录入">消费协议</span>
+  </div>
+
+  <div class="sidebar__group">
+    <span class="sidebar__link is-placeholder" title="Agent 守则:反 AI slop / 自检环路,待录入">Agent 守则</span>
+  </div>
+</aside>
+
+<main class="main">
+  <h1>🤖 AI 机制 <small>Zone 03 · AI-NATIVE</small></h1>
+  <p>把 V16 设计系统的"编辑面 ↔ 发布面 ↔ 审计面"用 AI Skill 串起来。这里不是写"AI 怎么用",而是写"AI 用什么协议跟 V16 对话"。</p>
+
+  <h2 id="skill-registry">Skill Registry · 4 个 native skill</h2>
+
+  <div class="skill-grid">
+    <a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md-v16/ai-mechanism/relay-to-design-md.md" target="_blank" rel="noopener" class="skill-card">
+      <div class="skill-card__head">
+        <span class="skill-card__name">📥 relay-to-design-md</span>
+        <span class="skill-card__version">v0.5.1</span>
+      </div>
+      <p class="skill-card__desc">Relay URL → <code>design.md</code> / 6 文件 page-doc bundle。V16 编辑面入口,机器抽 + 人写占位。</p>
+    </a>
+
+    <a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md-v16/ai-mechanism/design-md-to-portal.md" target="_blank" rel="noopener" class="skill-card">
+      <div class="skill-card__head">
+        <span class="skill-card__name">🏛 design-md-to-portal</span>
+        <span class="skill-card__version">v0.2</span>
+      </div>
+      <p class="skill-card__desc">全部 <code>design.md</code> 聚合成 <code>docs/design.html</code> 总站门户。只读 frontmatter,不切图,大量 TBD 占位。</p>
+    </a>
+
+    <a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md-v16/ai-mechanism/design-md-to-spec-page.md" target="_blank" rel="noopener" class="skill-card">
+      <div class="skill-card__head">
+        <span class="skill-card__name">📐 design-md-to-spec-page</span>
+        <span class="skill-card__version">v0.5</span>
+      </div>
+      <p class="skill-card__desc">单 <code>design.md</code> / bundle → 7 章节 <code>spec-page.html</code>。Pro/Basic 双视图,v0.5 增量启发跳切图。</p>
+    </a>
+
+    <a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md/ai-mechanism/design-review.md" target="_blank" rel="noopener" class="skill-card">
+      <div class="skill-card__head">
+        <span class="skill-card__name">🛡 design-review</span>
+        <span class="skill-card__version">v0.1.1 · V15</span>
+      </div>
+      <p class="skill-card__desc">Relay 节点 → 5 段式合规走查报告。仍按 V15 token 体系,V16 走查版本 P2。</p>
+    </a>
+  </div>
+
+  <h2>数据流(编辑面 / 发布面 / 审计面 三面)</h2>
+  <pre style="background:#1a1a1a;color:#e8e8e8;padding:20px 24px;border-radius:var(--r-base);overflow-x:auto;font-family:'JetBrains Mono','SF Mono',Menlo,Consolas,monospace;font-size:13px;line-height:1.6;margin:16px 0;">          ┌─────────────────────────────────────────────┐
+          │              Relay(设计源)                │
+          └──────────────┬──────────────────────────────┘
+                         │
+              ┌──────────┴──────────┐
+              ▼ (录入)              ▼ (审计)
+  /relay-to-design-md          /design-review
+              │                    │
+              ▼                    ▼
+ ┌─────────────────────┐    5 段式报告
+ │  design.md / bundle │    (PR comment / Slack)
+ │  (V16 编辑面)        │
+ └──────────┬──────────┘
+            │
+   ┌────────┴────────┐
+   ▼ (聚合)          ▼ (单组件深挖)
+/design-md-to-portal  /design-md-to-spec-page
+   │                  │
+   ▼                  ▼
+docs/design.html   &lt;slug&gt;/spec-page.html
+   (总站门户)        (单组件规范页)
+                  │
+                  ▼
+           GitHub Pages
+           (公开发布面)</pre>
+
+  <h2>跟 V15 ai-mechanism 的关系</h2>
+  <p>V15 的 ai-mechanism 体系侧重<strong>协议</strong>(naming-bem / token-sync / schema-spec / agent-protocol) + <strong>走查 skill</strong>(design-review)。V16 暂只继承走查 skill,新增<strong>录入 + 发布</strong>三件套,因为 V16 阶段的瓶颈是"怎么把 Relay 规范快速落成 md + HTML"。</p>
+  <p>V15 doc 完整索引见 <a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md/ai-mechanism/README.md" target="_blank" rel="noopener">jd-design-system-md/ai-mechanism/README.md</a>。</p>
+</main>
+
+</div><!-- /layout -->
+</body>
+</html>

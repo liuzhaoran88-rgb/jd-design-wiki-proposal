@@ -352,16 +352,53 @@
 </style>
 </head>
 <body>
-<div class="doc">
 
-<div class="title-row">
-  <h1>底部导航栏 · Tabbar 组件规范</h1>
-  <!-- ========== 视图切换 (v0.3): 常规 vs 专业 ========== -->
-  <div class="view-tabs" role="tablist" aria-label="视图切换">
+<!-- 顶部 bar:左 brand + 5 大 Zone tab + 右视图密度切换(跨 V16 spec-page 一致) -->
+<div class="top-bar">
+  <a href="../../../../docs/jd-design-wiki-knowledge-tree.html" class="top-bar__brand">JD Design Wiki <small>· V16</small></a>
+  <nav class="top-bar__nav" aria-label="5 大分区导航">
+    <a href="../../../knowledge/spec-page.html" class="top-bar__nav-link">📚 Design 知识</a>
+    <a href="../../../foundations/spec-page.html" class="top-bar__nav-link is-current">🎨 Design 基础</a>
+    <a href="../../../ai-mechanism/spec-page.html" class="top-bar__nav-link">🤖 AI 机制</a>
+    <a href="../../../product-architecture/spec-page.html" class="top-bar__nav-link">🏗 产品架构</a>
+    <a href="../../../../docs/jd-design-wiki-master-diagram.html" class="top-bar__nav-link is-placeholder" title="V16 Zone 05 暂未建页">🚀 横向专项</a>
+  </nav>
+  <span class="top-bar__spacer"></span>
+  <div class="view-tabs" role="tablist" aria-label="视图密度切换">
     <button class="view-tab is-active" role="tab" data-view="basic" aria-selected="true">常规版</button>
     <button class="view-tab" role="tab" data-view="pro" aria-selected="false">专业版</button>
   </div>
 </div>
+
+<div class="layout">
+
+<aside class="sidebar" aria-label="🎨 Design 基础 - 子目录">
+  <div class="sidebar__zone-tag">ZONE 02 · 🎨 Design 基础</div>
+
+  <div class="sidebar__group">
+    <a href="../../../foundations/spec-page.html" class="sidebar__link">Token 体系</a>
+  </div>
+
+  <div class="sidebar__group">
+    <span class="sidebar__link is-placeholder" title="原则守则:principles + guidelines,待录入">原则守则</span>
+  </div>
+
+  <div class="sidebar__group">
+    <span class="sidebar__link is-placeholder" title="原子组件:单一元素的基础变体,待录入">原子组件</span>
+  </div>
+
+  <div class="sidebar__group">
+    <a href="#" class="sidebar__link is-current">通用组件 <small style="color:rgba(255,255,255,0.55);font-weight:400;">shared/</small></a>
+    <div class="sidebar__sub">
+      <a href="./spec-page.html" class="sidebar__sub-link is-current">🧭 Tabbar 底部导航</a>
+      <a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md-v16/horizontal/components-base/button/design.md" target="_blank" rel="noopener" class="sidebar__sub-link">🔘 Button (md only)</a>
+    </div>
+  </div>
+</aside>
+
+<div class="doc">
+
+<h1>底部导航栏 · Tabbar 组件规范</h1>
 <div class="meta">
   适用范围:JD APP V16.0 全场景(横向 BG · 通用组件 component-base)<br>
   样式来源:Relay V16.0 GUIDELINE 节点 <code>312:46893</code> · Token 版本:<code>tokens.json V16 / page-doc bundle v0.3</code><br>
@@ -501,6 +538,104 @@
   }
   /* h1 已带下划线,这里取消;title-row 自己接管下划线 */
   h1 { border-bottom: none !important; padding-bottom: 0 !important; }
+
+  /* ========== 统一顶部 bar(跨 V16 spec-page 一致):5 大 Zone tab + view-tabs ========== */
+  .top-bar {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; gap: 16px;
+    padding: 10px 24px;
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+    flex-wrap: wrap;
+  }
+  .top-bar__brand {
+    font-size: 13px; font-weight: 600;
+    color: var(--c-text); text-decoration: none;
+    letter-spacing: 0.02em; margin-right: 4px;
+  }
+  .top-bar__brand small { color: var(--c-text-3); font-weight: 500; margin-left: 6px; }
+  .top-bar__nav { display: flex; align-items: stretch; gap: 4px; flex-wrap: wrap; }
+  /* ant design 风格 tab:无填充背景,选中态用下划线 */
+  .top-bar__nav-link {
+    padding: 14px 14px 12px; font-size: 13px;
+    color: var(--c-text-2); text-decoration: none;
+    font-weight: 500; line-height: 1.4;
+    white-space: nowrap; position: relative;
+    transition: color 150ms;
+  }
+  .top-bar__nav-link:hover { color: var(--c-text); }
+  .top-bar__nav-link.is-current { color: var(--c-text); font-weight: 600; }
+  .top-bar__nav-link.is-placeholder { color: var(--c-text-3); cursor: default; font-style: italic; }
+  .top-bar__nav-link.is-placeholder:hover { color: var(--c-text-3); }
+  .top-bar__spacer { flex: 1; }
+
+  /* 2 列 layout grid:左 sidebar(zone 子目录)+ 右 doc */
+  .layout {
+    max-width: 1400px; margin: 0 auto;
+    padding: 24px 24px 0;
+    display: grid; grid-template-columns: 240px 1fr;
+    gap: 24px; align-items: start;
+  }
+  .sidebar {
+    position: sticky; top: 64px;
+    align-self: start;
+    max-height: calc(100vh - 88px);
+    overflow-y: auto;
+    background: var(--c-bg);
+    padding: 20px 12px;
+    border-radius: var(--r-xl);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  }
+  .sidebar__zone-tag {
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--c-text-3);
+    padding: 6px 12px 12px;
+    border-bottom: 1px solid var(--c-line);
+    margin-bottom: 12px;
+  }
+  .sidebar__group { margin-bottom: 14px; }
+  .sidebar__group:last-child { margin-bottom: 0; }
+  .sidebar__link {
+    display: block; padding: 7px 12px;
+    font-size: 13px; color: var(--c-text-2);
+    text-decoration: none; border-radius: var(--r-base);
+    font-weight: 500; line-height: 1.5;
+    transition: background 150ms, color 150ms;
+  }
+  .sidebar__link:hover { background: rgba(0, 0, 0, 0.04); color: var(--c-text); }
+  .sidebar__link.is-current { background: var(--c-text); color: var(--c-bg); }
+  .sidebar__link.is-current:hover { background: var(--c-text); }
+  .sidebar__link.is-placeholder { color: var(--c-text-3); cursor: default; font-style: italic; }
+  .sidebar__link.is-placeholder:hover { background: transparent; color: var(--c-text-3); }
+  .sidebar__sub {
+    margin: 4px 0 8px 12px; padding-left: 8px;
+    border-left: 1px solid var(--c-line);
+  }
+  .sidebar__sub-link {
+    display: block; padding: 4px 10px;
+    font-size: 12px; color: var(--c-text-3);
+    text-decoration: none; border-radius: 4px;
+    line-height: 1.6;
+    transition: background 150ms, color 150ms;
+  }
+  .sidebar__sub-link:hover { background: rgba(0, 0, 0, 0.03); color: var(--c-text-2); }
+  .sidebar__sub-link.is-current { background: var(--c-bg-sunken); color: var(--c-text); font-weight: 500; }
+
+  .layout .doc {
+    max-width: none;
+    margin: 0;
+  }
+
+  @media (max-width: 960px) {
+    .layout { grid-template-columns: 1fr; gap: 16px; padding: 16px 12px 0; }
+    .sidebar { position: static; max-height: none; }
+  }
+  @media (max-width: 720px) {
+    .top-bar { padding: 10px 12px; }
+  }
   /* basic 模式隐藏 .pro-only,显示 .basic-only / 不带 class 的元素 */
   body.mode-basic .pro-only { display: none !important; }
   body.mode-pro .basic-only { display: none !important; }
@@ -987,7 +1122,8 @@ JDTabbar.dismissIsland();</code></pre>
   JD APP V16.0 Design System · 底部导航栏(Tabbar) 规范 · 生成于 2026-05-14 · 样式 = Relay 节点 312:46893 · skill design-md-to-spec-page v0.2(切图增强)
 </div>
 
-</div>
+</div><!-- /doc -->
+</div><!-- /layout -->
 
 <!-- v0.3: 视图切换 JS (轻量,无依赖) -->
 <script>

@@ -2,7 +2,7 @@
 zone: jd-design-system-md-v16
 version: 16.0-draft
 owner: 设计与用研部 · AI 核心产品设计部
-last_updated: 2026-05-12
+last_updated: 2026-05-18
 relay_source:
   file_id: "2029484645871009793"
   url: https://relay.jd.com/file/design?id=2029484645871009793
@@ -66,11 +66,27 @@ V16.0 每条 token 在 frontmatter / `$extensions` 中标记**与 V15.0 的关�
 | 图标 Icons | `12:263` | 🟡 图标清单完整（33 个），参数 token 沿用 V15 | `foundations/tokens/icon.md` |
 | 语义化统一（总览） | `58:9` | ✅ 作为 Token 真相源全程引用 | `foundations/tokens/tokens.json` |
 
-**已完成**：色彩 / 文本 / 圆角 / 线 / 材质 / 空间布局 / 图标 + 设计哲学占位 + 布局独立页占位 + **Atom Light/Dark Hex 批量回填** + **MIGRATION-V15-TO-V16.md** + **RELAY-V16-TYPOS.md (13 条)**
+**已完成**：色彩 / 文本 / 圆角 / 线 / 材质 / 空间布局 / 图标 + 设计哲学占位 + 布局独立页占位 + **Atom Light/Dark Hex 批量回填** + **MIGRATION-V15-TO-V16.md** + **RELAY-V16-TYPOS.md (13 条)** + **Foundation 总览 HTML**(`foundations/spec-page.html`,实物展示 + Pro/Basic 双视图)
 
 **等 V16 设计师 WIP**：errorred 独立色谱 hex / errorred_3 + infoblue_3 缺源 / 京东朗正体去向 / bold 700 去向 / 圆角 full 胶囊方案
 
-> 横向能力（horizontal/ai-mechanism/product-architecture）本期不录入，沿用 V15.0。
+---
+
+## V16 5 大 Zone HTML 发布层(2026-05-18 新)
+
+V16 录入开始铺 HTML 发布物。每个 Zone 都有一份 `spec-page.html`,共用顶部 5 大 Zone tab + 左 sidebar(参 Ant Design 模式):
+
+| Zone | 入口 | 状态 |
+|---|---|---|
+| 📚 Design 知识 | `knowledge/spec-page.html` | placeholder(3 子目录占位) |
+| 🎨 Design 基础 | `foundations/spec-page.html` | 8 token 类别 + 通用组件(tabbar/button)group |
+| 🤖 AI 机制 | `ai-mechanism/spec-page.html` | Skill Registry 4 卡片 + README + 3 个 V16 skill md |
+| 🏗 产品架构 | `product-architecture/spec-page.html` | placeholder(domains/pages/relations 占位) |
+| 🚀 横向专项 | 未建页 | top-bar 标灰 |
+
+横向 components-base 的实战落地:[horizontal/components-base/tabbar/](./horizontal/components-base/tabbar/) — V16 第一个完整的 page-doc bundle(6 文件 + 12 张原稿切图 + spec-page.html)。
+
+> **shared/ 重分类**:跨部门通用组件(Tabbar / Button)挂在 Zone 02 🎨 Design 基础 > 通用组件,而不是 Zone 04 🏗 产品架构 > shared/(原 ant-design 模板有 shared,V16 移到 Foundation 侧更贴近"原子/基础"语义)。
 
 ---
 

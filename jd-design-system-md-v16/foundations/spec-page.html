@@ -26,7 +26,17 @@
     --r-base: 6px;
     --r-detail: 8px;
     --r-xl: 12px;
+
+    /* JD 品牌字体 font-stack — 真实 family name 来自 macOS 系统注册 */
+    --font-zhenghei: "京东正黑 V2.1", "京东朗正体 2.0", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+    --font-langzheng: "京东朗正体 2.0", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+    --font-pingfang: "PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
   }
+
+  /* typography 段统一 font-stack 类 — 修双引号嵌套 attribute 截断 bug */
+  .typo-sample--zhenghei  { font-family: var(--font-zhenghei); }
+  .typo-sample--langzheng { font-family: var(--font-langzheng); }
+  .typo-sample--pingfang  { font-family: var(--font-pingfang); }
 
   * { box-sizing: border-box; }
 
@@ -501,6 +511,139 @@
     border-radius: var(--r-base);
     flex-shrink: 0;
   }
+
+  /* ========== 统一顶部 bar(跨 V16 spec-page 一致):brand + page-nav + view-tabs ========== */
+  .top-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 24px;
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+    flex-wrap: wrap;
+  }
+  .top-bar__brand {
+    font-size: 13px; font-weight: 600;
+    color: var(--c-text); text-decoration: none;
+    letter-spacing: 0.02em;
+    margin-right: 4px;
+  }
+  .top-bar__brand small { color: var(--c-text-3); font-weight: 500; margin-left: 6px; }
+  .top-bar__nav {
+    display: flex; align-items: stretch; gap: 4px;
+    flex-wrap: wrap;
+  }
+  /* ant design 风格 tab:无填充背景,选中态用下划线 */
+  .top-bar__nav-link {
+    padding: 14px 14px 12px;
+    font-size: 13px;
+    color: var(--c-text-2);
+    text-decoration: none;
+    font-weight: 500;
+    line-height: 1.4;
+    white-space: nowrap;
+    position: relative;
+    transition: color 150ms;
+  }
+  .top-bar__nav-link:hover { color: var(--c-text); }
+  .top-bar__nav-link.is-current {
+    color: var(--c-text);
+    font-weight: 600;
+  }
+  .top-bar__nav-link.is-placeholder { color: var(--c-text-3); cursor: default; font-style: italic; }
+  .top-bar__nav-link.is-placeholder:hover { color: var(--c-text-3); }
+  .top-bar__spacer { flex: 1; }
+  @media (max-width: 720px) {
+    .top-bar { padding: 8px 12px 0; }
+    .top-bar__nav-link { padding: 10px 10px 8px; font-size: 12px; }
+  }
+
+  /* ========== 2 列 layout grid:左 sidebar(zone 子目录)+ 右 doc(内容) ========== */
+  .layout {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px 24px 0;
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  .sidebar {
+    position: sticky;
+    top: 64px;     /* 顶部 bar 高度后 */
+    align-self: start;
+    max-height: calc(100vh - 88px);
+    overflow-y: auto;
+    background: var(--c-bg);
+    padding: 20px 12px;
+    border-radius: var(--r-xl);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  }
+  .sidebar__zone-tag {
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--c-text-3);
+    padding: 6px 12px 12px;
+    border-bottom: 1px solid var(--c-line);
+    margin-bottom: 12px;
+  }
+  .sidebar__group { margin-bottom: 14px; }
+  .sidebar__group:last-child { margin-bottom: 0; }
+  .sidebar__link {
+    display: block;
+    padding: 7px 12px;
+    font-size: 13px;
+    color: var(--c-text-2);
+    text-decoration: none;
+    border-radius: var(--r-base);
+    font-weight: 500;
+    transition: background 150ms, color 150ms;
+    line-height: 1.5;
+  }
+  .sidebar__link:hover { background: rgba(0, 0, 0, 0.04); color: var(--c-text); }
+  .sidebar__link.is-current { background: var(--c-text); color: var(--c-bg); }
+  .sidebar__link.is-current:hover { background: var(--c-text); }
+  .sidebar__link.is-placeholder { color: var(--c-text-3); cursor: default; font-style: italic; }
+  .sidebar__link.is-placeholder:hover { background: transparent; color: var(--c-text-3); }
+  .sidebar__sub {
+    margin: 4px 0 8px 12px;
+    padding-left: 8px;
+    border-left: 1px solid var(--c-line);
+  }
+  .sidebar__sub-link {
+    display: block;
+    padding: 4px 10px;
+    font-size: 12px;
+    color: var(--c-text-3);
+    text-decoration: none;
+    border-radius: 4px;
+    line-height: 1.6;
+    transition: background 150ms, color 150ms;
+  }
+  .sidebar__sub-link:hover { background: rgba(0, 0, 0, 0.03); color: var(--c-text-2); }
+
+  /* .doc 在 layout 内不再居中 — 它本身已经是右列的全部宽度 */
+  .layout .doc {
+    max-width: none;
+    margin: 0;
+  }
+
+  @media (max-width: 960px) {
+    .layout {
+      grid-template-columns: 1fr;
+      gap: 16px;
+      padding: 16px 12px 0;
+    }
+    .sidebar {
+      position: static;
+      max-height: none;
+    }
+  }
   .view-tab {
     background: transparent;
     border: none;
@@ -616,6 +759,60 @@
 
 </head>
 <body>
+
+<!-- 顶部 bar:左 brand + 5 大 Zone tab + 右视图密度切换 -->
+<div class="top-bar">
+  <a href="../../docs/jd-design-wiki-knowledge-tree.html" class="top-bar__brand">JD Design Wiki <small>· V16</small></a>
+  <nav class="top-bar__nav" aria-label="5 大分区导航">
+    <a href="../knowledge/spec-page.html" class="top-bar__nav-link">📚 Design 知识</a>
+    <a href="./spec-page.html" class="top-bar__nav-link is-current">🎨 Design 基础</a>
+    <a href="../ai-mechanism/spec-page.html" class="top-bar__nav-link">🤖 AI 机制</a>
+    <a href="../product-architecture/spec-page.html" class="top-bar__nav-link">🏗 产品架构</a>
+    <a href="../../docs/jd-design-wiki-master-diagram.html" class="top-bar__nav-link is-placeholder" title="V16 Zone 05 暂未建页">🚀 横向专项</a>
+  </nav>
+  <span class="top-bar__spacer"></span>
+  <div class="view-tabs" role="tablist" aria-label="视图密度切换">
+    <button class="view-tab is-active" role="tab" data-view="basic" aria-selected="true">常规版</button>
+    <button class="view-tab" role="tab" data-view="pro" aria-selected="false">专业版</button>
+  </div>
+</div>
+
+<div class="layout">
+
+<aside class="sidebar" aria-label="🎨 Design 基础 - 子目录">
+  <div class="sidebar__zone-tag">ZONE 02 · 🎨 Design 基础</div>
+
+  <div class="sidebar__group">
+    <a href="#" class="sidebar__link is-current">Token 体系</a>
+    <div class="sidebar__sub">
+      <a href="#ch-1" class="sidebar__sub-link">🎨 颜色 Colors</a>
+      <a href="#ch-2" class="sidebar__sub-link">✍ 文字 Typography</a>
+      <a href="#ch-3" class="sidebar__sub-link">⬜ 圆角 Radius</a>
+      <a href="#ch-4" class="sidebar__sub-link">📏 间距 Spacing</a>
+      <a href="#ch-5" class="sidebar__sub-link">🔖 图标 Icon</a>
+      <a href="#ch-6" class="sidebar__sub-link">➖ 线条 Lines</a>
+      <a href="#ch-7" class="sidebar__sub-link">📐 布局 Layout</a>
+      <a href="#ch-8" class="sidebar__sub-link">💎 材质 Materials</a>
+    </div>
+  </div>
+
+  <div class="sidebar__group">
+    <span class="sidebar__link is-placeholder" title="原则守则:principles + guidelines,待录入">原则守则</span>
+  </div>
+
+  <div class="sidebar__group">
+    <span class="sidebar__link is-placeholder" title="原子组件:单一元素的基础变体,待录入">原子组件</span>
+  </div>
+
+  <div class="sidebar__group">
+    <span class="sidebar__link">通用组件 <small style="color:var(--c-text-3);font-weight:400;">shared/</small></span>
+    <div class="sidebar__sub">
+      <a href="../horizontal/components-base/tabbar/spec-page.html" class="sidebar__sub-link">🧭 Tabbar 底部导航</a>
+      <a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md-v16/horizontal/components-base/button/design.md" target="_blank" rel="noopener" class="sidebar__sub-link">🔘 Button (md only)</a>
+    </div>
+  </div>
+</aside>
+
 <div class="doc">
 
 <header class="guideline-header is-divided">
@@ -626,10 +823,6 @@
     来源:Relay V16.0 GUIDELINE 多节点 + <code>jd-design-system-md-v16/foundations/</code> 9 份 md + <code>tokens/tokens.json</code> 真实数据
   </div>
   <div class="panda-deco" role="img" aria-label="JD 玻璃熊猫装饰"></div>
-  <div class="view-tabs" role="tablist" aria-label="视图切换" style="position:absolute;bottom:0;right:0;">
-    <button class="view-tab is-active" role="tab" data-view="basic" aria-selected="true">常规版</button>
-    <button class="view-tab" role="tab" data-view="pro" aria-selected="false">专业版</button>
-  </div>
 </header>
 
 <div class="toc">
@@ -844,27 +1037,27 @@
 <p style="color:var(--c-text-3);font-size:12px;margin:0 0 8px;">系统字体,macOS / iOS 自带;Windows fallback Microsoft YaHei;Linux Noto Sans SC</p>
 <div class="typo-list">
 <div class="typo-row">
-  <span class="typo-sample" style="font-family:"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;font-weight:400;font-size:13px;">京东设计 JD Design 0123 — 10pt</span>
+  <span class="typo-sample typo-sample--pingfang" style="font-weight:400;font-size:13px;">京东设计 JD Design 0123 — 10pt</span>
   <code class="typo-name pro-only">pingfang_regular/font_size_10_400</code>
 </div>
 <div class="typo-row">
-  <span class="typo-sample" style="font-family:"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;font-weight:400;font-size:14px;">京东设计 JD Design 0123 — 11pt</span>
+  <span class="typo-sample typo-sample--pingfang" style="font-weight:400;font-size:14px;">京东设计 JD Design 0123 — 11pt</span>
   <code class="typo-name pro-only">pingfang_regular/font_size_11_400</code>
 </div>
 <div class="typo-row">
-  <span class="typo-sample" style="font-family:"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;font-weight:400;font-size:17px;">京东设计 JD Design 0123 — 13pt</span>
+  <span class="typo-sample typo-sample--pingfang" style="font-weight:400;font-size:17px;">京东设计 JD Design 0123 — 13pt</span>
   <code class="typo-name pro-only">pingfang_regular/font_size_13_400</code>
 </div>
 <div class="typo-row">
-  <span class="typo-sample" style="font-family:"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;font-weight:400;font-size:18px;">京东设计 JD Design 0123 — 14pt</span>
+  <span class="typo-sample typo-sample--pingfang" style="font-weight:400;font-size:18px;">京东设计 JD Design 0123 — 14pt</span>
   <code class="typo-name pro-only">pingfang_regular/font_size_14_400</code>
 </div>
 <div class="typo-row">
-  <span class="typo-sample" style="font-family:"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;font-weight:400;font-size:21px;">京东设计 JD Design 0123 — 16pt</span>
+  <span class="typo-sample typo-sample--pingfang" style="font-weight:400;font-size:21px;">京东设计 JD Design 0123 — 16pt</span>
   <code class="typo-name pro-only">pingfang_regular/font_size_16_400</code>
 </div>
 <div class="typo-row">
-  <span class="typo-sample" style="font-family:"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;font-weight:400;font-size:23px;">京东设计 JD Design 0123 — 18pt</span>
+  <span class="typo-sample typo-sample--pingfang" style="font-weight:400;font-size:23px;">京东设计 JD Design 0123 — 18pt</span>
   <code class="typo-name pro-only">pingfang_regular/font_size_18_400</code>
 </div>
 </div>
@@ -872,27 +1065,27 @@
 <p style="color:var(--c-text-3);font-size:12px;margin:0 0 8px;">系统字体,Win/Linux 自动 fallback</p>
 <div class="typo-list">
 <div class="typo-row">
-  <span class="typo-sample" style="font-family:"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;font-weight:600;font-size:13px;">京东设计 JD Design 0123 — 10pt</span>
+  <span class="typo-sample typo-sample--pingfang" style="font-weight:600;font-size:13px;">京东设计 JD Design 0123 — 10pt</span>
   <code class="typo-name pro-only">pingfang_semibold/font_size_10_600</code>
 </div>
 <div class="typo-row">
-  <span class="typo-sample" style="font-family:"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;font-weight:600;font-size:14px;">京东设计 JD Design 0123 — 11pt</span>
+  <span class="typo-sample typo-sample--pingfang" style="font-weight:600;font-size:14px;">京东设计 JD Design 0123 — 11pt</span>
   <code class="typo-name pro-only">pingfang_semibold/font_size_11_600</code>
 </div>
 <div class="typo-row">
-  <span class="typo-sample" style="font-family:"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;font-weight:600;font-size:17px;">京东设计 JD Design 0123 — 13pt</span>
+  <span class="typo-sample typo-sample--pingfang" style="font-weight:600;font-size:17px;">京东设计 JD Design 0123 — 13pt</span>
   <code class="typo-name pro-only">pingfang_semibold/font_size_13_600</code>
 </div>
 <div class="typo-row">
-  <span class="typo-sample" style="font-family:"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;font-weight:600;font-size:18px;">京东设计 JD Design 0123 — 14pt</span>
+  <span class="typo-sample typo-sample--pingfang" style="font-weight:600;font-size:18px;">京东设计 JD Design 0123 — 14pt</span>
   <code class="typo-name pro-only">pingfang_semibold/font_size_14_600</code>
 </div>
 <div class="typo-row">
-  <span class="typo-sample" style="font-family:"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;font-weight:600;font-size:21px;">京东设计 JD Design 0123 — 16pt</span>
+  <span class="typo-sample typo-sample--pingfang" style="font-weight:600;font-size:21px;">京东设计 JD Design 0123 — 16pt</span>
   <code class="typo-name pro-only">pingfang_semibold/font_size_16_600</code>
 </div>
 <div class="typo-row">
-  <span class="typo-sample" style="font-family:"PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;font-weight:600;font-size:23px;">京东设计 JD Design 0123 — 18pt</span>
+  <span class="typo-sample typo-sample--pingfang" style="font-weight:600;font-size:23px;">京东设计 JD Design 0123 — 18pt</span>
   <code class="typo-name pro-only">pingfang_semibold/font_size_18_600</code>
 </div>
 </div>
@@ -900,31 +1093,31 @@
 <p style="color:var(--c-warning);font-size:12px;margin:0 0 8px;">⚠️ 京东正黑 V2.2 是品牌字体,需安装到本机或加载 webfont 才能真实渲染;当前 fallback 到 PingFang SC</p>
 <div class="typo-list">
 <div class="typo-row">
-  <span class="typo-sample" style="font-family:"JD-ZhengHei", "JDLangZhengTi", "PingFang SC", system-ui, sans-serif;font-weight:400;font-size:13px;">京东设计 JD Design 0123 — 10pt</span>
+  <span class="typo-sample typo-sample--zhenghei" style="font-weight:400;font-size:13px;">京东设计 JD Design 0123 — 10pt</span>
   <code class="typo-name pro-only">zhenghei_regular/font_size_10_400</code>
 </div>
 <div class="typo-row">
-  <span class="typo-sample" style="font-family:"JD-ZhengHei", "JDLangZhengTi", "PingFang SC", system-ui, sans-serif;font-weight:400;font-size:14px;">京东设计 JD Design 0123 — 11pt</span>
+  <span class="typo-sample typo-sample--zhenghei" style="font-weight:400;font-size:14px;">京东设计 JD Design 0123 — 11pt</span>
   <code class="typo-name pro-only">zhenghei_regular/font_size_11_400</code>
 </div>
 <div class="typo-row">
-  <span class="typo-sample" style="font-family:"JD-ZhengHei", "JDLangZhengTi", "PingFang SC", system-ui, sans-serif;font-weight:400;font-size:17px;">京东设计 JD Design 0123 — 13pt</span>
+  <span class="typo-sample typo-sample--zhenghei" style="font-weight:400;font-size:17px;">京东设计 JD Design 0123 — 13pt</span>
   <code class="typo-name pro-only">zhenghei_regular/font_size_13_400</code>
 </div>
 <div class="typo-row">
-  <span class="typo-sample" style="font-family:"JD-ZhengHei", "JDLangZhengTi", "PingFang SC", system-ui, sans-serif;font-weight:400;font-size:18px;">京东设计 JD Design 0123 — 14pt</span>
+  <span class="typo-sample typo-sample--zhenghei" style="font-weight:400;font-size:18px;">京东设计 JD Design 0123 — 14pt</span>
   <code class="typo-name pro-only">zhenghei_regular/font_size_14_400</code>
 </div>
 <div class="typo-row">
-  <span class="typo-sample" style="font-family:"JD-ZhengHei", "JDLangZhengTi", "PingFang SC", system-ui, sans-serif;font-weight:400;font-size:21px;">京东设计 JD Design 0123 — 16pt</span>
+  <span class="typo-sample typo-sample--zhenghei" style="font-weight:400;font-size:21px;">京东设计 JD Design 0123 — 16pt</span>
   <code class="typo-name pro-only">zhenghei_regular/font_size_16_400</code>
 </div>
 <div class="typo-row">
-  <span class="typo-sample" style="font-family:"JD-ZhengHei", "JDLangZhengTi", "PingFang SC", system-ui, sans-serif;font-weight:400;font-size:23px;">京东设计 JD Design 0123 — 18pt</span>
+  <span class="typo-sample typo-sample--zhenghei" style="font-weight:400;font-size:23px;">京东设计 JD Design 0123 — 18pt</span>
   <code class="typo-name pro-only">zhenghei_regular/font_size_18_400</code>
 </div>
 <div class="typo-row">
-  <span class="typo-sample" style="font-family:"JD-ZhengHei", "JDLangZhengTi", "PingFang SC", system-ui, sans-serif;font-weight:400;font-size:31px;">京东设计 JD Design 0123 — 24pt</span>
+  <span class="typo-sample typo-sample--zhenghei" style="font-weight:400;font-size:31px;">京东设计 JD Design 0123 — 24pt</span>
   <code class="typo-name pro-only">zhenghei_regular/font_size_24_400</code>
 </div>
 </div>
@@ -932,31 +1125,31 @@
 <p style="color:var(--c-warning);font-size:12px;margin:0 0 8px;">⚠️ 同上,需京东品牌字体源</p>
 <div class="typo-list">
 <div class="typo-row">
-  <span class="typo-sample" style="font-family:"JD-ZhengHei", "JDLangZhengTi", "PingFang SC", system-ui, sans-serif;font-weight:700;font-size:13px;">京东设计 JD Design 0123 — 10pt</span>
+  <span class="typo-sample typo-sample--zhenghei" style="font-weight:700;font-size:13px;">京东设计 JD Design 0123 — 10pt</span>
   <code class="typo-name pro-only">zhenghei_bold/font_size_10_600</code>
 </div>
 <div class="typo-row">
-  <span class="typo-sample" style="font-family:"JD-ZhengHei", "JDLangZhengTi", "PingFang SC", system-ui, sans-serif;font-weight:700;font-size:14px;">京东设计 JD Design 0123 — 11pt</span>
+  <span class="typo-sample typo-sample--zhenghei" style="font-weight:700;font-size:14px;">京东设计 JD Design 0123 — 11pt</span>
   <code class="typo-name pro-only">zhenghei_bold/font_size_11_600</code>
 </div>
 <div class="typo-row">
-  <span class="typo-sample" style="font-family:"JD-ZhengHei", "JDLangZhengTi", "PingFang SC", system-ui, sans-serif;font-weight:700;font-size:17px;">京东设计 JD Design 0123 — 13pt</span>
+  <span class="typo-sample typo-sample--zhenghei" style="font-weight:700;font-size:17px;">京东设计 JD Design 0123 — 13pt</span>
   <code class="typo-name pro-only">zhenghei_bold/font_size_13_600</code>
 </div>
 <div class="typo-row">
-  <span class="typo-sample" style="font-family:"JD-ZhengHei", "JDLangZhengTi", "PingFang SC", system-ui, sans-serif;font-weight:700;font-size:18px;">京东设计 JD Design 0123 — 14pt</span>
+  <span class="typo-sample typo-sample--zhenghei" style="font-weight:700;font-size:18px;">京东设计 JD Design 0123 — 14pt</span>
   <code class="typo-name pro-only">zhenghei_bold/font_size_14_600</code>
 </div>
 <div class="typo-row">
-  <span class="typo-sample" style="font-family:"JD-ZhengHei", "JDLangZhengTi", "PingFang SC", system-ui, sans-serif;font-weight:700;font-size:21px;">京东设计 JD Design 0123 — 16pt</span>
+  <span class="typo-sample typo-sample--zhenghei" style="font-weight:700;font-size:21px;">京东设计 JD Design 0123 — 16pt</span>
   <code class="typo-name pro-only">zhenghei_bold/font_size_16_600</code>
 </div>
 <div class="typo-row">
-  <span class="typo-sample" style="font-family:"JD-ZhengHei", "JDLangZhengTi", "PingFang SC", system-ui, sans-serif;font-weight:700;font-size:23px;">京东设计 JD Design 0123 — 18pt</span>
+  <span class="typo-sample typo-sample--zhenghei" style="font-weight:700;font-size:23px;">京东设计 JD Design 0123 — 18pt</span>
   <code class="typo-name pro-only">zhenghei_bold/font_size_18_600</code>
 </div>
 <div class="typo-row">
-  <span class="typo-sample" style="font-family:"JD-ZhengHei", "JDLangZhengTi", "PingFang SC", system-ui, sans-serif;font-weight:700;font-size:31px;">京东设计 JD Design 0123 — 24pt</span>
+  <span class="typo-sample typo-sample--zhenghei" style="font-weight:700;font-size:31px;">京东设计 JD Design 0123 — 24pt</span>
   <code class="typo-name pro-only">zhenghei_bold/font_size_24_600</code>
 </div>
 </div>
@@ -1122,7 +1315,8 @@
   JD APP V16.0 Design System · Foundation 总览 · 生成于 2026-05-15 · 8 个 token 类别 · 实物视觉展示版
 </div>
 
-</div>
+</div><!-- /doc -->
+</div><!-- /layout -->
 
 <script>
 (function () {

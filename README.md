@@ -98,41 +98,44 @@ knowledge-tree.html (顶层导航)
 
 ---
 
-## 组件 spec page 维护流程
+## V16 设计系统 spec-page
 
-落地产物示例:[tabbar/spec-page.html](./jd-design-system-md-v16/horizontal/components-base/tabbar/spec-page.html) — 单组件 7 章节规范页,含 Pro / Basic 视图切换、原稿切图、应用场景、Donts、AI Schema。在线版(repo 公开时)走 GitHub Pages。
+V16 录入开始铺 HTML 发布物。每个 Zone 都有一份 `spec-page.html`,顶部用 5 大 Zone tab 互跳,左 sidebar 列当前 Zone 的子目录:
+
+| Zone | 入口 | 状态 |
+|---|---|---|
+| 📚 Design 知识 | `jd-design-system-md-v16/knowledge/spec-page.html` | placeholder(3 子目录占位) |
+| 🎨 Design 基础 | `jd-design-system-md-v16/foundations/spec-page.html` | **8 token 类别 + 通用组件(tabbar/button)** |
+| 🤖 AI 机制 | `jd-design-system-md-v16/ai-mechanism/spec-page.html` | **4 个 skill 索引卡片**(README + 3 个 V16 skill md) |
+| 🏗 产品架构 | `jd-design-system-md-v16/product-architecture/spec-page.html` | placeholder(domains/pages/relations 占位) |
+| 🚀 横向专项 | 未建页 | top-bar 标灰 |
+
+落地组件实例:[tabbar/spec-page.html](./jd-design-system-md-v16/horizontal/components-base/tabbar/spec-page.html) — 单组件 7 章节规范页,Pro/Basic 双视图、原稿切图、应用场景、Donts、AI Schema。共用同套 top-bar + sidebar 壳。
 
 ### Relay 改稿后的同步链路
-
-当 Relay 设计稿更新,要让对外的 spec-page.html 同步:
 
 ```
 1. Relay 改稿
    ↓ local Claude session 跑:/relay-to-design-md <relay-url>
-2. design.md / spec.md / variants.md / behaviors.md bundle 自动同步
+2. design.md / spec.md / variants.md / behaviors.md / ai-schema.yaml / CHANGELOG.md
+   6 文件 bundle 自动同步(v0.5.1 bundle 结构)
    ↓ local Claude session 跑:/design-md-to-spec-page <slug>
-3. _assets/*.png 切图重导(3~5 min)+ spec-page.html 重渲染
+3. 增量启发(v0.5):比对 _assets/*.png 最旧 mtime vs frontmatter.last_synced,
+   Relay 没动就跳切图重导(3-5min → < 10s);带 --refresh-assets 强制重导
    ↓ git add -A && git commit -m "update <slug> spec" && git push
 4. GitHub Pages 自动重 build (~30s),URL 立即更新
 ```
 
-### 涉及的 3 个 skill
+### 涉及的 4 个 skill
 
-| Skill | 输入 | 输出 |
-|---|---|---|
-| [`relay-to-design-md`](./.claude/skills/relay-to-design-md/) | Relay URL | design.md / page-doc bundle(编辑面) |
-| [`design-md-to-portal`](./.claude/skills/design-md-to-portal/) | 所有 design.md | `docs/design.html` 总站(聚合发布面) |
-| [`design-md-to-spec-page`](./.claude/skills/design-md-to-spec-page/) | 单 design.md / bundle | `<slug>/spec-page.html` 单组件页(单页发布面) |
+| Skill | 版本 | 输入 | 输出 |
+|---|---|---|---|
+| [`relay-to-design-md`](./.claude/skills/relay-to-design-md/) | v0.5.1 | Relay URL | design.md / 6 文件 page-doc bundle(编辑面) |
+| [`design-md-to-portal`](./.claude/skills/design-md-to-portal/) | v0.2 | 所有 design.md | `docs/design.html` 总站门户(聚合发布面) |
+| [`design-md-to-spec-page`](./.claude/skills/design-md-to-spec-page/) | v0.5 | 单 design.md / bundle | `<slug>/spec-page.html` 单组件页(单页发布面) |
+| [`design-review`](./.claude/skills/design-review/) | v0.1.1 | Relay 节点 | 5 段式合规走查报告(V15 + V16 双轨) |
 
-### 已知效率痛点(待优化)
-
-当前每次跑 `/design-md-to-spec-page` 都会全量重导 9 张切图(走 use_design_script + chunkedB64 + sharedPluginData 中转 + jq 解 dump file),即使你只是改了一段 design.md 文字。skill v0.4 计划加增量逻辑:
-
-- 默认对比 `_assets/*.png` mtime vs design.md mtime,后者新才重导
-- `--refresh-assets` 强制全量
-- `--dry-run` 只看会变什么不动文件
-
-详见 [issue 列表](https://github.com/ShuaiMXu/jd-design-wiki-proposal/issues)。
+V16 ai-mechanism wiki 索引:[jd-design-system-md-v16/ai-mechanism/](./jd-design-system-md-v16/ai-mechanism/)(README + 3 个 V16 skill 职能说明)。design-review 仍 V15 范围,索引在 [V15 ai-mechanism](./jd-design-system-md/ai-mechanism/design-review.md)。
 
 ### CI 自动化?
 
@@ -142,11 +145,12 @@ GitHub Actions 触发 skill 重跑这条路**走不通** —— skill 依赖 `us
 
 ## 状态
 
-**v0.4 · 内部已授权推进**
+**v0.5 · 内部已授权推进**
 **牵引**:综合业务设计组 · Shaka
 
-**P1 阶段** (1 个月内):
-- Week 1-2: 录入 15.0 设计语言到 foundations/ + 建角色模板
-- Week 2-3: 2-3 场域试点（按部门-业务-组件三级结构）
-- Week 3-4: Figma + Zero 打通 POC + AI Skill 自动化 POC
-- 月底: MVP 完成，决定是否规模化
+**当前进度**(2026-05-18):
+- ✅ 4 个 native skill 上线(relay/portal/spec-page v0.5+ + design-review V15 维持)
+- ✅ V16 Foundation 8 token 类别 + Tabbar 落地组件 bundle 完整(6 文件)
+- ✅ 5 大 Zone 跨页导航 + 左 sidebar 子目录(参 Ant Design)
+- 🟡 录入中:button/V16 spec-page、ai-mechanism 协议层补全(消费协议/Agent 守则)
+- 🟡 待启动:product-architecture domains/pages/relations、横向专项整套
