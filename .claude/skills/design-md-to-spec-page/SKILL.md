@@ -62,16 +62,32 @@ allowed-tools: [Bash, Read, Write, Edit, Glob]
 
 输出路径：**`<bundle-dir>/spec-page.html`**（与 design.md 同目录）。
 
-#### v0.5 CLI flag（issue #25）
+#### v0.5 CLI flag(issue #25)
 
 | flag | 默认 | 行为 |
 |---|---|---|
-| `--refresh-assets` | 关 | 强制走 Step 5b 完整切图重导（chunked b64 + readback + jq）。**source md 改了 Relay 节点 / 切图源动了 → 必加** |
-| `--no-refresh-assets` | — | 强制跳过 Step 5b，即使 mtime 启发判定要重导（debug / source 切图实验时用） |
-| `--dry-run` | 关 | 只在终端列出"会变什么"，**不写**任何文件 / 不 git。配合 Step 4 后的内存 diff |
-| `--no-deploy` | 关 | 见 Step 9（v0.4 已加） |
+| `--refresh-assets` | 关 | 强制走 Step 5b 完整切图重导(chunked b64 + readback + jq)。**source md 改了 Relay 节点 / 切图源动了 → 必加** |
+| `--no-refresh-assets` | — | 强制跳过 Step 5b,即使 mtime 启发判定要重导(debug / source 切图实验时用) |
+| `--dry-run` | 关 | 只在终端列出"会变什么",**不写**任何文件 / 不 git。配合 Step 4 后的内存 diff |
+| `--no-deploy` | 关 | 见 Step 9(v0.4 已加)。**CI 批量跑 / 私有仓 / 想预览不部署都用这个** |
 
-无 flag 时（默认）：走 [Step 5a 增量启发](#step-5a-增量启发v05issue-25)，**根据 mtime 自动决定** 是否跳切图重导。**80% 场景只改了 md 文字、Relay 没动**，默认行为应该是秒级 re-render，不重导切图。
+无 flag 时(默认):走 [Step 5a 增量启发](#step-5a-增量启发v05issue-25),**根据 mtime 自动决定** 是否跳切图重导。**80% 场景只改了 md 文字、Relay 没动**,默认行为应该是秒级 re-render,不重导切图。
+
+#### Use-case → flag 矩阵
+
+> 本 skill 是"一键完成 + 事后审查"零输入设计 — 默认无 flag 跑能覆盖最常见场景。下表给出常见场景对应的 flag 组合,**不是每次跑都要选**:
+
+| 场景 | flag 组合 | 注 |
+|---|---|---|
+| 日常 — 改了 md 文字,Relay 没动 | (无) | 默认走 mtime 启发跳切图,秒级 re-render + 部署 |
+| 改了 Relay 视觉,需重导切图 | `--refresh-assets` | 走完整 Step 5b 链路 |
+| **CI 批量跑**(多组件 / nightly) | `--no-deploy` | 只生成 HTML,不 push;CI 自己决定何时合 |
+| **私有仓 / 没配 GitHub Pages** | `--no-deploy` | 同上 |
+| **预览不部署**(看渲染效果再决定) | `--no-deploy --dry-run` | 只 diff,不写文件 |
+| Debug 切图链路 | `--no-refresh-assets` | 跳过切图但其他都跑 |
+| Source 切图实验对照 | `--dry-run` | 看 diff,不动产物 |
+
+> 加 flag 后行为可拆但 skill 本身不拆 — 这是 Issue #40 第 1 条的设计决策(对齐 zero-input 偏好)。如果将来真的要拆,候选 \`spec-page-deploy\` 独立 skill 由 Step 9 演化而来。
 
 ### Step 2: 识别 bundle 还是 single
 
@@ -84,6 +100,8 @@ bundle 模式下追加读取 `spec.md` / `variants.md` / `behaviors.md`，按 [r
 ### Step 3: 映射到 7 章节
 
 章节名 / anchor slug 真相源在 [`../../shared/references/section-anchors.md`](../../shared/references/section-anchors.md)(与总站 design.html 共用,slug 不许漂)。详细字段→章节映射按 [references/section-mapping.md](./references/section-mapping.md) 把 design.md / bundle 字段塞进 7 章节的对应位置。**严禁编造**：
+
+> **与 design-md-to-site 的分工**:总站 design.html 只需"卡片摘要" — 用 shared/section-anchors.md 拿 anchor slug + design.md 正文 H2 段**首段**作摘要。**不消费**本 skill 的 \`references/section-mapping.md\` 详细字段映射 — 那是详情页 spec-page.html 的完整 7 章节渲染规则,site 卡片不需要。anchor slug 共用即可。
 
 | HTML 章节 | 来源（single） | 来源（bundle） |
 |---|---|---|
@@ -107,19 +125,15 @@ bundle 模式下追加读取 `spec.md` / `variants.md` / `behaviors.md`，按 [r
 
 ### Step 4c: 视图分层(v0.3)
 
-模板自带 Pro / Basic 视图切换 UI(标题旁紧凑 segmented + JS + localStorage 持久化)。**生成 7 章节内容时按 [references/view-toggle.md](./references/view-toggle.md) 给元素加 class**:
+模板自带 Pro / Basic 视图切换 UI(标题旁紧凑 segmented + JS + localStorage 持久化)。**Pro/Basic class 决策 + 元素级 / inline 双粒度规则全部在** [references/view-toggle.md](./references/view-toggle.md) **真相源**(235 行,含 7 章节标记策略 + class 决策表 + 失败模式)。
 
-- `class="pro-only"` 整段 / inline `<span class="pro-only pro-inline">` 元素 → 只在专业版显示
-- `class="basic-only"` / `class="basic-only summary"` 段 → 只在常规版显示(替代被隐藏的 pro 段)
+本 SKILL.md 只保留契约要点:
+
+- `pro-only` / `basic-only` / `basic-only summary` 三 class,生成 7 章节内容时按 view-toggle.md 给元素加
 - 不加 class 的元素 → 两版共享
+- 实战参考:`tabbar/spec-page.html` 现状 — basic 占 pro 81%,藏 ~6000 chars / 112 行
 
-典型分流:
-- token / DP 详细表(章节 4) → `<div class="pro-only">` 包,加 `<div class="basic-only summary">` info 蓝概述替代
-- ASCII / API 速查 → 整段 `pro-only`
-- 行为准则括号注 + 章节来源 → inline `<span class="pro-only pro-inline">`
-- 章节 H2/H3 标题 / 切图 / Donts / 应用场景 → 共享
-
-实战参考:`tabbar/spec-page.html` 现状 — basic 占 pro 81%,藏 ~6000 chars / 112 行(章节 3 token 表 / 4.1-4.4 token 表 / 5.2 ASCII / API)。
+> Pro/Basic 切换本质是模板层关注点 —— 决策表搬到 view-toggle.md 真相源后,SKILL.md 这章保持薄 4 行而非展开。改 class 策略 → 改 view-toggle.md,不动 SKILL.md。
 
 ### Step 5: 演示 stage 处理
 
@@ -150,6 +164,16 @@ bundle 模式下追加读取 `spec.md` / `variants.md` / `behaviors.md`，按 [r
 **80% 场景只改 md 文字 / 不动 Relay，切图重导完全多余**。增量启发：
 
 ```bash
+set -euo pipefail   # 严格模式:任一命令失败 / 未定义变量 / pipe 失败都立即 abort
+
+# 0. preflight - 确保依赖工具在 PATH
+for tool in jq stat awk date; do
+  command -v "$tool" >/dev/null 2>&1 || {
+    echo "❌ 缺少 $tool,无法跑 mtime 启发。装好后重跑,或加 --refresh-assets / --no-refresh-assets 显式绕过"
+    exit 1
+  }
+done
+
 # 1. flag 优先级：--refresh-assets 强制走，--no-refresh-assets 强制跳
 if [ "$FLAG_REFRESH_ASSETS" = "1" ]; then
   echo "🔄 --refresh-assets：强制走 Step 5b 切图重导"
@@ -164,13 +188,20 @@ else
     echo "🆕 _assets/ 不存在或为空 → 首次跑，走 Step 5b"
     RUN_STEP_5B=1
   else
-    # 跨平台 helper（macOS BSD vs GNU 选项不同；find -printf 与 date -d 都仅 GNU）
-    _mtime() { stat -f %m "$1" 2>/dev/null || stat -c %Y "$1" 2>/dev/null; }
+    # 跨平台 helper(macOS BSD vs GNU 选项不同;find -printf 与 date -d 都仅 GNU)
+    # 任一 stat 形式失败 → abort 而非 silent return 0(后者会让 mtime 永远 = epoch 起点,触发不该 trigger 的 refresh)
+    _mtime() {
+      stat -f %m "$1" 2>/dev/null && return
+      stat -c %Y "$1" 2>/dev/null && return
+      echo "❌ stat 跨平台 helper 都失败:$1" >&2
+      exit 1
+    }
     _iso_to_ts() {
-      [ -z "$1" ] && { echo 0; return; }
-      date -j -f "%Y-%m-%d" "$1" +%s 2>/dev/null \
-        || date -d "$1" +%s 2>/dev/null \
-        || echo 0
+      [ -z "$1" ] && { echo 0; return; }   # 空字符串 → 0 是契约(没有 last_synced 字段就回退,合法)
+      date -j -f "%Y-%m-%d" "$1" +%s 2>/dev/null && return
+      date -d "$1" +%s 2>/dev/null && return
+      echo "❌ date 跨平台 helper 都失败:无法解析 $1" >&2
+      exit 1
     }
 
     # 取 _assets/ 下所有 png 的最旧 mtime（最保守：只要任何一张比 source 新，整体视为新）
@@ -207,18 +238,39 @@ fi
 - **mtime 启发不完美**：edge case 如设计师手 mv 切图、git checkout 重置 mtime → 用户应显式 `--refresh-assets`
 - **失败回退保守路径**：自动启发判定不重导但 user 不放心 → 显式 `--refresh-assets`；自动启发要重导但其实 Relay 没改 → 显式 `--no-refresh-assets`
 
-### Step 5b: 切图导出（v0.2 加，v0.5 受 5a 控制）
+### Step 5b: 切图导出(v0.2 加,v0.5 受 5a 控制)
 
 > ⚠️ 本步骤受 [Step 5a 增量启发](#step-5a-增量启发v05issue-25) 控制。`RUN_STEP_5B=0` 时跳过。
 
-走 [references/stage-images-export.md](./references/stage-images-export.md) 4 步流程:
+切图链路按节点尺寸**两挡降级**:
 
-1. **chunked b64 export 到 sharedPluginData**（use_design_script）:必须 chunkedB64 helper 避免栈溢出;namespace 固定 `jd-spec-page-assets`(注册见 [`../../shared/references/relay-namespaces.md`](../../shared/references/relay-namespaces.md));一次脚本可批 export 7-12 张
-2. **批量 readback 触发 dump**（use_design_script）:MCP 自动把 result 落到磁盘文件,不污染 LLM context
-3. **jq + base64 -d 写 PNG**（Bash）:`jq -r '.[0].text | fromjson | to_entries[] | "\(.key)\n\(.value)"' "$SRC" | while ...`
-4. **清理 sharedPluginData**（use_design_script,可选）:避免 Relay 文件膨胀(临时 namespace 清理契约见上述注册表)
+#### 路 A:直 export(小节点 / 单张)
 
-切图统一存 `<bundle-dir>/_assets/`,命名 `sec-{N}-{slug}.png`（如 `sec-3-island-promo.png`)。模板 `<style>` 已有 `.stage--image` class 自动适配宽度。
+节点尺寸 ≤ 800×800 + 单张目标 → 直接调 `use_design_script` `node.exportAsync({format:'PNG'}) + relay.base64Encode(bytes)` 返回 inline base64;bash `echo '<base64>' | base64 -d > <output>.png`。
+
+**优点**:不需 chunkedB64 helper,不需 sharedPluginData 中转,不需 jq dump 文件;**链路 3 跳变 2 跳**,失败面小。
+**适用**:单张切图(如 button preview),小章节切图。
+**实现参考**:`relay-to-design-md` Step 6 export preview.png 已经是这种做法。
+
+#### 路 B:chunked b64 + sharedPluginData(大批量 / 大节点)
+
+走 [references/stage-images-export.md](./references/stage-images-export.md) 4 步完整流程:
+
+1. **chunked b64 export 到 sharedPluginData**(use_design_script):必须 chunkedB64 helper 避免栈溢出;namespace 固定 `jd-spec-page-assets`(注册见 [`../../shared/references/relay-namespaces.md`](../../shared/references/relay-namespaces.md));一次脚本可批 export 7-12 张
+2. **批量 readback 触发 dump**(use_design_script):MCP 自动把 result 落到磁盘文件,不污染 LLM context
+3. **jq + base64 -d 写 PNG**(Bash):`jq -r '.[0].text | fromjson | to_entries[] | "\(.key)\n\(.value)"' "$SRC" | while ...`
+4. **清理 sharedPluginData**(use_design_script,可选):避免 Relay 文件膨胀(临时 namespace 清理契约见上述注册表)
+
+**适用**:bundle 多张(7-12 张),节点尺寸大(如 tabbar 章节切图 1426×2154)。
+
+#### 路选规则
+
+- 总张数 ≤ 3 且**每张** 节点尺寸 ≤ 800×800 → 路 A 串行
+- 否则 → 路 B 批量
+- 路 A 任一张失败 → fall through 路 B 整批重导
+- 路 B 任一步失败 → 终端报错 + 提示 `--no-refresh-assets` 临时跳过,**不**降级路 A(那样可能比直接重试更慢)
+
+切图统一存 `<bundle-dir>/_assets/`,命名 `sec-{N}-{slug}.png`(如 `sec-3-island-promo.png`)。模板 `<style>` 已有 `.stage--image` class 自动适配宽度。
 
 ### Step 6: token CSS 变量
 
