@@ -1,11 +1,11 @@
 ---
 name: design-review
-description: Audit a JD APP V15.0 design from Relay against the design system wiki (color / typography / radius / spacing / motion / icon / layout tokens). Triggered by relay.jd.com URLs or node IDs together with verbs like "审核", "走查", "review", "audit", "检查规范", "符合 15.0 吗". Outputs a structured pass/warn/violate report with citations back to wiki rules.
+description: Audit a JD APP design from Relay (V15.0 or V16.0) against the design system wiki (color / typography / radius / spacing / motion / icon / layout tokens). Triggered by relay.jd.com URLs or node IDs together with verbs like "审核", "走查", "review", "audit", "检查规范", "符合 15.0 吗", "符合 16.0 吗". Routes to V15 or V16 token snapshot by source fileKey. Outputs a structured pass/warn/violate report with citations back to wiki rules.
 ---
 
-# /design-review · JD 15.0 设计稿合规走查
+# /design-review · JD V15.0 / V16.0 设计稿合规走查
 
-把 Relay 节点的设计稿与 `jd-design-wiki-proposal` 仓库的 15.0 token 体系做交叉校验,输出可读 + 可复核的合规报告。
+把 Relay 节点的设计稿与 `jd-design-wiki-proposal` 仓库的 token 体系做交叉校验,**根据源 fileKey 自动选 V15 还是 V16 真相源**,输出可读 + 可复核的合规报告。
 
 ---
 
@@ -13,7 +13,7 @@ description: Audit a JD APP V15.0 design from Relay against the design system wi
 
 用户给出一个 Relay 设计链接或节点 ID,并要求:
 - "审核 / 走查 / review / audit 这个设计稿"
-- "符合 15.0 设计规范吗"
+- "符合 15.0 设计规范吗" / "符合 16.0 吗"
 - "检查一下用了哪些 token"
 - "这个 token 用对了吗"
 
@@ -21,7 +21,7 @@ description: Audit a JD APP V15.0 design from Relay against the design system wi
 
 ## 不适用场景
 
-- 非 JD 内部 Relay 文件(只有 15.0 wiki 覆盖)
+- 非 JD 内部 Relay 文件(仅覆盖 V15.0 + V16.0 wiki)
 - 用户要求**生成**新设计(那是 design-on-zero 的工作)
 - 设计稿是 Figma 而非 Relay(zero-design MCP 只接 Relay)
 
@@ -50,15 +50,27 @@ URL 形如 `https://relay.jd.com/file/design?id={fileKey}&page_id={pageId}&node_
 
 > **限速**:同一 file 短时间并发 5 个以上 MCP 请求会让服务侧丢连接。三件套并行 OK,更多请串行。
 
-### Step 2 — 加载 15.0 token 真相源
+### Step 2 — 加载 token 真相源(按 fileKey 路由 V15 / V16)
 
-按优先级尝试:
-1. `~/code/jd-design-wiki-proposal/jd-design-system-md/foundations/tokens/tokens.json` —— 仓库克隆存在时,**首选**(最新)
-2. 本 skill 内嵌的 `references/tokens-snapshot.md` —— fallback
+#### 2.1 判断版本
 
-读 tokens.json 时只关心 `color` / `typography` / `radius` / `spacing` / `icon` / `motion` 6 大块的 `$value`。
+| 输入 `fileKey` | 版本 | tokens.json 路径 | fallback snapshot |
+|---|---|---|---|
+| `1896756863949619202` | V15.0(历史 spec file) | `~/code/jd-design-wiki-proposal/jd-design-system-md/foundations/tokens/tokens.json` | `references/tokens-snapshot.md`(V15) |
+| `2029484645871009793` | V16.0(当前 master) | `~/code/jd-design-wiki-proposal/jd-design-system-md-v16/foundations/tokens/tokens.json` | TBD(暂未提供 V16 fallback,无 tokens.json 时报错退出) |
+| 其他 | 未知 | 默认按 V16 路径尝试;失败再按 V15 | 同上 |
+
+> file_id 映射与 `relay-to-design-md/references/bg-mapping.json` 共用同一份真值,变更必须同步双方。
+
+#### 2.2 读取
+
+按版本选定 tokens.json 路径,仓库克隆存在 → **首选** tokens.json;不存在 → 走对应版本的 fallback snapshot。读 tokens.json 时只关心 `color` / `typography` / `radius` / `spacing` / `icon` / `motion` 6 大块的 `$value`。
+
+V15 / V16 两套 tokens.json **结构兼容**(都是 `$value` token 树),但具体 token 名 / 命名空间不完全相同 —— 走 V16 时下面 Step 3a-3f 的命名空间启发(如"`色彩变量 Color/...` 命名空间")可能不再适用,见 Step 3 前的注。
 
 ### Step 3 — 交叉校验
+
+> **V15 / V16 命名启发适用性提醒**:下方 3a-3f 的命名空间识别(如 `色彩变量 Color/...` / `日间` / `C_Newgray` 等 14.x→15.0 迁移痕迹)、Naming-conflict fingerprint 表(`colortexthelp` 等)均源于 V15 实战。V16 启用后命名空间可能改变,启发可能误报 / 漏报。**走 V16 跑出意外结果时,先把规则贴到报告里、标"V15 启发,V16 待校",然后开 follow-up issue 而不是直接静默**。
 
 #### 3·前置 · Token 命名唯一性检查(kebab/snake 双轨)
 
@@ -186,7 +198,7 @@ URL 形如 `https://relay.jd.com/file/design?id={fileKey}&page_id={pageId}&node_
 ### ⚠️ 警告(命名 / 残留 / 语义偏移)
 <同上>
 
-### ✅ 符合 15.0
+### ✅ 符合 V{version}(根据 Step 2 路由的版本填 V15.0 或 V16.0)
 <表格:检查项 | 设计稿值 | 对应 token>
 
 ### 📋 无法仅凭 metadata 判断
@@ -196,14 +208,21 @@ URL 形如 `https://relay.jd.com/file/design?id={fileKey}&page_id={pageId}&node_
 <1 段,X 个改动 + Y 个建议;主色彩 / 文本 / 字族遵守度评价;问题集中在哪>
 ```
 
-每条违规 / 警告 **必须** 链接到 wiki 文件 + 章节,例如:
+每条违规 / 警告 **必须** 链接到 wiki 文件 + 章节,**链接前缀跟随 Step 2 路由的版本**:
+
+| 版本 | 仓库内路径前缀 | GitHub URL 前缀 |
+|---|---|---|
+| V15 | `/jd-design-system-md/foundations/...` | `https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md/foundations/...` |
+| V16 | `/jd-design-system-md-v16/foundations/...` | `https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md-v16/foundations/...` |
+
+V15 例:
 ```
 - 规则:[`tokens/typography.md` §2 字号阶梯](/jd-design-system-md/foundations/tokens/typography.md)
 ```
 
-路径基于 `jd-design-wiki-proposal` 仓库根。如果用户没本地 clone,链接到 GitHub:
+V16 例:
 ```
-https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-md/foundations/tokens/typography.md
+- 规则:[`tokens/typography.md` §2 字号阶梯](/jd-design-system-md-v16/foundations/tokens/typography.md)
 ```
 
 ---
@@ -215,7 +234,8 @@ https://github.com/ShuaiMXu/jd-design-wiki-proposal/blob/main/jd-design-system-m
 | `get_screenshot` 返回 transport dropped | 串行重试 1 次;再失败就只用 variables + metadata 出报告,在「📋 无法判断」中说明缺截图 |
 | `get_variables` 返回 `{}` | 节点不引用变量(可能纯绘图 / 旧设计稿)→ 标注无变量,报告章节降级到只看结构与字号(从 metadata) |
 | `get_design_metadata` 输出 > 25k tokens | grep 不要全读,模式见下面"片段提取" |
-| 用户给的 fileKey 不是 1896756863949619202(15.0 spec file) | 仍可走 review,但在报告顶部标注「**警告:此设计稿不属于 15.0 规范文件,token 引用可能存在历史版本**」|
+| 用户给的 fileKey 不在已知 spec file 列表(V15 `1896756863949619202` / V16 `2029484645871009793`) | 仍可走 review:Step 2 按"其他"分支默认 V16 路径,失败回退 V15;报告顶部标注「**警告:此 fileKey 不在已知 spec file 列表,默认按 V16 真相源校验,如属其他业务文件请指明**」|
+| V16 tokens.json 缺失 + V16 fallback snapshot 未提供 | Step 2 报错退出,提示用户先 clone 仓库或 follow-up 提供 V16 fallback |
 
 ### Metadata 片段提取(应对超大节点)
 
