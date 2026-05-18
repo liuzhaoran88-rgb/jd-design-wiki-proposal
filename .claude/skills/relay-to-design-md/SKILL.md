@@ -36,6 +36,8 @@ allowed-tools: [mcp__zero-design__get_design_metadata, mcp__zero-design__get_des
 - ✅ 单一 design.md（普通组件） + **multi-md bundle**（page-doc，v0.5；v0.5.1 起 6 文件）
 - ✅ **page-doc 大节点**（高 > 5000px 或 ≥3 个章节 FRAME）→ **v0.4 单 md 内章节切分** → **v0.5 拆 4 文件 bundle** → **v0.5.1 拆 6 文件**（+ `ai-schema.yaml` + `CHANGELOG.md`，`relay_source` 单点存储）
 
+> **v0.5.1 即 bundle 结构终态(封板)**:从 v0.1 单 md → v0.4 章节切分 → v0.5 4 文件 → v0.5.1 6 文件,持续拆下去会增加设计师 review 成本。v0.5.1 起**只动内容不动结构**,后续 v0.6+ 是 level 扩展(component-business / page / flow),不再拆新文件。如果新需求似乎需要第 7 个文件,先开 issue 讨论"能否合到现有 6 文件之一"再拆。
+
 如果检测到 level ≠ component-base，**仍然写文件**，但 frontmatter `auto_detected.level` 标 ⚠️，并在终端输出"非 L1 节点，结果可能不准，请 review"。
 
 **page-doc 模式**：
@@ -198,7 +200,8 @@ flow + {bg}                  → jd-design-system-md-v16/product-architecture/{b
 1. **[templates/page-doc/design.md](./templates/page-doc/design.md)** → `{slug}/design.md` (index)
    - frontmatter 含 `bundle: page-doc` 标识 + `bundle_files: [...]` 6 文件清单 + 完整 `relay_source` 整段（v0.5.1：单点存储）
    - 主体只放 Relay 章节大纲表 + 一句话定义 + 关联段 + 指向 CHANGELOG.md 的链接（不再内嵌变更表）
-   - 占位符 `{{section_chapter_outline_table}}` = 章节 markdown table（# / 标题 / 节点 ID / 高度 / 内容要点 / bundle 落点）
+   - 占位符 `{{section_chapter_outline_table}}` = 章节 markdown table，**7 列**:`# / 标题 / 节点 ID / 高度 / 内容要点 / bundle 落点 / 对应 spec-page 章节 #`
+   - 最后一列(对应 spec-page 章节 #)按 [`../../shared/references/section-anchors.md`](../../shared/references/section-anchors.md) 7 章节映射(`sec-1` ~ `sec-7`),让设计师 review 时一眼看清"本 Relay 章节最终渲染到详情页第几节",消除 Liu review #5 提的"bundle 6 文件 vs spec-page 7 章节对不齐"
    - 占位符 `{{chapter_count}}` = `chapters[].length`
 
 2. **[templates/page-doc/spec.md](./templates/page-doc/spec.md)** → `{slug}/spec.md`
@@ -287,6 +290,8 @@ flow + {bg}                  → jd-design-system-md-v16/product-architecture/{b
 - 占位符位置如果数据缺失 → 替换为字面 `TODO` 或 ⚠️ 描述，**不要**留 `{{...}}` 在最终文件
 - 需要循环生成的段落（如 `section_colors_table` 多行）—— **由模型自己构造完整段落**作为单个字符串塞进去，不依赖模板 control flow
 
+> **这是明确契约,不是缺陷**:模板里不引入循环 DSL 是为了让模板"长得像最终产物",设计师 review 时不需理解 control flow 语法。代价是循环段落由模型构造 — 模型按变量名(`section_colors_table` / `section_donts_auto_or_todo` 等)识别"该这里构造什么形态",参考下方占位符语义表 + 同 bundle 现存样例。Liu review 提到的"回退到不确定性"是已知 tradeoff,接受。
+
 例：
 ```
 模板：name_zh: "{{name_zh}}"
@@ -360,7 +365,20 @@ node.setSharedPluginData('jd-design-wiki', 'bg', '<bg>')
 return { keys: node.getSharedPluginDataKeys('jd-design-wiki') }
 ```
 
-**写入失败 / Relay 离线 → 不阻断**：终端输出 `⚠️ Relay 回写失败，仅本地 INDEX.md 索引可用` 然后继续往下走。设计师后续手动跑 `bin/sync-index.sh --push-shared-data` 补回。
+**写入失败 / Relay 离线 → 重试 3 次后不阻断**:
+
+1. 失败 1:等 2s 重试(典型 transient MCP 抖动)
+2. 失败 2:等 5s 重试
+3. 失败 3:**最终失败**,终端**醒目** ⚠️ 输出:
+   ```
+   ⚠️⚠️⚠️ Relay sharedPluginData 回写 3 次失败!!
+   ⚠️ 本地 design.md / INDEX.md 已就绪,但 Relay 端节点反查不到 md 路径(双向追溯单边断)
+   ⚠️ 设计师必须手动补回:bin/sync-index.sh --push-shared-data {slug}
+   ⚠️ 不补回的后果:下次跑 design-review 等 skill 拿不到 Relay 端反查链
+   ```
+4. 继续往下走(不 abort,因为 design.md 是核心产物)
+
+设计师**应当**在 review 终端输出时看到 ⚠️ 提示并手动补回。**不补回**会让 [`../../shared/references/relay-namespaces.md`](../../shared/references/relay-namespaces.md) 中 `jd-design-wiki` namespace 永久持有的 keys 缺失,影响 design-review / spec-page 等下游 skill。
 
 详见 [references/traceability.md](./references/traceability.md) 第 ③ 节。
 
