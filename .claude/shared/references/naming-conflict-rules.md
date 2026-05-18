@@ -53,6 +53,22 @@ color-text-help            → colortexthelp
 - Fingerprint **算法本身** V15 / V16 通用 — 任何 design system 都怕同概念双轨
 - 跑 V16 撞已知冲突 → 仍按 ❌ 报,但报告里加注"V15 已知冲突,V16 是否已修请 follow-up 核";撞**新**冲突 → 单独报 + 开 follow-up issue,新冲突 fingerprint 由人评估后加进上表
 
+### V15 → V16 atom 层延续追踪(2026-05-18 tabbar 首跑发现)
+
+V15 已知 role 层冲突有可能以 atom 层"hex 漂移"形式延续到 V16,**外观是 Value-drift 不是 Naming-conflict**,但本质同源。**fingerprint 检查跑在 role 名上扫不到**——atom 层只有 dot path,不参与 fingerprint。已知延续:
+
+| V15 role 层 fingerprint | V16 atom 层延续点 | 漂移 |
+|---|---|---|
+| `colorbackgroundsunken`(`#f5f6fa` vs `#f7f8fc`) | `atom.gray.6.light = #F5F6FA` 在 V16 已 canon,但部分 V16 design.md(如 tabbar/spec.md 注释)仍标 `#f0f2f7` | `#F5F6FA` vs `#f0f2f7` 一色阶差 |
+| `colortexthelp`(`#828794` vs `#888b94`) | `atom.gray.3.light = #828794`(V16 canon) | (待 V16 实战验证是否仍有漂移点) |
+| `colorborder`(`#00000014` vs `#0000000f`) | (待 V16 实战验证) | — |
+
+**消费方处理**:
+- design-review 跑到 V16 design.md 撞 atom 层延续 hex → 报 ⚠️ Value-drift + 加注"V15 已知 fingerprint X 延续,详 shared/references/naming-conflict-rules.md V15→V16 段"
+- relay-to-design-md 反查 atom 层 token 时若实际值与 V16 tokens.json 不一致 → frontmatter 加 ⚠️ + 同上注释
+
+V16 实战发现新的延续 → 加进上表 + 加新 follow-up issue(由 V16 设计组判断 atom canon 值)。
+
 ---
 
 ## 消费方契约

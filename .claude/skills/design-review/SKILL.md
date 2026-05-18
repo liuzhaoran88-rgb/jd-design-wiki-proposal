@@ -262,7 +262,15 @@ V16 例:
    - `relay_source.{file_id, page_id, node_id, url}`
    - `references.uses_tokens.{colors, typography, radius, spacing, materials}`
    - `used_by`
-4. **若 `bundle: page-doc`**:同步读 `{dir}/spec.md` / `variants.md` / `behaviors.md` / `ai-schema.yaml` / `CHANGELOG.md`,各取 frontmatter 验 `bundle_part_of: design.md` 反向指针 + 各自正文
+4. **若 `bundle: page-doc`**:同步读 `{dir}/spec.md` / `variants.md` / `behaviors.md` / `ai-schema.yaml` / `CHANGELOG.md`,各按以下形式验 `bundle_part_of: design.md` 反向指针:
+
+   | 文件 | 反向指针位置 | 验法 |
+   |---|---|---|
+   | `spec.md` / `variants.md` / `behaviors.md` | 首段 `---` ~ `---` 标准 frontmatter | `bundle_part_of: design.md` 字段 |
+   | `ai-schema.yaml` | 文件**顶部 yaml 注释**(`# bundle_part_of: design.md`) | grep `^# bundle_part_of:` |
+   | `CHANGELOG.md` | 文件**顶部 markdown blockquote**(`> bundle_part_of: design.md`) | grep `^> bundle_part_of:` |
+
+   3 种形式都接受,缺一个 → ❌ "bundle 子文件 X 反向指针缺失"。
 
 ### Step 2 — 加载 token 真相源(复用 Relay 模式 Step 2)
 
@@ -291,14 +299,71 @@ V16 例:
 
 #### 3b · Token 反查正确性
 
-对 frontmatter `references.uses_tokens.{colors, typography, radius, spacing, materials}` 中每条 token 名:
+**数据源**(按 mode 取):
 
-1. 在 Step 2 加载的 tokens.json 中查这个 token 名是否存在
-2. 不存在 → ❌ Off-token("design.md 声明用 X 但 V{version} tokens.json 不含此 token")
-3. 存在但**正文**用的 hex / size 值与 token `$value` 对不上 → ⚠️ Value-drift
-4. 存在且对得上 → ✅
+| Mode | uses_tokens 在哪 |
+|---|---|
+| single design.md | `design.md` 自身 frontmatter `references.uses_tokens.*` |
+| bundle (`bundle: page-doc`) | **`spec.md` frontmatter `uses_tokens.*`**(design.md index 通常只放 `uses_components`,不放 `uses_tokens`) |
 
-> Token 反查算法见 [`../relay-to-design-md/references/token-reverse-lookup.md`](../relay-to-design-md/references/token-reverse-lookup.md)。本模式只需做"声明的 token 是否真实存在 + 值对不对",**不**做命名风格 fingerprint 检查(那是 Relay 模式 Step 3 前置规则的职责;design.md 已脱离设计稿命名空间)。
+> 漏看 bundle 数据源 → 误以为 design.md 没声明 token → 跳过 3b → 漏掉所有 Off-token / Value-drift。这是 v0.5 实战发现的常见错。
+
+对取到的 `uses_tokens.{colors, typography, radius, spacing, materials}` 每条 token 名,按命名空间 3 路反查:
+
+##### 路 1:role 层(优先)
+
+V16 / V15 tokens.json 的 `color.*` / `radius.*` / `spacing.*` 节点带 `$extensions.relay_token_name` 标注,直接对名匹配:
+
+```bash
+jq -r '.. | objects | select(."relay_token_name") | ."relay_token_name"' tokens.json
+# 列出所有 role 层 token 名(snake_case),如:
+#   color_primary / color_text_help / color_border / radius_base / ...
+```
+
+design.md 声明的 `color_primary` 等命名直接进入此表查找,命中 → 拿对应 `$value` → 继续 hex/size 校验。
+
+##### 路 2:typography role 反查归一化
+
+typography role token 在 design.md 用 `{family}/{size_role}` 形式(因 Relay 章节原稿就这么写),tokens.json 用 dot path `typography.role.{family}.{size_role}`,需归一化:
+
+```
+pingfang_regular/font_size_10_400  →  typography.role.pingfang_regular.font_size_10_400
+zhenghei_bold/font_size_14_600     →  typography.role.zhenghei_bold.font_size_14_600
+```
+
+规则:把 `/` 替换为 `.`,前缀加 `typography.role.`,直接按 dot path 查 tokens.json。`$extensions.relay_token_name` 在 typography role 节点**通常缺失**,所以**不走路 1**,只走本规则。
+
+V16 typography 仅 4 family — `pingfang_regular` / `pingfang_semibold` / `zhenghei_regular` / `zhenghei_bold`。**`pingfang_medium`**(weight 500)等不在表 → ❌ Off-token,设计师应改用 regular(400)/ semibold(600)或申请加 token。
+
+##### 路 3:atom 层兜底
+
+V16 tokens.json `atom.*` 节点(`atom.jdred.6` / `atom.gray.3.light` / `atom.red.7` 等)**没有** `relay_token_name` 标注。design.md 引用 atom 层 token 时直接用 family 名或简短 alias(`jdred` / `gray_6` / `white` / `black`):
+
+```bash
+# atom path 直接匹配
+jq -r '.atom | keys[]' tokens.json
+# → errorred / gray / infoblue / jdred / red / servicegold / successgreen / warningyellow / white
+```
+
+design.md 声明的 atom 名按以下规则反查:
+
+| design.md 名 | tokens.json path |
+|---|---|
+| `jdred` / `jdred_6`(单 family 单 shade) | `atom.jdred.6` |
+| `gray_1` / `gray_3` / ... / `gray_10` | `atom.gray.{N}`(若不存在则报 ❌) |
+| `white` / `black` | 在 `atom.*` 顶层独立 key,或映射到 `palette.*`(检查两处) |
+
+**路 1 + 路 2 + 路 3 都未命中** → ❌ Off-token。**任一路命中** → ✅ Pass。
+
+##### 值漂移校验
+
+命中后,把 token `$value` 解析到底(如 `color.primary.$value = "{atom.jdred.6}"` → `atom.jdred.6.$value = "#FF0F23"`),与 design.md / spec.md 正文中该 token 旁边标注的 hex / size 对比:
+
+- 对得上(case-insensitive)→ ✅
+- 对不上 → ⚠️ Value-drift("声明 X = #aaa 但 V{version} 实际 = #bbb")
+- 漂移属于 [`../../shared/references/naming-conflict-rules.md`](../../shared/references/naming-conflict-rules.md) 已知 V15 冲突表中的 fingerprint → 加注"V15 已知冲突,V16 是否已修请 follow-up 核"
+
+> Token 反查算法详细启发见 [`../relay-to-design-md/references/token-reverse-lookup.md`](../relay-to-design-md/references/token-reverse-lookup.md)。本模式**不**做命名风格 fingerprint 检查(那是 Relay 模式 Step 3 前置规则的职责;design.md 已脱离设计稿命名空间)。
 
 #### 3c · 章节完整性
 
@@ -316,14 +381,14 @@ V16 例:
 
 #### 3d · Donts 数量
 
-提取 6. 正反案例对应段(`## Donts` 或 bundle `behaviors.md` Donts 段)的条目数:
+提取 6. 正反案例对应段(`## Donts` 或 bundle `behaviors.md` Donts 段)的条目数。**上限按 mode 区分**:
 
-- ≥ 3 → ✅
-- 1-2 → ⚠️ "Donts 不足 3 条,正反案例覆盖不全"
-- 0 → ❌ "缺 Donts 段或空段,典型反例无规则可循"
-- > 8 → ⚠️ "Donts 过多,建议精简到核心 8 条以内"
+| Mode | 下限 | 上限 |
+|---|---|---|
+| single design.md | ≥ 3 ✅ / 1-2 ⚠️ / 0 ❌ | > 8 ⚠️ "建议精简到 8 条以内" |
+| bundle / page-doc | ≥ 3 ✅ / 1-2 ⚠️ / 0 ❌ | > 12 ⚠️ "建议精简到 12 条以内" |
 
-> 数量启发参考 [`../design-md-to-spec-page/references/section-mapping.md`](../design-md-to-spec-page/references/section-mapping.md) "6. 正反案例" 段(反例 target ≥ 3,< 3 → ⚠️ TBD)。
+> 实战(2026-05-18 tabbar/design.md 首跑)发现:复杂 bundle 组件(底导含常规 + Joy Agent + 灵动岛三形态 + 多端适配)9 条 Donts 都对应独立规则,合并损失语义。所以 bundle mode 上限放宽到 12,与 [`../design-md-to-spec-page/references/section-mapping.md`](../design-md-to-spec-page/references/section-mapping.md) "6. 正反案例" 段的"取最重要 8 条 + 末尾加截断提示"启发不冲突——8 是详情页渲染目标,12 是源文件容忍上限。
 
 #### 3e · (可选)AI Schema 完整性
 
@@ -400,7 +465,8 @@ PY
 ## 示例
 
 - **Relay 模式**:[`examples/shop-review-half-sheet.md`](examples/shop-review-half-sheet.md) —— 对节点 `639:3394`(店铺评价半弹层)的完整走查。这是黄金参考输出。
-- **design.md 模式**:TBD —— 第一份 V16 design.md(`jd-design-system-md-v16/horizontal/components-base/tabbar/design.md`)实跑完后落 `tabbar/design-review-report.md`,迁过来当黄金样例。
+- **design.md 模式**:[`/jd-design-system-md-v16/horizontal/components-base/tabbar/design-review-report.md`](/jd-design-system-md-v16/horizontal/components-base/tabbar/design-review-report.md) —— 2026-05-18 首跑产物。对 tabbar bundle(6 文件 page-doc)做完整 4 维校验,产出 2 ❌ + 8 ⚠️ + 多维 ✅。也是本 SKILL.md v0.6 修补的实战来源(3b atom 反查 / typography role 归一化 / bundle 数据源 / Step 1.4 反向指针 3 形式 / Step 3d Donts 上限按 mode 区分)。
+  > 这是**活产物**,以后跑会被覆盖。如需冻结样例,见本目录 `examples/` 或 git log。
 
 ---
 
