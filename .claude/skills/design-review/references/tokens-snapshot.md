@@ -8,19 +8,9 @@
 
 ## 0. 前置:Naming-conflict 检查(必跑)
 
-> SKILL.md §3 前置规则要求:走任何颜色 / 字体 / 圆角白名单匹配**之前**先跑一次 fingerprint 唯一性检查。fallback 模式同样适用。
+**真相源已迁移至** [`../../../shared/references/naming-conflict-rules.md`](../../../shared/references/naming-conflict-rules.md) —— fingerprint 算法、触发判定、V15 已知冲突表(`colorborder` / `colortexthelp` / `colorbackgroundsunken`)、消费方契约统一在那。fallback 模式同样适用。
 
-**算法**:对每个 variable name,取最后一段并 `lowercase + 去除所有 - 和 _` 得到 fingerprint。同 fingerprint 内若 `$value` 不同 → ❌ Naming-conflict;值相同但命名风格不一 → ⚠️ Naming-style。
-
-**已知存在双轨变体的 token 概念**(对照 15.0 文件 513:25300 vs 4061:7288 的 variables 数据漂移):
-
-| fingerprint | snake 值 | kebab 值 | 漂移 |
-|---|---|---|---|
-| `colorborder` | #00000014 | #0000000f | 透明度 8% vs 6% |
-| `colortexthelp` | #828794 | #888b94 | ~3 个色阶 |
-| `colorbackgroundsunken` | #f5f6fa | #f7f8fc | 接近但不同 |
-
-设计稿命中以上任一 → ❌ Naming-conflict 置 ❌ 段顶部,优先建议保留 **snake_case + `色彩变量 Color/...` 命名空间** 的版本(与下方白名单值一致)。
+> 本文件作为 V15 fallback snapshot,只保留下方白名单(hex / 字号 / 圆角 / 间距)。Naming-conflict 规则的任何变更请改 shared 真相源。
 
 ---
 

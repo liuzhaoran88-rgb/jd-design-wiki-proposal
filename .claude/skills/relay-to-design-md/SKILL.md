@@ -123,6 +123,23 @@ return {
 
 **没匹配到的 → 标 ⚠️ token-miss**，写到 frontmatter 注释 + section 表格说明，**不要尝试创建新 token**。
 
+#### Step 5.1: Naming-conflict 检测(消费 shared 规则)
+
+反查完拿到候选 token 名后,**写 frontmatter 之前**对每条 token 名跑一次 fingerprint 检查,真相源 [`../../shared/references/naming-conflict-rules.md`](../../shared/references/naming-conflict-rules.md):
+
+- **撞已知冲突表**(如 `color_border` / `color-border` 同 fingerprint) → frontmatter 该 token 后追加一行注释:
+  ```yaml
+  references:
+    uses_tokens:
+      colors:
+        - color_border  # ⚠️ naming-conflict: 与 color-border 同 fingerprint colorborder,值漂移(透明 8% vs 6%),详 shared/references/naming-conflict-rules.md
+  ```
+  并在终端 warn 设计师:`⚠️ token "color_border" 撞 V15 已知 naming-conflict,推荐保留 snake_case 版本。详情见报告 / shared/references/naming-conflict-rules.md`
+- **未撞已知** + 反查返回 ≥ 2 个 fingerprint 一致候选且 `$value` 不同 → 同样加 ⚠️ 注释,但措辞为"**新**未登记 naming-conflict (fingerprint = X),建议开 follow-up issue 加进 shared 规则文件"。
+- **未撞** → 不加注释,照常写。
+
+> 目的:**让上游不静悄悄把已知 / 新冲突 token 写进 design.md** 让 design-review 后置才发现。
+
 ### Step 6: 导出 preview.png
 
 按 [references/preview-export.md](./references/preview-export.md) 步骤：
@@ -387,6 +404,7 @@ return { keys: node.getSharedPluginDataKeys('jd-design-wiki') }
 |---|---|
 | [level-vocab.md](../../shared/references/level-vocab.md) | `level` 枚举词表 + 与 `bg` 边界(本 skill 写,site/spec-page 消费) |
 | [relay-namespaces.md](../../shared/references/relay-namespaces.md) | `jd-design-wiki` namespace 注册 + 生命周期 |
+| [naming-conflict-rules.md](../../shared/references/naming-conflict-rules.md) | Token fingerprint 算法 + V15 已知冲突表(Step 5.1 检测消费,与 design-review 共用) |
 
 本 skill 私有(`templates/`, `references/`):
 

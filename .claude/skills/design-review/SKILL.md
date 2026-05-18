@@ -98,37 +98,23 @@ V15 / V16 两套 tokens.json **结构兼容**(都是 `$value` token 树),但具�
 
 #### 3·前置 · Token 命名唯一性检查(kebab/snake 双轨)
 
-**强制规则(机器判定,无需人工分辨)**:同一 token 概念在 variables 表中出现 ≥ 2 个命名变体(kebab-case / snake_case / 大小写混用 / 中英混用)且**值不同** → **必标 ❌ Naming-conflict**(违规)。
+**真相源**:[`../../shared/references/naming-conflict-rules.md`](../../shared/references/naming-conflict-rules.md) —— fingerprint 算法、触发判定、V15 已知冲突表(`colorborder` / `colortexthelp` / `colorbackgroundsunken`)、消费方契约都在那。
 
-#### 判定算法
+走任何颜色 / 字体 / 圆角白名单匹配**之前**,先对 `get_variables(nodeId)` 返回的 variables 表跑一次 fingerprint 唯一性检查:
 
-1. 把每个 variable name 规范化:取最后一段(去掉命名空间前缀),`lowercase + 删除所有 - 和 _` → 得到 fingerprint。
-2. 按 fingerprint 分组。
-3. 同组内若存在 ≥ 2 个不同 `$value` → 触发 Naming-conflict。
-4. 同组内 `$value` **相同**但命名风格不一致(snake vs kebab vs CamelCase)→ 仅标 ⚠️ Naming-style(警告,不阻塞)。
-
-#### 案例
-
-| 变量名 A | 变量名 B | fingerprint | 值 A | 值 B | 判定 |
-|---|---|---|---|---|---|
-| `color_text_help` | `color-text-help` | `colortexthelp` | `#828794` | `#888b93` | ❌ Naming-conflict |
-| `color_border` | `color-border` | `colorborder` | `#00000014` | `#0000000f` | ❌ Naming-conflict |
-| `color_background_sunken` | `color-background-sunken` | `colorbackgroundsunken` | `#f5f6fa` | `#f7f8fc` | ❌ Naming-conflict |
-| `spacing_8` | `Spacing-8` | `spacing8` | `8` | `8` | ⚠️ Naming-style |
-| `元素布局/Spacing-4` | `元素布局/spacing_4` | `spacing4` | `4` | `4` | ⚠️ Naming-style |
+- 不同 `$value` 撞同 fingerprint → ❌ **Naming-conflict**(违规)
+- 同 `$value` 但命名风格混用 → ⚠️ **Naming-style**(警告,不阻塞)
 
 #### 报告规则
 
-- Naming-conflict 类违规**置于 ❌ 段顶部**,优先于 off-token / legacy。
-- 每条建议必须显式给出**保留哪个 / 删除哪个**:优先保留 snake_case 与 15.0 命名空间(`色彩变量 Color/...`)一致的版本。
-- 若两版都不在 15.0 命名空间(如全是 `品牌色/Brand-x`),先按命名空间合规性挑,再按 snake_case。
+- Naming-conflict 类违规**置于 ❌ 段顶部**,优先于 Off-token / Legacy
+- 每条建议显式给出**保留哪个 / 删除哪个**(保留策略见 shared 规则文件)
+- 触发后该 fingerprint 组内的其他错误(Off-token / Legacy)**仍要标**,但归并到同一组建议下输出
+- 撞**新**未登记冲突 → 报 ❌ + 开 follow-up issue 把 fingerprint 加进 shared 规则文件的已知冲突表
 
 #### 为什么这是前置全局规则
 
-- 14.x → 15.0 迁移最普遍的残留模式——同一概念两个 token 同时存在,值已漂移。
-- 让 AI / 设计师选取时随机命中,是设计漂移最隐蔽的源头。
-- 占典型走查 30%+ 的违规来源——机器可判,**优先扫掉**避免后续 3a-3f 重复报。
-- 触发后该 fingerprint 组内的其他错误(Off-token / Legacy)**仍要标**,但归并到同一组建议下输出。
+14.x → 15.0 迁移最普遍的残留模式 —— 同一概念两个 token 同时存在,值已漂移。让 AI / 设计师选取时随机命中,是设计漂移最隐蔽的源头,占典型走查 30%+ 的违规来源,机器可判,**优先扫掉**避免后续 3a-3f 重复报。
 
 ---
 
