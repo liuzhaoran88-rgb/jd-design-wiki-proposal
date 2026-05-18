@@ -1,14 +1,12 @@
 ---
 file: spec
-bundle_part_of: design.md       # 反向指回 index
+bundle_part_of: design.md       # 反向指回 index；relay_source 单点存储在 design.md
 slug: tabbar
-last_synced: "2026-05-14"
+last_synced: "2026-05-18"
 
 # v0.5 page-doc bundle: 视觉规范
 # 来源：Relay 节点 312:46893 章节 01-02（设计原则 + 组件设计属性）
-relay_source:
-  node_id: "312:46893"
-  url: "https://relay.jd.com/file/design?id=2029484645871009793&page_id=31%3A1&node_id=312%3A46893"
+# v0.5.1 起 relay_source 单点存储在 design.md，本文件不重复
 
 uses_tokens:
   colors:

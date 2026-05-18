@@ -10,8 +10,8 @@ name_en: "Tabbar"
 owner: "@xushui2018"
 contributors: []
 status: draft
-version: "0.3"
-last_synced: "2026-05-14"
+version: "0.4"
+last_synced: "2026-05-18"
 
 # skill 自动推断的字段。如不对，请改 frontmatter + mv 文件夹后告知。
 # v0.5 起 page-doc 节点拆为 4 文件 bundle，本文件是 index。详细规范见同目录子文件。
@@ -31,10 +31,12 @@ relay_source:
   url: "https://relay.jd.com/file/design?id=2029484645871009793&page_id=31%3A1&node_id=312%3A46893"
 
 bundle_files:
-  - design.md     # 本文件，index + frontmatter + 章节链接
-  - spec.md       # 视觉规范：colors / typography / radius / spacing / materials
-  - variants.md   # 形态 / 状态 / 各维度变体
-  - behaviors.md  # 应用场景 / 交互 / Donts / AI Schema / 多端适配
+  - design.md       # 本文件，index + frontmatter (含 relay_source 单点存储) + 章节链接
+  - spec.md         # 视觉规范：colors / typography / radius / spacing / materials
+  - variants.md     # 形态 / 状态 / 各维度变体
+  - behaviors.md    # 应用场景 / 交互 / Donts / 多端适配（文字部分）
+  - ai-schema.yaml  # 机器可读 schema（v0.5.1 从 behaviors.md 拆出）
+  - CHANGELOG.md    # 跨 bundle 变更记录（v0.5.1 从 design.md 搬出）
 
 references:
   uses_components:
@@ -45,18 +47,20 @@ used_by: []
 
 # 底部导航栏 · Tabbar
 
-> 自动同步 2026-05-14 · skill v0.5 (page-doc bundle) · Relay [`312:46893`](https://relay.jd.com/file/design?id=2029484645871009793&page_id=31%3A1&node_id=312%3A46893)
+> 自动同步 2026-05-18 · skill v0.5.1 (page-doc bundle) · Relay [`312:46893`](https://relay.jd.com/file/design?id=2029484645871009793&page_id=31%3A1&node_id=312%3A46893)
 
 ## 这是 page-doc bundle
 
-本组件来自 Relay page-doc 节点（高 18519px，5 大章节），内容超出单 md 承载量，已按 v0.5 multi-md bundle 模板拆分为 **4 份**：
+本组件来自 Relay page-doc 节点（高 18519px，5 大章节），内容超出单 md 承载量，已按 v0.5.1 multi-md bundle 模板拆分为 **6 份**：
 
 | 文件 | 内容 | 章节来源 |
 |---|---|---|
 | **[spec.md](./spec.md)** | 视觉规范：colors / typography / radius / spacing / materials | 章节 01-02 |
 | **[variants.md](./variants.md)** | 形态 / 状态 / 坑位 / 灵动岛 / 招手 各维度变体 | 章节 02-03 |
-| **[behaviors.md](./behaviors.md)** | 应用场景 / 交互 / Donts / AI Schema / 多端适配 | 章节 04-05 |
-| **design.md**（本文件） | frontmatter / Relay 章节大纲 / 链接索引 | — |
+| **[behaviors.md](./behaviors.md)** | 应用场景 / 交互 / Donts / 多端适配 | 章节 04-05 |
+| **[ai-schema.yaml](./ai-schema.yaml)** | 机器可读 schema（forms / slots / states / island / agent / events） | 章节 01-05 抽取 |
+| **[CHANGELOG.md](./CHANGELOG.md)** | 跨 bundle 变更记录 | — |
+| **design.md**（本文件） | frontmatter（含 relay_source 单点存储）/ Relay 章节大纲 / 链接索引 | — |
 
 ## 一句话定义
 
@@ -75,6 +79,8 @@ used_by: []
 | 04 | 应用场景 | `312:47792` | 3864 | Joy Agent 形态搭配（2 个 INSTANCE 引用）/ 230 frame 场景排布 | [behaviors.md](./behaviors.md) |
 | 05 | 多端适配 | `312:52979` | 1678 | iOS 26+ 液态玻璃 / Android·iOS 老系统毛玻璃 | [behaviors.md](./behaviors.md#多端适配) |
 
+机器可读 schema（forms / slots / states / island / agent / events）抽到 [ai-schema.yaml](./ai-schema.yaml)。
+
 ## 关联
 
 - 此组件归属：`level: component-base`（page-doc bundle），`bg: horizontal`
@@ -84,11 +90,7 @@ used_by: []
 
 ## 变更记录
 
-| 时间 | 操作 | 来源 | 备注 |
-|---|---|---|---|
-| 2026-05-13 | 创建 | skill v0.1 手作 / page-doc 模式 | 自动抽 token + Relay 5 章节大纲 / 5 处 TODO / 6 处 ⚠️ |
-| 2026-05-13 | v0.4 升级 | skill v0.4（page-doc）+ get_design_context 真文本 | 修正 spacing / 补章节 02-03 全部内容 / 自动收 Donts 9 条 / AI Schema 完整草稿 |
-| 2026-05-14 | v0.5 拆 bundle | skill v0.5 multi-md bundle | 540 行单 design.md → 4 文件 bundle（design / spec / variants / behaviors）— close issue #18 |
+见 [CHANGELOG.md](./CHANGELOG.md)（v0.5.1：跨 bundle 变更记录搬到独立文件，design.md 保持薄 index 形态）。
 
 ---
 

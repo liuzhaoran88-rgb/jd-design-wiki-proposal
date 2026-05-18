@@ -1,6 +1,6 @@
 ---
 name: design-md-to-spec-page
-description: 把单份 design.md（普通组件）或 page-doc bundle（design.md + spec.md + variants.md + behaviors.md）渲染成一份对外、可展示的 7 章节单页 HTML 规范文档。参考 jd-toast-spec(1).html 的样式与结构（定义/行为准则/类型/结构/布局/正反案例/典型场景），输出到组件目录下 spec-page.html。Triggered by /design-md-to-spec-page 或 "为 X 生成 spec 页"、"design.md to html"、"出一份 X 的规范 HTML"。
+description: 把单份 design.md（普通组件）或 page-doc bundle（design.md + spec.md + variants.md + behaviors.md + ai-schema.yaml + CHANGELOG.md）渲染成一份对外、可展示的 7 章节单页 HTML 规范文档。参考 jd-toast-spec(1).html 的样式与结构（定义/行为准则/类型/结构/布局/正反案例/典型场景），输出到组件目录下 spec-page.html。v0.5 起默认走增量模式（mtime 启发跳过切图重导），可 --refresh-assets 强制重导 / --dry-run 仅 diff。Triggered by /design-md-to-spec-page 或 "为 X 生成 spec 页"、"design.md to html"、"出一份 X 的规范 HTML"。
 allowed-tools: [Bash, Read, Write, Edit, Glob]
 ---
 
@@ -50,7 +50,7 @@ allowed-tools: [Bash, Read, Write, Edit, Glob]
 
 ## 执行流程
 
-### Step 1: 解析输入
+### Step 1: 解析输入 + CLI flag
 
 支持 3 种调用形态：
 
@@ -61,6 +61,17 @@ allowed-tools: [Bash, Read, Write, Edit, Glob]
 ```
 
 输出路径：**`<bundle-dir>/spec-page.html`**（与 design.md 同目录）。
+
+#### v0.5 CLI flag（issue #25）
+
+| flag | 默认 | 行为 |
+|---|---|---|
+| `--refresh-assets` | 关 | 强制走 Step 5b 完整切图重导（chunked b64 + readback + jq）。**source md 改了 Relay 节点 / 切图源动了 → 必加** |
+| `--no-refresh-assets` | — | 强制跳过 Step 5b，即使 mtime 启发判定要重导（debug / source 切图实验时用） |
+| `--dry-run` | 关 | 只在终端列出"会变什么"，**不写**任何文件 / 不 git。配合 Step 4 后的内存 diff |
+| `--no-deploy` | 关 | 见 Step 9（v0.4 已加） |
+
+无 flag 时（默认）：走 [Step 5a 增量启发](#step-5a-增量启发v05issue-25)，**根据 mtime 自动决定** 是否跳切图重导。**80% 场景只改了 md 文字、Relay 没动**，默认行为应该是秒级 re-render，不重导切图。
 
 ### Step 2: 识别 bundle 还是 single
 
@@ -126,7 +137,79 @@ bundle 模式下追加读取 `spec.md` / `variants.md` / `behaviors.md`，按 [r
 - 仅 feedback 组件（toast / loading / spinner） → 切图 + JS engine
 - 反例 → 简化 div+class CSS mockup,不强求像
 
-### Step 5b: 切图导出（v0.2 新）
+### Step 5a: 增量启发（v0.5，issue #25）
+
+在跑 Step 5b 之前，**先决定是否需要重导切图**。当前 skill 的成本结构（实测 tabbar 9 张）：
+
+| 阶段 | 耗时 | 重跑后续 |
+|---|---|---|
+| Step 5b 切图重导（chunked b64 + sharedPluginData + jq + 写 PNG） | **3-5 min** | bundle 切图源动了才必要 |
+| Step 4-7 HTML 渲染 + 写文件 | < 5 s | 必跑 |
+| Step 9 git + Pages build | ~30 s | 必跑 |
+
+**80% 场景只改 md 文字 / 不动 Relay，切图重导完全多余**。增量启发：
+
+```bash
+# 1. flag 优先级：--refresh-assets 强制走，--no-refresh-assets 强制跳
+if [ "$FLAG_REFRESH_ASSETS" = "1" ]; then
+  echo "🔄 --refresh-assets：强制走 Step 5b 切图重导"
+  RUN_STEP_5B=1
+elif [ "$FLAG_NO_REFRESH_ASSETS" = "1" ]; then
+  echo "⏭️  --no-refresh-assets：跳过 Step 5b（debug 模式）"
+  RUN_STEP_5B=0
+else
+  # 2. 自动启发：比较 _assets/*.png 最新 mtime vs source md / frontmatter.last_synced
+  ASSETS_DIR="$BUNDLE_DIR/_assets"
+  if [ ! -d "$ASSETS_DIR" ] || [ -z "$(ls -A "$ASSETS_DIR"/*.png 2>/dev/null)" ]; then
+    echo "🆕 _assets/ 不存在或为空 → 首次跑，走 Step 5b"
+    RUN_STEP_5B=1
+  else
+    # 跨平台 helper（macOS BSD vs GNU 选项不同；find -printf 与 date -d 都仅 GNU）
+    _mtime() { stat -f %m "$1" 2>/dev/null || stat -c %Y "$1" 2>/dev/null; }
+    _iso_to_ts() {
+      [ -z "$1" ] && { echo 0; return; }
+      date -j -f "%Y-%m-%d" "$1" +%s 2>/dev/null \
+        || date -d "$1" +%s 2>/dev/null \
+        || echo 0
+    }
+
+    # 取 _assets/ 下所有 png 的最旧 mtime（最保守：只要任何一张比 source 新，整体视为新）
+    ASSETS_OLDEST=$(for f in "$ASSETS_DIR"/*.png; do _mtime "$f"; done | sort -n | head -1)
+    # source md / yaml 最新 mtime（design.md / spec.md / variants.md / behaviors.md / ai-schema.yaml）
+    SOURCE_NEWEST=$(for f in "$BUNDLE_DIR"/*.md "$BUNDLE_DIR"/*.yaml; do [ -f "$f" ] && _mtime "$f"; done | sort -n | tail -1)
+    # 同时读 design.md 的 frontmatter.last_synced（Relay 同步时间，比 git mtime 更准确）
+    LAST_SYNCED_ISO=$(awk '/^last_synced:/ { sub(/^last_synced:[[:space:]]*"?/, ""); sub(/"?[[:space:]]*$/, ""); print; exit }' "$BUNDLE_DIR/design.md")
+    LAST_SYNCED_TS=$(_iso_to_ts "$LAST_SYNCED_ISO")
+
+    # 启发优先级：last_synced（Relay 同步时间，最准）→ 缺失则回退 source md/yaml 最新 mtime
+    if [ "$LAST_SYNCED_TS" -gt 0 ]; then
+      COMPARE_TS=$LAST_SYNCED_TS
+      COMPARE_NOTE="frontmatter.last_synced ($LAST_SYNCED_ISO)"
+    else
+      COMPARE_TS=${SOURCE_NEWEST:-0}
+      COMPARE_NOTE="source md/yaml 最新 mtime（last_synced 缺失，已回退）"
+    fi
+    if [ "${COMPARE_TS%.*}" -gt "${ASSETS_OLDEST%.*}" ]; then
+      echo "🔄 $COMPARE_NOTE > _assets/ 最旧 mtime → 自动 refresh-assets"
+      RUN_STEP_5B=1
+    else
+      echo "⏭️  _assets/ 切图（最旧 mtime）≥ $COMPARE_NOTE → 跳 Step 5b，秒级 re-render"
+      RUN_STEP_5B=0
+    fi
+  fi
+fi
+```
+
+注意事项：
+- **必须比 _assets/ 最旧 mtime**（不是最新）—— 防止部分切图过期但其它还新的混合状态
+- **frontmatter.last_synced 优先于 source md mtime** —— `last_synced` 表达"Relay 端最后一次同步"语义，比文件系统 mtime 更准（设计师只改了一段文字、Relay 没动 → last_synced 不变）。若 design.md 无 `last_synced` 字段或解析失败，自动回退到 source md/yaml 最新 mtime。
+- **跨平台 mtime / date**：`_mtime()` 和 `_iso_to_ts()` helper 同时兼容 macOS (BSD `stat -f` / `date -j -f`) 与 Linux (GNU `stat -c` / `date -d`)。**不要**用 `find -printf`（GNU-only）
+- **mtime 启发不完美**：edge case 如设计师手 mv 切图、git checkout 重置 mtime → 用户应显式 `--refresh-assets`
+- **失败回退保守路径**：自动启发判定不重导但 user 不放心 → 显式 `--refresh-assets`；自动启发要重导但其实 Relay 没改 → 显式 `--no-refresh-assets`
+
+### Step 5b: 切图导出（v0.2 加，v0.5 受 5a 控制）
+
+> ⚠️ 本步骤受 [Step 5a 增量启发](#step-5a-增量启发v05issue-25) 控制。`RUN_STEP_5B=0` 时跳过。
 
 走 [references/stage-images-export.md](./references/stage-images-export.md) 4 步流程:
 
@@ -146,10 +229,30 @@ bundle 模式下追加读取 `spec.md` / `variants.md` / `behaviors.md`，按 [r
 
 ### Step 7: 写文件 + 校验
 
+> v0.5：如果 `--dry-run`，**不写文件**，改在终端打 unified diff（旧 spec-page.html vs 新渲染串）。完成后退出，不走 Step 9 部署。
+
 1. `Write` 到 `<bundle-dir>/spec-page.html`
 2. Bash `grep -E '\{\{[^}]+\}\}' <output>` 确认无残留占位符
 3. Bash `wc -l` + `head -10 / tail -10` 抽查
 4. **不要**自动打开浏览器（对外发布物，由用户决定何时 publish）
+
+#### v0.5 dry-run 实现
+
+```bash
+if [ "$FLAG_DRY_RUN" = "1" ]; then
+  # 新内容已在内存（Step 4 完成的字符串）
+  TMP=$(mktemp)
+  printf '%s' "$NEW_HTML" > "$TMP"
+  if [ -f "$BUNDLE_DIR/spec-page.html" ]; then
+    diff -u "$BUNDLE_DIR/spec-page.html" "$TMP" | head -200 || true
+    echo "💡 --dry-run 模式：仅 diff，不写文件。如要落盘，去掉 --dry-run 重跑"
+  else
+    echo "🆕 --dry-run + 新文件：会创建 $BUNDLE_DIR/spec-page.html（$(wc -c < "$TMP") bytes / $(wc -l < "$TMP") 行）"
+  fi
+  rm -f "$TMP"
+  exit 0
+fi
+```
 
 ### Step 7b: HTML 自动 cache-bust(v0.4)
 
@@ -259,8 +362,9 @@ echo "✓ Pages 重 build 完成: $s"
    ├─ 章节齐全度: 7/7
    ├─ TBD 段: {N} 个（详见 HTML 内 blockquote.warn）
    ├─ 演示 stage: {static-mockup | js-engine}
-   ├─ 切图: {N} 张 / _assets/ {总 KB}
+   ├─ 切图: {N} 张 / _assets/ {总 KB}  {若 Step 5a 跳过 → 标 "（跳过重导，复用既有切图）"}
    ├─ Cache-bust: <img> src 自动加 ?v={today_iso}
+   ├─ 增量模式: {full | incremental} {v0.5}
    └─ 字数: {N} 字 / 行数: {M}
 
 📎 来源: {bundle 或 single design.md path}
@@ -271,6 +375,7 @@ echo "✓ Pages 重 build 完成: $s"
 
 {若启用 --deploy（默认开），紧接着输出 Step 9e 的"🚀 已部署"段}
 {若 --no-deploy，输出: 💡 已禁用 --deploy。git push 后 GitHub Pages 自动重 build}
+{若 --dry-run，输出: 💡 --dry-run 模式：仅 diff 不写文件。去掉 --dry-run 重跑落盘}
 ```
 
 ---
@@ -343,4 +448,11 @@ echo "✓ Pages 重 build 完成: $s"
   - **③ 5 个 pattern 沉淀到 [view-toggle.md](./references/view-toggle.md)**:入门暖场 / 一句话理解 / 决策树 / 组件拆解 / 标记约定(👉 / 📖 / 📐)
   - **④ "不写的事" 4 条**:basic 段不出现 token 名 / 精确 DP / 章节来源 / 嵌套 ≥ 3 层
   - 实战:tabbar basic / pro = 88.4%(原 81%,因为 basic 加了入门内容反而更长,但绝对体验更友好)
-- v0.5 (planned) 增量 diff(避免每次全量重导切图)+ 批量模式(一次跑多组件)+ TOC 自动嵌套(含 h3 子标题)+ 切图节点自动选择(避免每次手枚举)
+- **v0.5** (2026-05-18) 增量更新逻辑 —— 兑现 issue #25:
+  - **① Step 5a 增量启发**：跑 Step 5b 切图重导前先比较 `_assets/*.png` 最旧 mtime vs `design.md frontmatter.last_synced`（Relay 同步时间）；后者更新才自动 refresh-assets，否则跳过整个 Step 5b（80% 场景秒级 re-render）
+  - **② `--refresh-assets` flag**：强制走完整 Step 5b 流程（同 v0.4 行为），用于 Relay 节点改了 / 切图源动了 / mtime 启发判定错时
+  - **③ `--no-refresh-assets` flag**：强制跳过 Step 5b（debug / source 切图实验时），即使启发判定要重导
+  - **④ `--dry-run` flag**：Step 4 渲染后只 diff 不写文件（前 200 行 unified diff），跳过 Step 9 部署，便于预览改动；新文件则报体积估算
+  - **⑤ Step 8 终端输出加"增量模式"字段**：full / incremental，切图段加"（跳过重导）"标识
+  - 实测：tabbar 只改文字时，从 3-5 min（full）→ < 10 s（incremental）；本次改动只触及 SKILL.md 流程文档，无 reference 文件改动
+- v0.6 (planned) 批量模式(一次跑多组件)+ TOC 自动嵌套(含 h3 子标题)+ 切图节点自动选择(避免每次手枚举)

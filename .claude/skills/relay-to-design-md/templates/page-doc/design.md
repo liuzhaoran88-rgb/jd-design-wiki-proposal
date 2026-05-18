@@ -31,10 +31,12 @@ relay_source:
   url: "{{relay_url}}"
 
 bundle_files:
-  - design.md     # 本文件，index + frontmatter + 章节链接
-  - spec.md       # 视觉规范：token / colors / typography / radius / spacing / materials
-  - variants.md   # 形态 / 状态 / 各维度变体
-  - behaviors.md  # 交互 / Donts / AI Schema / 应用场景 / 多端适配
+  - design.md       # 本文件，index + frontmatter (含 relay_source 单点存储) + 章节链接
+  - spec.md         # 视觉规范：token / colors / typography / radius / spacing / materials
+  - variants.md     # 形态 / 状态 / 各维度变体
+  - behaviors.md    # 应用场景 / 交互 / Donts / 多端适配（文字部分）
+  - ai-schema.yaml  # 机器可读 schema（v0.5.1 从 behaviors.md 拆出）
+  - CHANGELOG.md    # 跨 bundle 变更记录（v0.5.1 从 design.md 搬出）
 
 references:
   uses_components:
@@ -49,14 +51,16 @@ used_by: []
 
 ## 这是 page-doc bundle
 
-本组件来自 Relay page-doc 节点（高 {{node_h}}px，{{chapter_count}} 大章节），内容超出单 md 承载量，已按 v0.5 multi-md bundle 模板拆分为 **4 份**：
+本组件来自 Relay page-doc 节点（高 {{node_h}}px，{{chapter_count}} 大章节），内容超出单 md 承载量，已按 v0.5.1 multi-md bundle 模板拆分为 **6 份**：
 
 | 文件 | 内容 | 章节来源 |
 |---|---|---|
 | **[spec.md](./spec.md)** | 视觉规范：colors / typography / radius / spacing / materials | 章节 01-02 |
 | **[variants.md](./variants.md)** | 形态 / 状态 / 坑位 / 子组件 各维度变体 | 章节 02-03 |
-| **[behaviors.md](./behaviors.md)** | 交互 / Donts / AI Schema / 应用场景 / 多端适配 | 章节 04-05 |
-| **design.md**（本文件） | frontmatter / Relay 章节大纲 / 链接索引 | — |
+| **[behaviors.md](./behaviors.md)** | 应用场景 / 交互 / Donts / 多端适配 | 章节 04-05 |
+| **[ai-schema.yaml](./ai-schema.yaml)** | 机器可读 schema（forms / slots / states / events ...） | 章节 01-05 抽取 |
+| **[CHANGELOG.md](./CHANGELOG.md)** | 跨 bundle 变更记录 | — |
+| **design.md**（本文件） | frontmatter（含 relay_source 单点存储）/ Relay 章节大纲 / 链接索引 | — |
 
 ## 一句话定义
 
@@ -74,9 +78,7 @@ used_by: []
 
 ## 变更记录
 
-| 时间 | 操作 | 来源 | 备注 |
-|---|---|---|---|
-| {{today_iso}} | 创建 | skill {{skill_version}} (page-doc bundle) | 自动生成 4 份 md / {{flag_count_note}} |
+见 [CHANGELOG.md](./CHANGELOG.md)（v0.5.1：跨 bundle 变更记录搬到独立文件，design.md 保持薄 index 形态）。
 
 ---
 

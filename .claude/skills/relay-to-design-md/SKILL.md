@@ -33,8 +33,8 @@ allowed-tools: [mcp__zero-design__get_design_metadata, mcp__zero-design__get_des
 
 - ✅ L1 通用组件（component-base）
 - ⏳ L2/L3/L4（component-business / page / flow）→ v0.6+
-- ✅ 单一 design.md（普通组件） + **multi-md bundle**（page-doc，v0.5）
-- ✅ **page-doc 大节点**（高 > 5000px 或 ≥3 个章节 FRAME）→ **v0.4 单 md 内章节切分** → **v0.5 拆 4 文件 bundle（design / spec / variants / behaviors）**
+- ✅ 单一 design.md（普通组件） + **multi-md bundle**（page-doc，v0.5；v0.5.1 起 6 文件）
+- ✅ **page-doc 大节点**（高 > 5000px 或 ≥3 个章节 FRAME）→ **v0.4 单 md 内章节切分** → **v0.5 拆 4 文件 bundle** → **v0.5.1 拆 6 文件**（+ `ai-schema.yaml` + `CHANGELOG.md`，`relay_source` 单点存储）
 
 如果检测到 level ≠ component-base，**仍然写文件**，但 frontmatter `auto_detected.level` 标 ⚠️，并在终端输出"非 L1 节点，结果可能不准，请 review"。
 
@@ -145,61 +145,77 @@ page + {bg}                  → jd-design-system-md-v16/product-architecture/{b
 flow + {bg}                  → jd-design-system-md-v16/product-architecture/{bg}/flows/{slug}/design.md
 ```
 
-#### v0.5 page-doc bundle 路径
+#### v0.5.1 page-doc bundle 路径
 
-如果 `pageDocMode === true`，**输出目录**与上面相同（`{slug}/`），但写 **4 个文件**：
+如果 `pageDocMode === true`，**输出目录**与上面相同（`{slug}/`），但写 **6 个文件**（v0.5.1 起，issue #23）：
 
 ```
 {slug}/
-├── design.md       # index（含 bundle: page-doc 标识 + bundle_files 清单）
-├── spec.md         # 视觉规范
+├── design.md       # index（含 bundle: page-doc 标识 + bundle_files 清单 + relay_source 单点存储）
+├── spec.md         # 视觉规范（frontmatter 只 bundle_part_of，relay_source 见 design.md）
 ├── variants.md     # 变体维度
-└── behaviors.md    # 交互 / Donts / AI Schema
+├── behaviors.md    # 应用场景 / 交互 / Donts / 多端适配（AI Schema 留摘要 + 链接）
+├── ai-schema.yaml  # 机器可读 schema（forms / slots / states / events ...）
+└── CHANGELOG.md    # 跨 bundle 变更记录
 ```
 
-如果 `{slug}/design.md` 已存在 + 是 v0.1 单 md（`bundle:` 字段缺失）→ 全部 4 个文件都加 `.NEW` 后缀写入，让设计师手动迁移。终端输出："⚠️ {slug}/design.md 是 v0.1 单 md 形态，page-doc bundle 写入 design.md.NEW / spec.md.NEW / variants.md.NEW / behaviors.md.NEW，请手动迁移。"
+如果 `{slug}/design.md` 已存在 + 是 v0.1 单 md（`bundle:` 字段缺失）→ 全部 6 个文件都加 `.NEW` 后缀写入，让设计师手动迁移。终端输出："⚠️ {slug}/design.md 是 v0.1 单 md 形态，page-doc bundle 写入 design.md.NEW / spec.md.NEW / variants.md.NEW / behaviors.md.NEW / ai-schema.yaml.NEW / CHANGELOG.md.NEW，请手动迁移。"
+
+> **frontmatter 单点存储约定（v0.5.1）**：`relay_source` 整段（file_id / page_id / node_id / node_name / node_type / bounds / url）**只在 design.md 写**。spec.md / variants.md / behaviors.md / ai-schema.yaml 顶部 frontmatter 只保留 `bundle_part_of: design.md` 反向指针。这样 Relay URL / file_id / node_name 变更时只需改 1 处。
 
 如果路径已存在 `design.md`，**不要覆盖**：改名为 `design.md.NEW`，让设计师手动 diff。终端输出："⚠️ {path}/design.md 已存在，新版本写入 design.md.NEW，请 diff 后合并。"
 
 ### Step 8: 套模板生成 design.md
 
-#### v0.5 模板分流（首先决定走哪套模板）
+#### v0.5.1 模板分流（首先决定走哪套模板）
 
 | 条件 | 模板 | 输出 |
 |---|---|---|
 | `rootInfo.pageDocMode === false` | [templates/component.md](./templates/component.md)（v0.1 单 md） | `{slug}/design.md` 一个文件 |
-| `rootInfo.pageDocMode === true` | [templates/page-doc/](./templates/page-doc/) bundle 4 模板 | `{slug}/{design,spec,variants,behaviors}.md` 4 个文件 |
+| `rootInfo.pageDocMode === true` | [templates/page-doc/](./templates/page-doc/) bundle 6 模板 | `{slug}/{design,spec,variants,behaviors}.md + ai-schema.yaml + CHANGELOG.md` 6 个文件 |
 
 ##### page-doc bundle 渲染规则
 
-读 4 个模板各自渲染：
+读 6 个模板各自渲染：
 
 1. **[templates/page-doc/design.md](./templates/page-doc/design.md)** → `{slug}/design.md` (index)
-   - frontmatter 含 `bundle: page-doc` 标识 + `bundle_files: [...]` 4 文件清单
-   - 主体只放 Relay 章节大纲表 + 一句话定义 + 关联段
-   - 占位符 `{{section_chapter_outline_table}}` = 5 章节 markdown table（# / 标题 / 节点 ID / 高度 / 内容要点）
+   - frontmatter 含 `bundle: page-doc` 标识 + `bundle_files: [...]` 6 文件清单 + 完整 `relay_source` 整段（v0.5.1：单点存储）
+   - 主体只放 Relay 章节大纲表 + 一句话定义 + 关联段 + 指向 CHANGELOG.md 的链接（不再内嵌变更表）
+   - 占位符 `{{section_chapter_outline_table}}` = 章节 markdown table（# / 标题 / 节点 ID / 高度 / 内容要点 / bundle 落点）
    - 占位符 `{{chapter_count}}` = `chapters[].length`
 
 2. **[templates/page-doc/spec.md](./templates/page-doc/spec.md)** → `{slug}/spec.md`
-   - frontmatter 含 `file: spec` + `bundle_part_of: design.md` 反向指针 + 完整 `uses_tokens` 段
+   - frontmatter 含 `file: spec` + `bundle_part_of: design.md` 反向指针 + 完整 `uses_tokens` 段。**不再含 `relay_source` 段**（v0.5.1：单点存储，见 design.md）
    - 主体含 colors / typography / radius / spacing / materials 全表 + 章节 01-02 原文引用块
    - 占位符 `{{section_chapter_01_02_full_text_or_empty}}` = 章节 01 设计原则全文 + 章节 02 组件设计属性核心规范文字（按 v0.4 抽取的 chapters[].notes 渲染）
 
 3. **[templates/page-doc/variants.md](./templates/page-doc/variants.md)** → `{slug}/variants.md`
-   - frontmatter 含 `file: variants` + `bundle_part_of`
+   - frontmatter 含 `file: variants` + `bundle_part_of`。**不再含 `relay_source` 段**（v0.5.1）
    - 主体含变体维度概览 + 各维度详细规范 + 章节 02 状态/招手 + 章节 03 灵动岛三型原文
    - 占位符 `{{section_variant_dimensions_overview}}` = 形态 / 状态 / 坑位 / 子组件 等维度的 bullet list
    - 占位符 `{{section_variant_details_per_dimension}}` = 每个维度展开（继承 v0.4 章节细分段的渲染逻辑）
 
 4. **[templates/page-doc/behaviors.md](./templates/page-doc/behaviors.md)** → `{slug}/behaviors.md`
-   - frontmatter 含 `file: behaviors` + `bundle_part_of`
-   - 主体含应用场景 ✅/❌ + 交互 + Donts + AI Schema + 多端适配 + 章节 04-05 原文
+   - frontmatter 含 `file: behaviors` + `bundle_part_of`。**不再含 `relay_source` 段**（v0.5.1）
+   - 主体含应用场景 ✅/❌ + 交互 + Donts + **AI Schema 摘要段（一句话 + 链到 `ai-schema.yaml`）** + 多端适配 + 章节 04-05 原文
    - 占位符 `{{section_donts_auto_or_todo}}` = v0.4 自动收的 dont_rule 聚合（每条标来源章节）
-   - 占位符 `{{section_ai_schema}}` = AI Schema YAML
+   - 占位符 `{{section_ai_schema_summary}}` = AI Schema 简短摘要（"含 9 个段：forms/slots/states/.../events。`on_island_*` 仍为 TODO"），完整 YAML 写到 ai-schema.yaml
+
+5. **[templates/page-doc/ai-schema.yaml](./templates/page-doc/ai-schema.yaml)** → `{slug}/ai-schema.yaml` （v0.5.1 新增）
+   - 顶部 4-5 行 `# bundle_part_of: design.md` 注释（YAML 不走 frontmatter）
+   - 占位符 `{{section_ai_schema_yaml}}` = 完整 AI Schema YAML（原 v0.5 behaviors.md `{{section_ai_schema}}` 内容）
+
+6. **[templates/page-doc/CHANGELOG.md](./templates/page-doc/CHANGELOG.md)** → `{slug}/CHANGELOG.md` （v0.5.1 新增）
+   - 跨 bundle 的变更表，每次 skill 重跑追加一行（不覆写），design.md 内只保留指向 CHANGELOG.md 的链接
+   - **"存在则追加"渲染规则**（仅本文件特殊，其它 5 个文件按"覆盖 / 或 .NEW"原路径处理）：
+     - 渲染前先判 `[ -f "$BUNDLE_DIR/CHANGELOG.md" ]`
+     - **存在** → `Read` 原文件，保留所有"标题 / 反向指针 / 已有 table 行"，**只在表末追加一行新 entry**（时间 / 操作 / 来源 / 备注），整体回写
+     - **不存在** → 套模板生成首份（1 行"创建"）
+   - 新增行字段约定：`时间`=`{{today_iso}}`，`操作`=本次升级语义（如"v0.5.1 优化"/"v0.6 升级"），`来源`=`skill {{skill_version}}` + flag 说明，`备注`=本次主要 diff 概述 + 关联 issue/PR
 
 > **bundle 之间的反向引用**
 >
-> design.md (index) 在主体表格列出 4 文件链接;spec.md / variants.md / behaviors.md 顶部有 `> design.md → [index](./design.md) · 同 bundle: ...` 导航条;3 个子文件 frontmatter 都有 `bundle_part_of: design.md` 标识。
+> design.md (index) 在主体表格列出 6 文件链接;spec.md / variants.md / behaviors.md 顶部有 `> design.md → [index](./design.md) · 同 bundle: ...` 导航条;子文件 frontmatter 都有 `bundle_part_of: design.md` 标识；`relay_source` 整段只在 design.md 出现一次。
 
 > **如果只是 `pageDocMode === false`（普通组件）**
 >
@@ -368,10 +384,12 @@ return { keys: node.getSharedPluginDataKeys('jd-design-wiki') }
 | 文件 | 作用 |
 |---|---|
 | [templates/component.md](./templates/component.md) | 单 md 模板 (v0.1) — 普通组件 |
-| [templates/page-doc/design.md](./templates/page-doc/design.md) | page-doc bundle index 模板 (v0.5) |
-| [templates/page-doc/spec.md](./templates/page-doc/spec.md) | page-doc bundle 视觉规范模板 (v0.5) |
-| [templates/page-doc/variants.md](./templates/page-doc/variants.md) | page-doc bundle 变体模板 (v0.5) |
-| [templates/page-doc/behaviors.md](./templates/page-doc/behaviors.md) | page-doc bundle 行为模板 (v0.5) |
+| [templates/page-doc/design.md](./templates/page-doc/design.md) | page-doc bundle index 模板 (v0.5)；v0.5.1 起 relay_source 单点存储于此，变更记录链到 CHANGELOG.md |
+| [templates/page-doc/spec.md](./templates/page-doc/spec.md) | page-doc bundle 视觉规范模板 (v0.5)；v0.5.1 删 relay_source |
+| [templates/page-doc/variants.md](./templates/page-doc/variants.md) | page-doc bundle 变体模板 (v0.5)；v0.5.1 删 relay_source |
+| [templates/page-doc/behaviors.md](./templates/page-doc/behaviors.md) | page-doc bundle 行为模板 (v0.5)；v0.5.1 AI Schema 改为摘要 + 链接 |
+| [templates/page-doc/ai-schema.yaml](./templates/page-doc/ai-schema.yaml) | page-doc bundle AI Schema 独立模板 (v0.5.1，issue #23) |
+| [templates/page-doc/CHANGELOG.md](./templates/page-doc/CHANGELOG.md) | page-doc bundle 变更记录独立模板 (v0.5.1，issue #23) |
 | [references/auto-detect-rules.md](./references/auto-detect-rules.md) | 推断 level / bg / slug / name_zh 的规则表（v0.2 加 slug 变体后缀） |
 | [references/node-type-mapping.md](./references/node-type-mapping.md) | Relay 节点属性 → design.md section 对照 + 统一抽取脚本 |
 | [references/token-reverse-lookup.md](./references/token-reverse-lookup.md) | hex / fontSize+weight / radius / spacing 反查 V16 token 算法（v0.2 加 rgba 容差） |
@@ -428,4 +446,9 @@ return { keys: node.getSharedPluginDataKeys('jd-design-wiki') }
   - **③ Step 8 模板分流**：`pageDocMode === true` 走 bundle 4 模板，否则走 v0.1 单 md。v0.4 单 md 内章节细分段保留作 fallback
   - **④ bundle 反向引用**：design.md frontmatter 加 `bundle: page-doc` + `bundle_files: [...]`；spec/variants/behaviors 三个子文件 frontmatter 加 `bundle_part_of: design.md` + 顶部导航条
   - **⑤ 回填重跑 tabbar**：540 行单 design.md 拆成 4 文件 bundle（PR 同时提交）
+- **v0.5.1** (2026-05-18) issue #23 follow-up —— PR #22 review 找到的 bundle 优化集中收口：
+  - **① AI Schema 拆独立 `ai-schema.yaml`**：原 behaviors.md 内嵌 108 行 yaml（机器可读 schema）和人类规范文字（应用场景 / 交互 / Donts / 多端适配）性质完全不同，拆为独立 `tabbar/ai-schema.yaml`；behaviors.md 改为一行摘要 + 链接；新建 [templates/page-doc/ai-schema.yaml](./templates/page-doc/ai-schema.yaml) 模板；bundle_files 清单加一项
+  - **② 变更记录搬到独立 `CHANGELOG.md`**：design.md (index) 不该承担变更历史，原 8 行变更表移到 `tabbar/CHANGELOG.md`，design.md 只留指向链接；新建 [templates/page-doc/CHANGELOG.md](./templates/page-doc/CHANGELOG.md) 模板
+  - **③ `relay_source` 单点存储到 design.md**：原 spec / variants / behaviors 三个子文件都重复 `relay_source: {node_id, url}`（一旦 url / file_id 变了要改 4 处）。改为只在 design.md 写完整 `relay_source` 整段，子文件 frontmatter 只保留 `bundle_part_of: design.md` 反向指针 + 一行注释说明
+  - **④ tabbar bundle 同步回填**：tabbar/{design,spec,variants,behaviors}.md 按上面 3 项重组（新增 ai-schema.yaml + CHANGELOG.md，删 3 处 relay_source 重复，搬变更表）
 - v0.6 (planned) 加 page.md / flow.md 模板 + batch 模式 + Diff 模式（只更新机器抽取段，保留人写段）

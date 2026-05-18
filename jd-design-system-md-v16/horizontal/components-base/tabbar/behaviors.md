@@ -1,17 +1,15 @@
 ---
 file: behaviors
-bundle_part_of: design.md
+bundle_part_of: design.md       # 反向指回 index；relay_source 单点存储在 design.md
 slug: tabbar
-last_synced: "2026-05-14"
+last_synced: "2026-05-18"
 
-# v0.5 page-doc bundle: 应用场景 / 交互 / Donts / AI Schema / 多端适配
+# v0.5 page-doc bundle: 应用场景 / 交互 / Donts / 多端适配（文字）
 # 来源：Relay 节点 312:46893 章节 04-05 + 跨章节 dont_rule 聚合
-relay_source:
-  node_id: "312:46893"
-  url: "https://relay.jd.com/file/design?id=2029484645871009793&page_id=31%3A1&node_id=312%3A46893"
+# v0.5.1 起 AI Schema 抽到独立 ai-schema.yaml；relay_source 单点存储在 design.md
 ---
 
-# 底部导航栏 · 行为 / 禁止 / Schema / 适配
+# 底部导航栏 · 行为 / 禁止 / 适配
 
 > design.md → [index](./design.md) · 同 bundle: [spec](./spec.md) · [variants](./variants.md)
 
@@ -59,116 +57,9 @@ relay_source:
 
 ## AI Schema
 
-> 草稿，基于章节 01-05 实际规范抽出。状态机/事件签名仍需设计师 + 工程师 review。
-
-```yaml
-component_type: tabbar
-
-forms:
-  regular:        # 常规底导
-    total_height: 69      # DP, 含 iOS 安全区
-    nav_height: 52        # DP, 不含安全区
-    safe_area: 17         # DP, iOS, 不可放置任何操作
-    width: 351            # DP
-  agent_combo:    # Joy Agent 组合
-    total_height: 69
-    nav_height: 52
-    safe_area: 17
-    width: 319            # DP, 距 Agent 8 DP
-
-slots:
-  count: [2, 3, 4, 5]     # 章节 02 图 2-5; 建议上限 5
-  size: { w: 44, h: 44 }  # DP
-  icon: { w: 20, h: 20 }  # DP
-  text_box: { w: 44, h: 14 }   # DP, 字符与图标间距 4 DP, 最多 4 汉字
-  marketing_image: { w: 38, h: 38 }  # DP, 仅可替换图片
-  layout: 均分, 自动布局, 5 坑位左右间距 -4 DP
-
-states:
-  default:
-    icon_color: gray_1
-    text_color: gray_1
-    typography: pingfang_regular/font_size_10_400
-  selected:
-    icon_color: jdred
-    text_color: jdred
-    background: gray_6     # 灵动岛展开期间背景消失
-    typography: pingfang_semibold/font_size_10_600
-  marketing:
-    image_only: true       # 仅可替换 38x38 图片, 其它样式不可改
-
-badges:
-  red_dot:
-    offset_icon: { left: 19, bottom: 14 }
-    offset_marketing: { left: 28, bottom: 32 }
-  number:
-    offset_icon: { left: 15, bottom: 14 }
-    offset_marketing: { left: 24, bottom: 32 }
-  text:
-    offset_icon: { left: 15, bottom: 14 }
-    offset_marketing: { left: 24, bottom: 32 }
-    max_chars: 4
-  island_collapse:
-    rule: 灵动岛存在时降级为 red_dot, 灵动岛消失后恢复
-
-island:
-  regular:                # 常规型
-    size: { w: 131, h: 44 }
-    image: 32
-    background: gray_6
-    image_bg: white       # PNG 透明底
-    material: solid_no_stroke
-    use_case: 日常商品推荐
-  operation:              # 运营型
-    size: { w: 131, h: 44 }
-    image: 32
-    material: gradient_stroke_100 + frosted_85
-    color_rule: 同频色 / 浅色背景+深色字 / 避免红配绿/纯黑白
-    content: 运营图 + 利益文本 (gif)
-    use_case: 运营会场推广
-  promotion:              # 大促型
-    size: { w: 144, h: 52 }
-    image: 34
-    material: gradient_stroke_0_60 + irregular_backplate
-    color_rule: 同频色 / 浅色背景+深色字 / 避免红配绿/纯黑白
-    content: 运营图 + 利益文本 (gif)
-    use_case: 重点大促活动
-  forbidden_zone: 红色区域禁止出现任何元素 (三型通用)
-  offset_safe_bottom: 4   # DP
-  on_expand:
-    selected_background: 消失
-    agent_inflate: 28     # DP (从默认 16 扩到 28)
-
-agent:                    # Joy Agent (仅 agent_combo 形态)
-  size: 52                # DP, 52x52
-  offset_bottom: 17       # DP
-  inflate_default: 16     # DP, 向外抽缩
-  inflate_with_island: 28 # DP
-  bubble:
-    offset_bottom: 8      # DP, 距 Agent 模块
-    offset_right: 16      # DP, 距页边距
-    max_chars: 18         # 汉字
-    animation: 缓出向上弹出
-  click_action: 进入对话中心场景弹层
-
-material:                 # 底导背景, 章节 05
-  ios_26_plus: liquid-glass
-  android_or_legacy_ios: frosted-glass
-
-typography:
-  default_label: pingfang_regular/font_size_10_400
-  selected_label: pingfang_semibold/font_size_10_600
-  island_primary: pingfang_semibold/font_size_14_600    # 行高 20
-  island_secondary: pingfang_semibold/font_size_14_600  # 行高 20
-  island_small: pingfang_medium/font_size_10_500        # 行高 14
-  island_promo_emphasis: zhenghei_bold/font_size_14_600
-
-events:
-  on_tab_click: 切换整页内容
-  on_agent_click: 进入对话中心场景弹层
-  on_island_click: TODO        # 待设计师 / PM 确认行为
-  on_island_dismiss: TODO      # 灵动岛消失行为 (timeout / user-dismiss / route-change)
-```
+> v0.5.1 起抽到独立机器可读文件 → [`ai-schema.yaml`](./ai-schema.yaml)
+>
+> 含 `forms / slots / states / badges / island / agent / material / typography / events` 9 个段。状态机 / 事件签名仍需设计师 + 工程师 review（`on_island_click` / `on_island_dismiss` 仍为 TODO）。
 
 ## 多端适配
 

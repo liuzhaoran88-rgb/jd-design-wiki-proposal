@@ -1,0 +1,7 @@
+# {{name_zh}} · AI Schema
+# bundle_part_of: design.md
+# 来源：Relay 节点 {{node_id}} 章节抽取（v0.5.1 从 behaviors.md 拆出）
+# 状态：草稿，状态机 / 事件签名待设计师 + 工程师 review
+# 关联：spec.md (视觉规范) / variants.md (变体维度) / behaviors.md (交互文字)
+
+{{section_ai_schema_yaml}}
