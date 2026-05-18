@@ -295,6 +295,7 @@ V16 例:
 | `last_synced` ISO date | `YYYY-MM-DD` | 不符 → ❌ |
 | `relay_source.url` 可解析 | URL 中能提取 file_id / page_id / node_id 三者 | 不能 → ❌ |
 | `auto_detected.*` 有 ⚠️ flag | level / bg / slug 中含 `⚠️ fallback` 标记 | 有 → ⚠️ 提示"需设计师 review 推断结果" |
+| **slug 语义启发**(变体 vs 组件入口) | `relay_source.node_type` 是 `INSTANCE` + `bounds.w < 200` + `slug` 与 page 名同名 → 当前 design.md 可能是**单变体**而非组件总入口 | 触发 → ⚠️ 提示"建议设计师拍板:① 升级为组件总入口(扩展为 page-doc bundle) / ② 重命名为 `{slug}-{variant}` 作为变体文档,另起总入口" |
 | Bundle frontmatter 单点存储 | `spec.md` / `variants.md` / `behaviors.md` / `ai-schema.yaml` 顶部应**只**有 `bundle_part_of: design.md` 反向指针,**不含**重复 `relay_source` 块(v0.5.1 起契约) | 重复了 → ⚠️ "build-up drift,改回单点存储" |
 
 #### 3b · Token 反查正确性
@@ -379,6 +380,23 @@ design.md 声明的 atom 名按以下规则反查:
 | 6. 正反案例 | `## Donts` + `## 应用场景` 段(必,缺 → ❌) | `behaviors.md Donts` + `应用场景` |
 | 7. 典型场景 | `## 应用场景` ✅ 子段 | `behaviors.md` 应用场景 ✅ 子段 |
 
+##### 段在但内容空(实质空判定)
+
+段标题存在 ≠ 章节合规。draft 阶段 design.md 经常出现"段标题在但下面只有 `<!-- TODO -->` 注释或 HTML 注释占位"的情况。**实质空判定**:
+
+1. 取段落首 `^## ` 到下一个 `^## ` 之间的所有行
+2. 过滤掉:空行、HTML 注释(`<!-- ... -->`)、纯标题行(`^###`)
+3. 剩余文本字符数 < 20 → **实质空**
+
+实质空处理(按章节必要性区分):
+
+| 章节必要性 | 段缺 | 段在但实质空 |
+|---|---|---|
+| 必(1 定义 / 4 结构 / 6 正反案例) | ❌ "章节段缺失" | ❌ "章节段存在但实质空(全 TODO / HTML 注释占位),无可消费内容" |
+| 可选(2 行为准则 / 3 类型 / 5 布局 / 7 典型场景) | ⚠️ | ⚠️ "可选章节实质空,建议补内容" |
+
+> 实战(2026-05-18 button/design.md 二跑)发现:button v0.1 draft 7 段全在但 4 段实质空(`## 一句话定义` / `## Donts` / `## 应用场景 ✅` / `## 应用场景 ❌`),如果只查"段在"会全部漏报。实质空判定补这个洞。
+
 #### 3d · Donts 数量
 
 提取 6. 正反案例对应段(`## Donts` 或 bundle `behaviors.md` Donts 段)的条目数。**上限按 mode 区分**:
@@ -392,12 +410,22 @@ design.md 声明的 atom 名按以下规则反查:
 
 #### 3e · (可选)AI Schema 完整性
 
-若 bundle 含 `ai-schema.yaml`,基础结构检查:
+AI Schema 在两种形态出现,**同等检查**:
+
+| Mode | 位置 | 验法 |
+|---|---|---|
+| bundle / page-doc | 独立 `ai-schema.yaml` 文件 | 直接读 yaml |
+| single design.md | `## AI Schema` 段内嵌 fenced yaml block(```yaml ... ```) | 提取 fenced 块作 yaml 解析 |
+
+基础结构检查(两种 mode 共用):
 
 - YAML 可解析(语法对) → ✅;不可解析 → ❌
-- 至少含 `forms` / `slots` / `states` / `events` 4 个顶层 key 中的 1 个 → ✅;一个都没有 → ⚠️ "ai-schema.yaml 太空,可能漏填"
+- 至少含 `forms` / `slots` / `states` / `events` 4 个顶层 key 中的 1 个 → ✅;一个都没有 → ⚠️ "AI Schema 太空,可能漏填"
+- key 存在但值是 `TODO` 字面量(如 `states: TODO` 或 `events: TODO`)→ ⚠️ "AI Schema 段标题在但内容 TODO,建议设计师 + 工程师补状态机 / 事件签名"
 
 不做语义完整性检查(那需要业务知识)。
+
+> 实战(2026-05-18 button/design.md 二跑)发现:button single mode `## AI Schema` 内嵌 yaml block,states 4 态 + events 全部 `TODO` 字面量。原 SKILL.md 只对 bundle 独立文件做 3e,single 内嵌 yaml 没规则。本次扩展覆盖两种形态。
 
 ### Step 4 — 输出报告
 
@@ -434,6 +462,7 @@ design.md 声明的 atom 名按以下规则反查:
 | Bundle 模式有缺文件 | 缺哪个就跳过对应章节校验,❌ 段加"bundle_files 声明含 X 但文件不存在" |
 | `references.uses_tokens` 空 / 缺整段 | 跳过 3b token 反查,⚠️ "design.md 未声明 uses_tokens,无法做反查正确性校验;建议补 frontmatter" |
 | `design-review-report.md` 已存在 | 默认**全量覆写**(report 是产物,不该手改;手改的内容会被下次跑覆盖)。**写之前**报告路径放在终端摘要里,设计师如要保留旧版本应先重命名 |
+| V16 `spacing.*` 仅 `_v15_inherited` + `safe-area`(spacing scale 全局未建立) | 任何 design.md 的 `uses_tokens.spacing` 引用按 3b 反查会全部不命中。**不**报 ❌ Off-token,改报 ⚠️ "V16 spacing scale 全局未建,等 V16 token 落地后回填",并在报告"📋 无法判断"段提示设计组优先建 spacing scale |
 
 ### Metadata 片段提取(应对超大节点)
 
@@ -465,8 +494,9 @@ PY
 ## 示例
 
 - **Relay 模式**:[`examples/shop-review-half-sheet.md`](examples/shop-review-half-sheet.md) —— 对节点 `639:3394`(店铺评价半弹层)的完整走查。这是黄金参考输出。
-- **design.md 模式**:[`/jd-design-system-md-v16/horizontal/components-base/tabbar/design-review-report.md`](/jd-design-system-md-v16/horizontal/components-base/tabbar/design-review-report.md) —— 2026-05-18 首跑产物。对 tabbar bundle(6 文件 page-doc)做完整 4 维校验,产出 2 ❌ + 8 ⚠️ + 多维 ✅。也是本 SKILL.md v0.6 修补的实战来源(3b atom 反查 / typography role 归一化 / bundle 数据源 / Step 1.4 反向指针 3 形式 / Step 3d Donts 上限按 mode 区分)。
-  > 这是**活产物**,以后跑会被覆盖。如需冻结样例,见本目录 `examples/` 或 git log。
+- **design.md 模式**(bundle):[`/jd-design-system-md-v16/horizontal/components-base/tabbar/design-review-report.md`](/jd-design-system-md-v16/horizontal/components-base/tabbar/design-review-report.md) —— 2026-05-18 首跑产物。对 tabbar bundle(6 文件 page-doc)做完整 4 维校验,产出 2 ❌ + 8 ⚠️ + 多维 ✅。是 SKILL.md v0.6 修补的实战来源(3b atom 反查 / typography role 归一化 / bundle 数据源 / Step 1.4 反向指针 3 形式 / Step 3d Donts 上限按 mode 区分)。
+- **design.md 模式**(single):[`/jd-design-system-md-v16/horizontal/components-base/button/design-review-report.md`](/jd-design-system-md-v16/horizontal/components-base/button/design-review-report.md) —— 2026-05-18 二跑产物,验证 PR4 修补效果。对 button single design.md(v0.1 draft)校验,产出 3 ❌ + 6 ⚠️。是 SKILL.md v0.7 修补的实战来源(3a slug 语义启发 / 3c 段在但内容空判定 / 3e single mode 内嵌 AI Schema / 失败模式 V16 spacing 真空)。
+  > 两份都是**活产物**,以后跑会被覆盖。如需冻结样例,见本目录 `examples/` 或 git log。
 
 ---
 
