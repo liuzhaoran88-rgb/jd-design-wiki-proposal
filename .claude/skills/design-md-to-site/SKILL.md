@@ -36,25 +36,46 @@ allowed-tools: [Bash, Read, Write, Edit, Glob]
 
 ## 输入解析
 
-- **glob**：`jd-design-system-md-v16/**/design.md`（递归全量）
-- **不扫**：`jd-design-system-md/`（V15 已冻结）
-- 每份只读 **frontmatter**（不读正文，正文将来由「点详情」按需加载，本期 TBD）
+- **glob**：`jd-design-system-md-v16/**/design.md`（递归全量)
+- **不扫**：`jd-design-system-md/`（V15 已冻结)
+- 每份读 **frontmatter 全部字段 + 正文 H2 段第一段作摘要**(章节级,不读全文)
 
-### 必读 frontmatter 字段
+> 实战修订(2026-05-18):原版宣言"只读 frontmatter 不读正文",但 Step 3 渲染表实际要正文 `## 定义` / `## 行为准则` / `## 结构` 段。两者矛盾。统一改为:**读 frontmatter 全部字段 + 正文 H2 段首段(每段取 1-3 行作卡片摘要)**,这是当前真实实现。
+
+### 必读 frontmatter 字段(对齐 [`../relay-to-design-md/references/frontmatter-spec.md`](../relay-to-design-md/references/frontmatter-spec.md) 实际产物)
 
 | 字段 | 用途 | 缺失兜底 |
 |---|---|---|
+| `file` | 校验是 design 主文件(bundle 模式 spec/variants/behaviors 不进站点 TOC) | ≠ `design` 跳过 |
+| `bundle` | 标识 bundle 主文件;`bundle_files[]` 不展开,仅 design.md 入站 | 单 md 模式正常 |
 | `slug` | section id + TOC 锚点 | 从文件路径推断 |
 | `name_zh` | section 标题 + TOC 文案 | `slug` |
 | `name_en` | section 副标题 | 空 |
-| `level` | section 分组（枚举见 [`../../shared/references/level-vocab.md`](../../shared/references/level-vocab.md)） | `uncategorized` |
+| `level` | section 分组(枚举见 [`../../shared/references/level-vocab.md`](../../shared/references/level-vocab.md)) | `uncategorized` |
 | `bg` | 业务背景标签 | 空 |
-| `status` | 角标（draft / wip / stable） | `draft` |
-| `relay_source.url` | 源链接 | 空 |
+| `status` | 角标(draft / review / published / deprecated) | `draft` |
 | `version` | 版本号 | `0.0` |
 | `last_synced` | 抓取时间 | 空 |
+| `relay_source.url` | 源链接(顶层 + 一层嵌套) | 空 |
+| `references.uses_components` | 关联组件列表(渲染为站点内 cross-link) | `[]` |
 
-> **不强制**正文格式 —— 缺字段就 fallback，不报错退出。
+> **uses_tokens / variants 不在 frontmatter**:relay-to-design-md 实际产物把这两类放在 design.md / spec.md(bundle)主体表格(`## 视觉` 表 / `## 变体 Variants` 段),frontmatter 只放 frontmatter-spec.md 列出的 14 个顶层字段。
+
+### 读正文 H2 段首段(章节级摘要)
+
+每份 design.md 渲染卡片时,从正文取以下 H2 段的**首段文字**(1-3 行):
+
+| H2 段标题 | 取到的渲染到卡片哪 |
+|---|---|
+| `## 一句话定义` 或 `## 定义` | 卡片副标"定义"段 |
+| `## 行为准则` 或 `## 交互` | 卡片"行为准则"段 |
+| `## 视觉` 或 `## 结构` | 卡片"结构"段(只取概述句,不进表格) |
+| `## 应用场景` | 卡片"典型场景"段 |
+| `## 错误示例` 或 `## Donts` | 卡片"错误示例"段 |
+
+> 缺段或段实质空(HTML 注释占位 / `<!-- TBD -->`)→ 站点卡片显示 `<!-- TBD -->` 占位文案,不报错。
+
+> **bundle 模式特殊处理**:bundle 主文件 design.md 通常正文很薄(只放章节大纲表 + 链接),要展开摘要应转读 \`spec.md\` / \`behaviors.md\` 对应段。若不想做这步,fallback 渲染 "## 这是 page-doc bundle" 段提示用户跳详情页。
 
 ### 配套资源
 
@@ -66,11 +87,13 @@ allowed-tools: [Bash, Read, Write, Edit, Glob]
 
 ### banner 装饰图资产
 
-`docs/design.html` 顶部 banner 右侧的装饰图（Relay 节点 `6:229;6:10`，548×240）走**手动导出**约定：
+`docs/design.html` 顶部 banner 右侧的装饰图(Relay 节点 `6:229;6:10`,548×240)走 **fallback 优先 + 手动是 nice-to-have** 约定:
 
-- 设计师在 Relay 桌面端选中节点 → Export PNG → 落 `docs/assets/banner-art.png`
-- skill 本身**不**抓这张图（MCP `get_screenshot` 返回内联截图，没法落盘）
-- HTML 中已预置 fallback 径向渐变；PNG 缺失时仍能正常渲染（只是装饰差点意思）
+- **fallback 永远兜底**:HTML 中已预置 CSS 径向渐变。PNG 缺失时站点正常渲染(只是装饰差点意思),**不报错、不阻断、跑批安全**
+- **手动 export 可选**:设计师有空时,Relay 桌面端选中节点 → Export PNG → 落 `docs/assets/banner-art.png`,有则覆盖 CSS 渐变
+- skill 本身**不**自动抓这张图(MCP `get_screenshot` 返回内联截图,没法落盘;且 banner 是装饰非内容,缺失不影响信息)
+
+> 设计原则:**任何依赖手动操作的资产都走"自动 fallback + 手动覆盖"模式**,跑批时永不卡住。
 
 详细规范见 `docs/assets/README.md`。
 
@@ -90,16 +113,18 @@ find jd-design-system-md-v16 -name "design.md" -type f
 
 每份 spec 按「design.html 范式」（见 `docs/design.html` v0.2）输出**示意黄头 + 7 圆点章节**。章节 anchor slug **必须**对齐 [`../../shared/references/section-anchors.md`](../../shared/references/section-anchors.md)（与详情页 spec-page.html 共用,允许章节渲染深度差异化,但 `id=` 不许漂）。
 
-| 章节（PDF 顺位） | 必/选 | 数据源 |
+| 章节（PDF 顺位） | 必/选 | 数据源(对齐"读正文 H2 段首段"契约) |
 |---|---|---|
-| 示意黄头 | — | `name_zh` / `name_en` / `status` / `version` / `relay_source.url` |
-| `{{name_zh}} 定义` | 必写 | 正文 `## 定义` 段，缺则 TBD |
-| `行为准则` | 选写 | 正文 `## 行为准则` 段，缺则 TBD |
-| `{{name_zh}} 类型` | 选写 | frontmatter `variants` 或 references/variant-vocab，缺则 TBD |
-| `{{name_zh}} 结构` | 必写 | 正文 `## 结构` 段，缺则 TBD |
-| `设计属性` | 必写 | frontmatter `uses_tokens` 渲染表 + 正文 `## 属性` 段 |
-| `典型场景示意` | 必写 | 同目录 `preview.png` + `relay_source.url` |
-| `错误示例` | 选写 | 正文 `## 错误示例` 段，缺则 TBD |
+| 示意黄头 | — | frontmatter `name_zh` / `name_en` / `status` / `version` / `relay_source.url` |
+| `{{name_zh}} 定义` | 必写 | 正文 `## 一句话定义` 或 `## 定义` 段**首段** |
+| `行为准则` | 选写 | 正文 `## 行为准则` 或 `## 交互` 段**首段** |
+| `{{name_zh}} 类型` | 选写 | 正文 `## 变体 Variants` 段**首段**(bundle 模式转读 `variants.md`)|
+| `{{name_zh}} 结构` | 必写 | 正文 `## 视觉` 或 `## 结构` 段**首段**(只取概述句,不进表格;bundle 模式转读 `spec.md`)|
+| `设计属性` | 必写 | 主体 `## 视觉` 段下的 token 引用表(实际产物把 token 放主体而非 frontmatter,见上文 frontmatter 字段表注释) |
+| `典型场景示意` | 必写 | 同目录 `preview.png` + `relay_source.url` + 正文 `## 应用场景` 段**首段** |
+| `错误示例` | 选写 | 正文 `## 错误示例` 或 `## Donts` 段**首段** |
+
+> 上表口径与"读正文 H2 段首段"段(输入解析)一致。所有 H2 段缺或实质空 → 该卡片章节渲染 `<!-- TBD -->` 占位文案,**不报错**。
 
 **渲染规则**：
 1. 复制 `references/site-template.html` 末尾的 **SPEC_SECTION 模板**
@@ -119,6 +144,8 @@ find jd-design-system-md-v16 -name "design.md" -type f
 ```
 
 写完跑 `git diff docs/design.html` 给用户看，等他 review。
+
+**关于已删除 design.md 的清理**:Step 1 glob 扫**当前**仓库 design.md 集合,删过的文件不在结果里 → Step 4 全量重建产物自然不含该 section → Step 5 覆写 `docs/design.html` 后旧 section 消失。**整链路天然处理**,无需显式 GC 逻辑。设计师只需删 design.md 文件并重跑 \`/design-md-to-site\`。
 
 ## 输出契约（v0.2 PDF 范式）
 
