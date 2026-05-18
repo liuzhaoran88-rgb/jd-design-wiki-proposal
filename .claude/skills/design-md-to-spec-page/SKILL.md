@@ -33,7 +33,7 @@ allowed-tools: [Bash, Read, Write, Edit, Glob]
 
 | 场景 | 该走哪里 |
 |---|---|
-| 把仓库**所有** design.md 聚合成总站 | `design-md-to-site` |
+| 把仓库**所有** design.md 聚合成总站 | `design-md-to-portal` |
 | 从 Relay 抽稿生成新 design.md | `relay-to-design-md` |
 | 审稿 design.md 是否合规 | `design-review` |
 
@@ -42,7 +42,7 @@ allowed-tools: [Bash, Read, Write, Edit, Glob]
 | Skill | 输入 | 输出 |
 |---|---|---|
 | `relay-to-design-md` | Relay URL | design.md / bundle（编辑面） |
-| `design-md-to-site` | design.md 集合 | docs/design.html（总站发布面） |
+| `design-md-to-portal` | design.md 集合 | docs/design.html（总站发布面） |
 | **`design-md-to-spec-page`（本）** | 单 design.md / bundle | `<slug>/spec-page.html`（单组件发布面） |
 | `design-review` | design.md | review 报告（不改文件） |
 

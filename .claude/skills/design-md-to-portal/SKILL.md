@@ -1,10 +1,10 @@
 ---
-name: design-md-to-site
-description: 把 jd-design-system-md-v16/**/design.md 集合一键聚合成 docs/design.html —— 一份对外公开的 16.0 GUIDELINE 设计系统总站。零输入、全量重建、覆写。仅做骨架，大量 section 留 TBD 占位，预期多轮迭代。Triggered by /design-md-to-site or verbs like "更新设计站", "重建 design.html", "发布最新设计系统", "把新规范挂上站点".
+name: design-md-to-portal
+description: 把 jd-design-system-md-v16/**/design.md 集合一键聚合成 docs/design.html —— 一份对外公开的 16.0 GUIDELINE 设计系统总站。零输入、全量重建、覆写。仅做骨架，大量 section 留 TBD 占位，预期多轮迭代。Triggered by /design-md-to-portal or verbs like "更新设计站", "重建 design.html", "发布最新设计系统", "把新规范挂上站点".
 allowed-tools: [Bash, Read, Write, Edit, Glob]
 ---
 
-# /design-md-to-site · design.md 集合 → docs/design.html
+# /design-md-to-portal · design.md 集合 → docs/design.html
 
 把仓库内**所有**已存在的 `design.md`（V16 规范源）聚合成一份 `docs/design.html` 对外站点。
 
@@ -13,7 +13,7 @@ allowed-tools: [Bash, Read, Write, Edit, Glob]
 | Skill | 输入 | 输出 | 用户 |
 |---|---|---|---|
 | `relay-to-design-md` | Relay URL | `design.md`（编辑面） | 设计师 maintainer |
-| **`design-md-to-site`（本）** | `design.md` 集合 | `docs/design.html`（发布面） | 公开站访客 |
+| **`design-md-to-portal`（本）** | `design.md` 集合 | `docs/design.html`（发布面） | 公开站访客 |
 
 本 skill **不调 Relay MCP**，**不**修改任何 `design.md` 源 —— 只读 + 渲染 + 覆写发布产物。
 
@@ -21,7 +21,7 @@ allowed-tools: [Bash, Read, Write, Edit, Glob]
 
 满足任意一项：
 
-- 用户调 `/design-md-to-site`
+- 用户调 `/design-md-to-portal`
 - 用户说「更新设计站」/「重建 design.html」/「把新规范挂上站点」/「发布最新设计系统」
 - 任何一份 `design.md` 新增 / 修改后，希望对外站点同步
 
@@ -172,7 +172,7 @@ find jd-design-system-md-v16 -name "design.md" -type f
 | 缺 frontmatter 字段 | 按上表 fallback，不报错 |
 | 缺截图 | 占位灰底 |
 | 全量重建 | 是，每次覆写 |
-| 触发节奏 | 用户手动 `/design-md-to-site`，**不自动**跟 design.md 变更联动 |
+| 触发节奏 | 用户手动 `/design-md-to-portal`，**不自动**跟 design.md 变更联动 |
 
 ## 与其他 skill 的关系
 

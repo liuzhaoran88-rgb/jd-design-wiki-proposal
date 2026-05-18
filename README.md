@@ -121,7 +121,7 @@ knowledge-tree.html (顶层导航)
 | Skill | 输入 | 输出 |
 |---|---|---|
 | [`relay-to-design-md`](./.claude/skills/relay-to-design-md/) | Relay URL | design.md / page-doc bundle(编辑面) |
-| [`design-md-to-site`](./.claude/skills/design-md-to-site/) | 所有 design.md | `docs/design.html` 总站(聚合发布面) |
+| [`design-md-to-portal`](./.claude/skills/design-md-to-portal/) | 所有 design.md | `docs/design.html` 总站(聚合发布面) |
 | [`design-md-to-spec-page`](./.claude/skills/design-md-to-spec-page/) | 单 design.md / bundle | `<slug>/spec-page.html` 单组件页(单页发布面) |
 
 ### 已知效率痛点(待优化)
