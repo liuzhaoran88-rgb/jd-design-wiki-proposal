@@ -349,6 +349,183 @@
     table { font-size: 12px; }
     th, td { padding: 8px 10px; }
   }
+
+  /* ==========================================
+     v0.7 合并:interactive demo + Atom 真切图(默认 .pro-only)
+     ========================================== */
+  .demo {
+    margin: 24px 0;
+    background: var(--c-bg-sunken);
+    border-radius: var(--r-base);
+    border: 1px solid var(--c-line);
+    overflow: hidden;
+  }
+  .demo .demo-head {
+    padding: 10px 16px;
+    background: #fff;
+    border-bottom: 1px solid var(--c-line);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap;
+  }
+  .demo .demo-title {
+    font-size: 12px; color: var(--c-text-3); font-weight: 500;
+    letter-spacing: 0.05em; text-transform: uppercase;
+  }
+  .demo .demo-body {
+    padding: 24px;
+    display: flex; flex-direction: column; align-items: center; gap: 16px;
+  }
+  .demo .demo-caption {
+    font-size: 12px; color: var(--c-text-3); text-align: center; margin: 0;
+  }
+
+  /* segmented control */
+  .seg { display: inline-flex; background: var(--c-bg-sunken); border-radius: var(--r-base); padding: 2px; gap: 2px; }
+  .seg label { cursor: pointer; padding: 4px 10px; border-radius: 4px; font-size: 12px; color: var(--c-text-2); user-select: none; transition: 0.12s; }
+  .seg input { display: none; }
+  .seg input:checked + span { background: #fff; color: var(--c-text); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.06); display: inline-block; padding: 4px 10px; margin: -4px -10px; border-radius: 4px; }
+  .seg span { display: inline-block; }
+
+  /* color swatches */
+  .sw { display: inline-flex; gap: 6px; }
+  .sw label { cursor: pointer; width: 24px; height: 24px; border-radius: 50%; }
+  .sw input { display: none; }
+  .sw input:checked + span { box-shadow: 0 0 0 2px var(--c-text); }
+  .sw span { display: block; width: 100%; height: 100%; border-radius: 50%; border: 1px solid var(--c-line); }
+
+  /* phone stage */
+  .phone {
+    width: 100%; max-width: 360px; height: 200px;
+    border-radius: 24px; border: 1px solid var(--c-line);
+    overflow: hidden; position: relative;
+    /* 默认背景:color_background_component #f5f6fa(跟 Relay 原稿大图一致,
+       保证选中态 gray_6 #f0f2f7 跟 Tabbar 容器有足够对比) */
+    background: #f5f6fa;
+  }
+  .phone.short { height: 130px; }
+  /* 液态玻璃 / 毛玻璃材质保留 backdrop-filter,在彩色背景下才能看出来,纯灰背景下 Tabbar 接近实色 */
+  .phone[data-material="liquid"] .tabbar { backdrop-filter: blur(28px) saturate(1.5); background: rgba(255,255,255,0.55); }
+  .phone[data-material="frost"] .tabbar { backdrop-filter: blur(12px); background: rgba(255,255,255,0.78); }
+  /* 章节 5 多端材质 demo 专用:彩色 / 实拍背景对照(显示液态玻璃 vs 毛玻璃材质差) */
+  .phone[data-bg="white"] { background: #fff; }
+  .phone[data-bg="gradient"] { background: linear-gradient(180deg, #ffd9e2 0%, #ffeaa0 25%, #c9ffa0 50%, #a0d4ff 75%, #d6a0ff 100%); }
+  .phone[data-bg="stripe"] { background: linear-gradient(90deg, #ff595e 0 20%, #ffca3a 20% 40%, #8ac926 40% 60%, #1982c4 60% 80%, #6a4c93 80% 100%); }
+  .phone[data-bg="photo"] { background: radial-gradient(ellipse 80% 60% at 20% 30%, #c19a72 0%, transparent 60%), radial-gradient(ellipse 90% 70% at 80% 70%, #d97757 0%, transparent 65%), linear-gradient(135deg, #f4a261 0%, #e76f51 100%); }
+
+  .tabbar-host { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 12px 8px; display: flex; align-items: flex-end; justify-content: center; gap: 8px; pointer-events: none; }
+
+  /* Joy Agent atom — 用京东正式 CDN 位图(URL 在 _assets-cdn.md / 对应 Relay 312:58236)
+     atom 是设计师手工创作的卡通图形资产,token 不可表达,必须用位图。
+     底部跟 .tabbar 同贴 .tabbar-host 底部(align-items: flex-end + padding-bottom: 8 已管距底);
+     不再加 margin-bottom — design.md 的「距 phone 底 17 DP」由 phone iOS 安全区承担,跟 tabbar 同位 */
+  .agent {
+    width: 52px; height: 52px;
+    margin-left: -16px;
+    flex-shrink: 0; position: relative;
+    transition: margin-left 0.25s;
+  }
+  .agent.inflate-28 { margin-left: -28px; }
+  .agent img {
+    width: 100%; height: 100%;
+    display: block;
+    object-fit: contain;
+    pointer-events: none;
+  }
+
+  .agent .bubble {
+    position: absolute; bottom: calc(100% + 8px); right: -8px;
+    white-space: nowrap;
+    background: linear-gradient(90deg, #b794f4, #f687b3);
+    color: #fff; padding: 6px 12px;
+    border-radius: 14px 14px 14px 4px;
+    font-size: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 3;
+  }
+
+  .tabbar { flex: 1; height: 52px; border-radius: 16px; display: flex; align-items: center; padding: 0 12px; transition: 0.2s; }
+  .slots { display: flex; flex: 1; height: 44px; align-items: stretch; }
+  .slot {
+    flex: 1; height: 44px; border-radius: 12px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 2px; color: #11141a; transition: 0.15s; position: relative;
+  }
+  .slot.selected { background: #f0f2f7; color: #ff0f23; }
+  .slot.selected.no-bg { background: transparent; }
+  .slot .icon-home {
+    display: inline-block; width: 20px; height: 20px;
+    background-color: #11141a; /* gray_1 默认态 */
+    -webkit-mask: url('https://img11.360buyimg.com/img/jfs/t1/435818/38/8886/1500/6a0c64ceFf9186b68/027603c0398a7c74.png') no-repeat center / contain;
+    mask: url('https://img11.360buyimg.com/img/jfs/t1/435818/38/8886/1500/6a0c64ceFf9186b68/027603c0398a7c74.png') no-repeat center / contain;
+  }
+  .slot.selected .icon-home { background-color: #ff0f23; /* jdred 选中态 */ }
+  .slot .label-text { font-size: 10px; line-height: 14px; font-weight: 400; }
+  .slot.selected .label-text { font-weight: 600; }
+  .slot.marketing .icon-svg { display: none; }
+  .slot.marketing::before { content: ''; width: 38px; height: 38px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #ffe1bd, #ff8c61 60%, #c54f2a); display: block; }
+  .slot.marketing .label-text { display: none; }
+
+  .slot .badge { position: absolute; pointer-events: none; z-index: 3; }
+  .slot .badge.red-dot { width: 8px; height: 8px; border-radius: 50%; background: #ff0f23; left: calc(50% + 5px); bottom: calc(50% + 4px); }
+  .slot .badge.number { min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px 8px 8px 4px; background: #ff0f23; color: #fff; font-size: 10px; line-height: 16px; font-weight: 600; text-align: center; left: calc(50% + 1px); bottom: calc(50% + 0px); }
+  .slot .badge.text { padding: 0 6px; height: 16px; border-radius: 8px 8px 8px 4px; background: #ff0f23; color: #fff; font-size: 10px; line-height: 16px; font-weight: 500; white-space: nowrap; left: calc(50% + 1px); bottom: calc(50% + 0px); }
+
+  /* island */
+  .slot.island { flex: none; flex-direction: row; padding: 0 6px; gap: 6px; border-radius: 12px; }
+  .slot.island.normal { width: 131px; height: 44px; background: #f0f2f7; }
+  .slot.island.normal .ig-img { width: 32px; height: 32px; border-radius: 6px; background: radial-gradient(circle at 40% 30%, #fff, #f0f0f0), linear-gradient(180deg, #d4f1ff 0%, #74b9e8 100%); background-size: 60% 60%, 100% 100%; background-repeat: no-repeat; background-position: center 30%, center; flex-shrink: 0; }
+  .slot.island.normal .ig-text { font-size: 10px; line-height: 14px; color: #11141a; overflow: hidden; }
+  .slot.island.normal .ig-text strong { display: block; font-weight: 500; }
+  .slot.island.operation { width: 131px; height: 44px; background: linear-gradient(90deg, var(--ig-a, #ddffcc) 0%, var(--ig-b, #b7fa96) 100%); color: var(--ig-text, #019508); position: relative; overflow: hidden; }
+  .slot.island.operation::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%); pointer-events: none; border-radius: inherit; }
+  .slot.island.operation::after { content: ''; position: absolute; inset: 0; border: 1px solid var(--ig-b, #b7fa96); border-radius: inherit; pointer-events: none; }
+  .slot.island.operation .ig-img { width: 32px; height: 32px; border-radius: 6px; background: rgba(255,255,255,0.6); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; position: relative; z-index: 1; }
+  .slot.island.operation .ig-text { position: relative; z-index: 1; line-height: 1.15; color: var(--ig-text, #019508); }
+  .slot.island.operation .ig-text strong { font-size: 12px; font-weight: 700; display: block; }
+  .slot.island.operation .ig-text span { font-size: 9px; display: block; }
+  .slot.island.promo { width: 144px; height: 52px; background: linear-gradient(90deg, #fef0ed 0%, #ffaea8 100%); padding: 4px 10px 4px 4px; position: relative; box-shadow: inset 0 0 0 1px rgba(255,15,35,0.16); overflow: hidden; }
+  .slot.island.promo .ig-img { width: 34px; height: 34px; border-radius: 8px; background: radial-gradient(circle at 40% 30%, #fff, #ffeae6), linear-gradient(180deg, #ff8a8a 0%, #ff0f23 100%); flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; position: relative; z-index: 1; }
+  .slot.island.promo .ig-text { line-height: 1.1; color: #c1273e; font-weight: 700; position: relative; z-index: 1; }
+  .slot.island.promo .ig-text strong { font-size: 13px; display: block; }
+  .slot.island.promo .ig-text .cta { display: inline-block; font-size: 9px; padding: 1px 6px; background: #ff0f23; color: #fff; border-radius: 8px; margin-top: 1px; font-weight: 500; }
+
+  /* compare grid */
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .compare-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .compare-cell { background: #fff; border-radius: var(--r-base); border: 1px solid var(--c-line); padding: 16px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .compare-cell h5 { margin: 0; font-size: 13px; color: var(--c-text); font-weight: 600; }
+  .compare-cell .note { font-size: 11px; color: var(--c-text-3); margin: 0; text-align: center; }
+
+  /* Atom 矩阵 */
+  .atom-matrix { width: 100%; display: grid; grid-template-columns: 80px repeat(4, 1fr); gap: 8px 12px; align-items: center; }
+  .atom-matrix .atom-head { font-size: 11px; color: var(--c-text-3); font-weight: 500; text-align: center; padding-bottom: 6px; border-bottom: 1px solid var(--c-line); }
+  .atom-matrix .atom-label { font-size: 12px; color: var(--c-text-2); font-weight: 600; text-align: right; padding-right: 4px; }
+  .atom-matrix .atom-cell { display: flex; align-items: center; justify-content: center; min-height: 72px; background: #fff; border: 1px solid var(--c-line); border-radius: 8px; position: relative; }
+  .atom-matrix .atom-cell.marketing-bg::before { content: ''; width: 38px; height: 38px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #ffe1bd, #ff8c61 60%, #c54f2a); }
+  .atom-matrix .atom-cell .badge.red-dot { left: calc(50% + 8px); bottom: calc(50% + 6px); }
+  .atom-matrix .atom-cell .badge.number, .atom-matrix .atom-cell .badge.text { left: calc(50% + 2px); bottom: calc(50% + 2px); }
+  .atom-matrix .atom-cell.marketing-bg .badge.red-dot { left: calc(50% + 14px); bottom: calc(50% + 14px); }
+  .atom-matrix .atom-cell.marketing-bg .badge.number, .atom-matrix .atom-cell.marketing-bg .badge.text { left: calc(50% + 10px); bottom: calc(50% + 10px); }
+  .atom-slot { width: 44px; height: 44px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #11141a; position: relative; }
+  .atom-slot.selected { background: #f0f2f7; color: #ff0f23; }
+  .atom-slot .icon-home {
+    display: inline-block; width: 20px; height: 20px;
+    background-color: #11141a;
+    -webkit-mask: url('https://img11.360buyimg.com/img/jfs/t1/435818/38/8886/1500/6a0c64ceFf9186b68/027603c0398a7c74.png') no-repeat center / contain;
+    mask: url('https://img11.360buyimg.com/img/jfs/t1/435818/38/8886/1500/6a0c64ceFf9186b68/027603c0398a7c74.png') no-repeat center / contain;
+  }
+  .atom-slot.selected .icon-home { background-color: #ff0f23; }
+  .atom-slot .label-text { font-size: 10px; line-height: 14px; }
+  .atom-slot.selected .label-text { font-weight: 600; }
+
+  /* swatch card */
+  .swatch-card { display: flex; gap: 12px; align-items: center; padding: 12px; background: #fff; border: 1px solid var(--c-line); border-radius: var(--r-base); }
+  .swatch-card .sq { width: 32px; height: 32px; border-radius: 4px; border: 1px solid var(--c-line); flex-shrink: 0; }
+  .swatch-card .label-mini { font-size: 11px; color: var(--c-text-3); }
+  .swatch-card .hex { font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--c-text); font-weight: 600; }
+
+  @media (max-width: 760px) {
+    .compare, .compare-3 { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
@@ -696,10 +873,6 @@
 <p><strong>V16 立场</strong>:Tabbar 是 APP 唯一全局导航,不允许在底部并行存在其它常驻导航条;不允许超过 5 个一级 Tab(章节 01 建议上限);不允许定制坑位高度或图标尺寸偏离 44×44 / 20×20 规范。</p>
 </blockquote>
 
-<div class="stage stage--image">
-  <img src="./_assets/sec-1-principles.png?v=2" alt="Relay 章节 01 设计原则原稿">
-</div>
-<div class="stage-label">📖 Relay 章节 01 设计原则原稿(节点 312:46895,1426×304)</div>
 
 
 <h3>1.1 行为准则</h3>
@@ -716,6 +889,34 @@
 </ol>
 
 
+<!-- ============ ch-1 末尾:形态对照 demo (Pro) ============ -->
+<div class="pro-only">
+<div class="demo">
+  <div class="demo-head"><span class="demo-title">DEMO · 两种形态并列对照</span></div>
+  <div class="demo-body">
+    <div class="compare" style="width:100%;">
+      <div class="compare-cell">
+        <h5>常规底导</h5>
+        <div class="phone short" data-material="liquid">
+          <div class="tabbar-host"><div class="tabbar"><div class="slots" id="def-regular"></div></div></div>
+        </div>
+        <p class="note">351 DP · 5 坑位均分</p>
+      </div>
+      <div class="compare-cell">
+        <h5>Joy Agent 组合底导</h5>
+        <div class="phone short" data-material="liquid">
+          <div class="tabbar-host">
+            <div class="agent"><img src="https://img13.360buyimg.com/img/jfs/t1/434027/27/16417/14829/6a0c6236F67e0986e/027609c09c2c80cd.png" alt="Joy Agent"></div>
+            <div class="tabbar"><div class="slots" id="def-agent"></div></div>
+          </div>
+        </div>
+        <p class="note">319 DP · 左侧 Joy Agent 52×52 固定</p>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
 <!-- ============ ch-2 Relay 章节 02 组件设计属性 ============ -->
 <h2 id="ch-2"><span class="num">2</span>组件设计属性</h2>
 
@@ -731,7 +932,6 @@
   <p style="margin-top:12px;color:var(--c-text-3);">📐 完整 token / DP / 字号 表见 <strong>专业版</strong>。📖 下方 2.3 形态原稿展示直接看 2 张原图。</p>
 </div>
 <h3>2.1 形态维度</h3>
-<h3>3.1 形态维度</h3>
 
 <table>
 <thead><tr><th>形态</th><th>标识</th><th>宽度</th><th>组成</th><th>典型用途</th></tr></thead>
@@ -826,19 +1026,120 @@
 
 </div><!-- /pro-only 4.1-4.4 -->
 
-<h4>2.2.5 状态 + 招手实体预览</h4>
+<!-- ============ ch-2 末尾:多个 Pro demo ============ -->
+<div class="pro-only">
 
-<div class="stage stage--image">
-  <img src="./_assets/sec-2-states-badges.png?v=2" alt="交互状态 + 4 型招手原稿">
+<h4>DEMO · 坑位数 2~5 切换</h4>
+<div class="demo">
+  <div class="demo-head">
+    <span class="demo-title">坑位均分(常规底导)</span>
+    <div class="seg" id="seg-2-2">
+      <label><input type="radio" name="cnt-2-2" value="2"><span>2 坑</span></label>
+      <label><input type="radio" name="cnt-2-2" value="3"><span>3 坑</span></label>
+      <label><input type="radio" name="cnt-2-2" value="4"><span>4 坑</span></label>
+      <label><input type="radio" name="cnt-2-2" value="5" checked><span>5 坑</span></label>
+    </div>
+  </div>
+  <div class="demo-body">
+    <div class="phone" id="phone-2-2" data-material="liquid">
+      <div class="tabbar-host"><div class="tabbar"><div class="slots" id="slots-2-2"></div></div></div>
+    </div>
+    <p class="demo-caption">容器宽 351 DP,坑位均分自适应。5 坑 -4 DP 重叠负间距。</p>
+  </div>
 </div>
-<div class="stage-label">📖 默认 / 选中 / 营销 三态 + 红点 / 数字 / 文字 / 灵动岛展开 4 型招手 — 节点 312:47337, 1426×1942</div>
 
-<h4>2.2.6 Joy Agent 实体预览</h4>
+<h4>DEMO · Atom 基础状态 12 组合矩阵</h4>
+<div class="demo">
+  <div class="demo-head"><span class="demo-title">原子-基础状态 · 3 行 × 4 列 · 节点 93:10967</span></div>
+  <div class="demo-body">
+    <div class="atom-matrix">
+      <div></div>
+      <div class="atom-head">无招手</div>
+      <div class="atom-head">红点</div>
+      <div class="atom-head">数字 8</div>
+      <div class="atom-head">文字「最多四字」</div>
 
-<div class="stage stage--image">
-  <img src="./_assets/sec-2-joy-agent.png?v=2" alt="Joy Agent 形态原稿">
+      <div class="atom-label">默认态</div>
+      <div class="atom-cell"><div class="atom-slot"><i class="icon-home"></i><span class="label-text">文案</span></div></div>
+      <div class="atom-cell"><div class="atom-slot"><i class="icon-home"></i><span class="label-text">文案</span><div class="badge red-dot"></div></div></div>
+      <div class="atom-cell"><div class="atom-slot"><i class="icon-home"></i><span class="label-text">文案</span><div class="badge number">8</div></div></div>
+      <div class="atom-cell"><div class="atom-slot"><i class="icon-home"></i><span class="label-text">文案</span><div class="badge text">最多四字</div></div></div>
+
+      <div class="atom-label">营销态</div>
+      <div class="atom-cell marketing-bg"></div>
+      <div class="atom-cell marketing-bg"><div class="badge red-dot"></div></div>
+      <div class="atom-cell marketing-bg"><div class="badge number">8</div></div>
+      <div class="atom-cell marketing-bg"><div class="badge text">最多四字</div></div>
+
+      <div class="atom-label">选中态</div>
+      <div class="atom-cell"><div class="atom-slot selected"><i class="icon-home"></i><span class="label-text">文案</span></div></div>
+      <div class="atom-cell"><div class="atom-slot selected"><i class="icon-home"></i><span class="label-text">文案</span><div class="badge red-dot"></div></div></div>
+      <div class="atom-cell"><div class="atom-slot selected"><i class="icon-home"></i><span class="label-text">文案</span><div class="badge number">8</div></div></div>
+      <div class="atom-cell"><div class="atom-slot selected"><i class="icon-home"></i><span class="label-text">文案</span><div class="badge text">最多四字</div></div></div>
+    </div>
+    <p class="demo-caption">⚠️ 营销态可叠加招手,但与选中态互斥(图片占满 38×38,无背景层)</p>
+  </div>
 </div>
-<div class="stage-label">📖 Joy Agent 基础布局 + 招手气泡 + 灵动岛态 — 节点 312:47431, 1426×902</div>
+
+<h4>DEMO · Joy Agent 抽缩 16 → 28 对照</h4>
+<div class="demo">
+  <div class="demo-head"><span class="demo-title">灵动岛展开期 Agent 抽缩(节点 312:47431)</span></div>
+  <div class="demo-body">
+    <div class="compare" style="width:100%;">
+      <div class="compare-cell">
+        <h5>默认抽缩 16 DP</h5>
+        <div class="phone short" data-material="liquid">
+          <div class="tabbar-host">
+            <div class="agent"><img src="https://img13.360buyimg.com/img/jfs/t1/434027/27/16417/14829/6a0c6236F67e0986e/027609c09c2c80cd.png" alt="Joy Agent"></div>
+            <div class="tabbar"><div class="slots" id="slots-2-6-a"></div></div>
+          </div>
+        </div>
+        <p class="note">无灵动岛 · margin-left: −16 DP</p>
+      </div>
+      <div class="compare-cell">
+        <h5>灵动岛展开 → 抽缩 28 DP</h5>
+        <div class="phone short" data-material="liquid">
+          <div class="tabbar-host">
+            <div class="agent inflate-28"><img src="https://img13.360buyimg.com/img/jfs/t1/434027/27/16417/14829/6a0c6236F67e0986e/027609c09c2c80cd.png" alt="Joy Agent"></div>
+            <div class="tabbar"><div class="slots" id="slots-2-6-b"></div></div>
+          </div>
+        </div>
+        <p class="note">灵动岛存在 · margin-left: −28 DP</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h4>DEMO · 招手 4 型对照</h4>
+<div class="demo">
+  <div class="demo-head"><span class="demo-title">红点 / 数字 / 文字 / 灵动岛展开降级</span></div>
+  <div class="demo-body">
+    <div class="compare" style="width:100%; grid-template-columns: repeat(4, 1fr);">
+      <div class="compare-cell">
+        <h5>红点型</h5>
+        <div style="padding:30px;"><div class="atom-slot"><i class="icon-home"></i><span class="label-text">文案</span><div class="badge red-dot"></div></div></div>
+        <p class="note">19 / 14 DP 偏移</p>
+      </div>
+      <div class="compare-cell">
+        <h5>数字型</h5>
+        <div style="padding:30px;"><div class="atom-slot"><i class="icon-home"></i><span class="label-text">文案</span><div class="badge number">8</div></div></div>
+        <p class="note">15 / 14 DP 偏移</p>
+      </div>
+      <div class="compare-cell">
+        <h5>文字型</h5>
+        <div style="padding:30px;"><div class="atom-slot"><i class="icon-home"></i><span class="label-text">文案</span><div class="badge text">最多四字</div></div></div>
+        <p class="note">15 / 14 DP · ≤4 字符</p>
+      </div>
+      <div class="compare-cell">
+        <h5>灵动岛存在时降级</h5>
+        <div style="padding:30px;"><div class="atom-slot"><i class="icon-home"></i><span class="label-text">文案</span><div class="badge red-dot"></div></div></div>
+        <p class="note">数字 / 文字 → 红点</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /ch-2 pro demos -->
 
 
 <h3>2.3 布局位置 + 内部结构</h3>
@@ -874,20 +1175,6 @@
 距底部安全区 4 DP</code></pre>
 
 
-<h3>2.4 各形态原稿展示</h3>
-<h3>3.3 各形态原稿展示</h3>
-
-<div class="stage stage--image">
-  <img src="./_assets/sec-2-regular-layout.png?v=2" alt="常规底导布局原稿">
-</div>
-<div class="stage-label">📖 常规底导布局(总高 69 / 导航 52 / 安全区 17 DP, 2-5 坑位 + 灵动岛)— 节点 312:46904, 1426×1476</div>
-
-<div class="stage stage--image">
-  <img src="./_assets/sec-2-agent-layout.png?v=2" alt="Agent + 底导布局原稿">
-</div>
-<div class="stage-label">📖 Agent + 底导布局(Joy Agent 52×52 + 右侧 319 DP)— 节点 312:47132, 1426×1460</div>
-
-
 <!-- ============ ch-3 Relay 章节 03 灵动岛运营资源位 ============ -->
 <h2 id="ch-3"><span class="num">3</span>灵动岛运营资源位</h2>
 
@@ -903,7 +1190,6 @@
   <p style="margin-top:12px;color:var(--c-text-3);">📐 具体尺寸(131×44 / 144×52)/ 字号 / 材质规则,切到 <strong>专业版</strong> 看 3.1 完整表;<strong>下方 3.2</strong> 直接看 3 张原稿。</p>
 </div>
 <h3>3.1 灵动岛三型规范</h3>
-<h3>3.2 灵动岛运营资源位维度</h3>
 
 <table>
 <thead><tr><th>类型</th><th>标识</th><th>尺寸</th><th>商品/运营图</th><th>字号</th><th>材质</th><th>颜色规则</th><th>适用</th></tr></thead>
@@ -914,25 +1200,68 @@
 </tbody>
 </table>
 
-<h3>3.2 灵动岛三型原稿</h3>
-<div class="stage stage--image">
-  <img src="./_assets/sec-3-island-regular.png?v=2" alt="常规灵动岛">
-</div>
-<div class="stage-label">📖 常规灵动岛(131×44, gray_6 纯色,商品图 32 DP)— 节点 312:47480, 1426×1856</div>
-
-<div class="stage stage--image">
-  <img src="./_assets/sec-3-island-operation.png?v=2" alt="运营灵动岛">
-</div>
-<div class="stage-label">📖 运营灵动岛(131×44, 渐变描边 100% + 85% 灰阶叠加,推荐同频色)— 节点 312:47617, 1426×1419</div>
-
-<div class="stage stage--image">
-  <img src="./_assets/sec-3-island-promo.png?v=2" alt="大促灵动岛">
-</div>
-<div class="stage-label">📖 大促灵动岛(144×52, 渐变描边 0~60% + 异型背板,运营图 34 DP)— 节点 312:47747, 1426×2154</div>
-
 <blockquote class="danger">
 <p><strong>不允许</strong>新增 Tabbar 形态。运营 / 大促诉求由灵动岛(占用消息位)承载,不允许新增第 5+ 坑位或将 Tabbar 整条改色。</p>
 </blockquote>
+
+<!-- ============ ch-3 末尾:Pro demos ============ -->
+<div class="pro-only">
+
+<h4>DEMO · 三型灵动岛并列</h4>
+<div class="demo">
+  <div class="demo-head"><span class="demo-title">常规 / 运营 / 大促 · 节点 312:47480</span></div>
+  <div class="demo-body">
+    <div class="compare compare-3" style="width:100%;">
+      <div class="compare-cell">
+        <h5>常规 131×44</h5>
+        <div class="slot island normal" style="margin:0;">
+          <div class="ig-img"></div>
+          <div class="ig-text"><strong>鲜奶定期购</strong><span style="font-size:9px;">剩 1 期</span></div>
+        </div>
+        <p class="note">gray_6 底 / 商品图白底</p>
+      </div>
+      <div class="compare-cell">
+        <h5>运营 131×44</h5>
+        <div class="slot island operation" style="--ig-a:#ddffcc; --ig-b:#b7fa96; --ig-text:#019508; margin:0;">
+          <div class="ig-img">🌿</div>
+          <div class="ig-text"><strong>抢 5 折商品</strong><span>京东超市</span></div>
+        </div>
+        <p class="note">同频色渐变 + 100% 描边</p>
+      </div>
+      <div class="compare-cell">
+        <h5>大促 144×52</h5>
+        <div class="slot island promo" style="margin:0;">
+          <div class="ig-img">🧧</div>
+          <div class="ig-text"><strong>领取专属福利</strong><span class="cta">抢万元红包 ›</span></div>
+        </div>
+        <p class="note">异型背板 + 模糊 8</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h4>DEMO · 同频色 5 套切换 → 实时染色(运营 / 大促)</h4>
+<div class="demo">
+  <div class="demo-head">
+    <span class="demo-title">5 套推荐同频色 · 节点 312:47617</span>
+    <div class="sw" id="sw-3-3">
+      <label title="绿"><input type="radio" name="pal-3-3" value="green" checked><span style="background:linear-gradient(135deg,#ddffcc,#b7fa96)"></span></label>
+      <label title="橙"><input type="radio" name="pal-3-3" value="orange"><span style="background:linear-gradient(135deg,#fff2e0,#ffebcc)"></span></label>
+      <label title="红"><input type="radio" name="pal-3-3" value="red"><span style="background:linear-gradient(135deg,#fff1ef,#ffe3e0)"></span></label>
+      <label title="紫"><input type="radio" name="pal-3-3" value="purple"><span style="background:linear-gradient(135deg,#f1efff,#eee0ff)"></span></label>
+      <label title="蓝"><input type="radio" name="pal-3-3" value="blue"><span style="background:linear-gradient(135deg,#eff7ff,#e0f2ff)"></span></label>
+    </div>
+  </div>
+  <div class="demo-body">
+    <div class="phone short" data-material="liquid" style="height:120px;">
+      <div class="tabbar-host"><div class="tabbar"><div class="slots" id="slots-3-3"></div></div></div>
+    </div>
+    <div id="swatch-readout" style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center;"></div>
+    <p class="demo-caption">每套含 3 色:A 区背景 / B 区背景 / 文本</p>
+  </div>
+</div>
+
+</div><!-- /ch-3 pro demos -->
 
 
 <!-- ============ ch-4 Relay 章节 04 应用场景 ============ -->
@@ -975,9 +1304,6 @@
 
 <div class="case good">
   <h4><span class="badge">✓ 正例 A</span> 标准 5 坑位常规底导</h4>
-  <div class="stage stage--image">
-    <img src="./_assets/sec-2-regular-layout.png?v=2" alt="常规 5 坑位">
-  </div>
   <ul>
     <li>形态 <code>regular</code>,5 坑位均分,坑位文本 ≤ 4 汉字</li>
     <li>选中态 <code>jdred</code>,默认态 <code>gray_1</code>,符合所有规则</li>
@@ -987,9 +1313,6 @@
 
 <div class="case good">
   <h4><span class="badge">✓ 正例 B</span> Agent 组合 4 坑位</h4>
-  <div class="stage stage--image">
-    <img src="./_assets/sec-2-agent-layout.png?v=2" alt="Agent + 底导布局">
-  </div>
   <ul>
     <li>形态 <code>agent_combo</code>,Joy Agent 52×52,右侧 319 DP</li>
     <li>距 Agent 间距 8 DP,Agent 距底部 17 DP</li>
@@ -999,9 +1322,6 @@
 
 <div class="case good">
   <h4><span class="badge">✓ 正例 C</span> 大促灵动岛展开态</h4>
-  <div class="stage stage--image">
-    <img src="./_assets/sec-3-island-promo.png?v=2" alt="大促灵动岛">
-  </div>
   <ul>
     <li>大促型灵动岛 144×52,占用消息坑位</li>
     <li>异型背板 + 渐变描边 0~60% + 85% 灰阶叠加</li>
@@ -1050,16 +1370,99 @@
 </div>
 
 
+<!-- ============ ch-4 末尾:4 类典型场景缩略 demo (Pro) ============ -->
+<div class="pro-only">
+<h4>DEMO · 4 类典型场景并列(自动归纳)</h4>
+<div class="demo">
+  <div class="demo-head"><span class="demo-title">形态 × 灵动岛 × 招手 · 节点 312:47792</span></div>
+  <div class="demo-body">
+    <div class="compare" style="grid-template-columns: repeat(2, 1fr); width:100%; gap:16px;">
+      <div class="compare-cell">
+        <h5>A · 默认形态</h5>
+        <div class="phone short" data-material="liquid">
+          <div class="tabbar-host">
+            <div class="agent"><img src="https://img13.360buyimg.com/img/jfs/t1/434027/27/16417/14829/6a0c6236F67e0986e/027609c09c2c80cd.png" alt="Joy Agent"></div>
+            <div class="tabbar"><div class="slots" id="slots-4-a"></div></div>
+          </div>
+        </div>
+        <p class="note"><strong>Joy Agent + 4-5 坑</strong><br>无招手 / 无灵动岛</p>
+      </div>
+      <div class="compare-cell">
+        <h5>B · 常规灵动岛</h5>
+        <div class="phone short" data-material="liquid">
+          <div class="tabbar-host">
+            <div class="agent inflate-28"><img src="https://img13.360buyimg.com/img/jfs/t1/434027/27/16417/14829/6a0c6236F67e0986e/027609c09c2c80cd.png" alt="Joy Agent"></div>
+            <div class="tabbar"><div class="slots" id="slots-4-b"></div></div>
+          </div>
+        </div>
+        <p class="note"><strong>日常商品复购</strong><br>鲜奶定期购</p>
+      </div>
+      <div class="compare-cell">
+        <h5>C · 运营 / 大促</h5>
+        <div class="phone short" data-material="liquid">
+          <div class="tabbar-host">
+            <div class="agent inflate-28"><img src="https://img13.360buyimg.com/img/jfs/t1/434027/27/16417/14829/6a0c6236F67e0986e/027609c09c2c80cd.png" alt="Joy Agent"></div>
+            <div class="tabbar"><div class="slots" id="slots-4-c"></div></div>
+          </div>
+        </div>
+        <p class="note"><strong>运营会场 / 大促</strong><br>抢 5 折 / 领福利</p>
+      </div>
+      <div class="compare-cell">
+        <h5>D · 招手气泡</h5>
+        <div class="phone" style="height:200px;" data-material="liquid">
+          <div class="tabbar-host">
+            <div class="agent"><img src="https://img13.360buyimg.com/img/jfs/t1/434027/27/16417/14829/6a0c6236F67e0986e/027609c09c2c80cd.png" alt="Joy Agent"><div class="bubble">来聊聊新款手机推荐</div></div>
+            <div class="tabbar"><div class="slots" id="slots-4-d"></div></div>
+          </div>
+        </div>
+        <p class="note"><strong>主动 onboarding</strong><br>新用户 / 长期未点击</p>
+      </div>
+    </div>
+  </div>
+</div>
+</div><!-- /ch-4 pro demos -->
+
+
 <!-- ============ ch-5 Relay 章节 05 多端适配 ============ -->
 <h2 id="ch-5"><span class="num">5</span>多端适配</h2>
 
 <p>底导背景材质按 <strong>OS 端 + 版本</strong>差异化适配,保证跨平台视觉一致性。同时记录组件动效规范(motion / transition)。</p>
 <h3>5.1 多端材质适配</h3>
 
-<div class="stage stage--image">
-  <img src="./_assets/sec-5-multi-platform.png?v=2" alt="多端材质适配原稿">
+
+<!-- ============ ch-5 末尾:多端材质 + 4 种背景切换 demo (Pro) ============ -->
+<div class="pro-only">
+<h4>DEMO · 切换背景验证材质可读性</h4>
+<div class="demo">
+  <div class="demo-head">
+    <span class="demo-title">液态玻璃 vs 毛玻璃 · 4 种壁纸</span>
+    <div class="seg" id="seg-5">
+      <label><input type="radio" name="bg-5" value="gradient" checked><span>渐变</span></label>
+      <label><input type="radio" name="bg-5" value="white"><span>纯白</span></label>
+      <label><input type="radio" name="bg-5" value="stripe"><span>彩条</span></label>
+      <label><input type="radio" name="bg-5" value="photo"><span>实拍</span></label>
+    </div>
+  </div>
+  <div class="demo-body">
+    <div class="compare" style="width:100%;">
+      <div class="compare-cell">
+        <h5>液态玻璃 · iOS 26+</h5>
+        <div class="phone short" id="phone-5-a" data-bg="gradient" data-material="liquid">
+          <div class="tabbar-host"><div class="tabbar"><div class="slots" id="slots-5-a"></div></div></div>
+        </div>
+      </div>
+      <div class="compare-cell">
+        <h5>毛玻璃 · 老系统</h5>
+        <div class="phone short" id="phone-5-b" data-bg="gradient" data-material="frost">
+          <div class="tabbar-host"><div class="tabbar"><div class="slots" id="slots-5-b"></div></div></div>
+        </div>
+      </div>
+    </div>
+    <p class="demo-caption">切换上方背景,观察两种材质在不同壁纸下的可读性差异</p>
+  </div>
 </div>
-<div class="stage-label">📖 iOS 26+ 液态玻璃 vs iOS 26 以下 + Android 毛玻璃 fallback — 节点 312:52986, 1426×1374</div>
+</div><!-- /ch-5 pro demos -->
+
 
 <h3>5.2 动效</h3>
 
@@ -1109,7 +1512,7 @@ JDTabbar.dismissIsland();</code></pre>
 <ul>
   <li>Relay 节点 — <a href="https://relay.jd.com/file/design?id=2029484645871009793&page_id=31:1&node_id=312:46893">JD APP V16.0 GUIDELINE · 导航类-底部导航栏设计规范</a></li>
   <li>Bundle 源 — <a href="./design.md">design.md</a> · <a href="./spec.md">spec.md</a> · <a href="./variants.md">variants.md</a> · <a href="./behaviors.md">behaviors.md</a></li>
-  <li>原稿切图 — <code>./_assets/sec-{1-5}-*.png</code>(9 张,2.0 MB,SCALE 1:1 from Relay)</li>
+  <li>位图 CDN — <a href="./_assets-cdn.md">_assets-cdn.md</a>(11 张清单:2 atom + 9 Relay 章节大图 · 当前 jsdelivr,长期迁京东 CDN)</li>
   <li><code>foundations/tokens/color.md</code> — <code>color_primary</code> / <code>gray_1</code> / <code>gray_6</code> / <code>jdred</code> / <code>white</code></li>
   <li><code>foundations/tokens/typography.md</code> — <code>pingfang_regular/font_size_10_400</code> / <code>pingfang_semibold/font_size_10_600</code> / <code>pingfang_semibold/font_size_14_600</code> / <code>pingfang_medium/font_size_10_500</code></li>
   <li><code>foundations/tokens/radius.md</code> — <code>radius_xxl</code>(底导容器,16px) / <code>radius_xl</code>(灵动岛容器,12px)</li>
@@ -1172,6 +1575,155 @@ JDTabbar.dismissIsland();</code></pre>
       img.parentElement.appendChild(link);
     }
   });
+})();
+
+// ==========================================
+// v0.7 合并:interactive demo 渲染脚本
+// ==========================================
+(function() {
+  const SVG_HOME = '<i class="icon-home"></i>';
+  const LABELS = ['文案', '文案', '文案', '文案', '文案'];
+  const PALETTES = {
+    green:  { a: '#DDFFCC', b: '#B7FA96', text: '#019508', emoji: '🌿' },
+    orange: { a: '#FFF2E0', b: '#FFEBCC', text: '#7D3600', emoji: '🍊' },
+    red:    { a: '#FFF1EF', b: '#FFE3E0', text: '#FF0F23', emoji: '🍓' },
+    purple: { a: '#F1EFFF', b: '#EEE0FF', text: '#713290', emoji: '🍇' },
+    blue:   { a: '#EFF7FF', b: '#E0F2FF', text: '#2D6AA6', emoji: '🫐' },
+  };
+
+  function buildSlot(opts) {
+    const slot = document.createElement('div');
+    slot.className = 'slot';
+    if (opts.state === 'selected') {
+      slot.classList.add('selected');
+      if (opts.islandActive) slot.classList.add('no-bg');
+    }
+    if (opts.state === 'marketing') {
+      slot.classList.add('marketing');
+      const txt = document.createElement('span'); txt.className = 'label-text';
+      slot.appendChild(txt);
+    } else {
+      slot.innerHTML = SVG_HOME + '<span class="label-text">' + (opts.label || '文案') + '</span>';
+    }
+    if (opts.badge && opts.badge !== 'none') {
+      const b = document.createElement('div');
+      b.className = 'badge ' + opts.badge;
+      if (opts.badge === 'number') b.textContent = '8';
+      if (opts.badge === 'text') b.textContent = '最多四字';
+      slot.appendChild(b);
+    }
+    return slot;
+  }
+
+  function buildIsland(type, palette) {
+    const s = document.createElement('div');
+    s.className = 'slot island ' + type;
+    if (type === 'normal') {
+      s.innerHTML = '<div class="ig-img"></div><div class="ig-text"><strong>鲜奶定期购</strong><span style="font-size:9px; line-height:14px;">剩 1 期</span></div>';
+    } else if (type === 'operation') {
+      const p = PALETTES[palette || 'green'];
+      s.style.setProperty('--ig-a', p.a);
+      s.style.setProperty('--ig-b', p.b);
+      s.style.setProperty('--ig-text', p.text);
+      s.innerHTML = '<div class="ig-img">' + p.emoji + '</div><div class="ig-text"><strong>抢 5 折商品</strong><span>京东超市</span></div>';
+    } else if (type === 'promo') {
+      s.innerHTML = '<div class="ig-img">🧧</div><div class="ig-text"><strong>领取专属福利</strong><span class="cta">抢万元红包 ›</span></div>';
+    }
+    return s;
+  }
+
+  function fillSlots(container, count, opts) {
+    opts = opts || {};
+    container.innerHTML = '';
+    for (let i = 0; i < count; i++) {
+      const slot = buildSlot({
+        label: LABELS[i] || '文案',
+        state: opts.selectedIndex === i ? (opts.selectedState || 'selected') : 'default',
+        badge: opts.badgeIndex === i ? opts.badge : null,
+        islandActive: opts.islandActive,
+      });
+      container.appendChild(slot);
+    }
+  }
+
+  function fillSlotsWithIsland(container, count, islandType, palette, opts) {
+    opts = opts || {};
+    container.innerHTML = '';
+    const islandIdx = Math.min(2, count - 1);
+    for (let i = 0; i < count; i++) {
+      if (i === islandIdx && islandType) {
+        container.appendChild(buildIsland(islandType, palette));
+      } else {
+        container.appendChild(buildSlot({
+          label: LABELS[i] || '文案',
+          state: opts.selectedIndex === i ? 'selected' : 'default',
+          islandActive: !!islandType,
+          badge: opts.badgeIndex === i ? opts.badge : null,
+        }));
+      }
+    }
+  }
+
+  // ---- DEMO 形态对照(章节 1 末) ----
+  const defR = document.getElementById('def-regular');
+  const defA = document.getElementById('def-agent');
+  if (defR) fillSlots(defR, 5, { selectedIndex: 1 });
+  if (defA) fillSlots(defA, 4, { selectedIndex: 1 });
+
+  // ---- DEMO 坑位 2-5 切换(章节 2 末) ----
+  function render22() {
+    const radio = document.querySelector('input[name="cnt-2-2"]:checked');
+    if (!radio) return;
+    const cnt = +radio.value;
+    fillSlots(document.getElementById('slots-2-2'), cnt, { selectedIndex: Math.min(1, cnt - 1) });
+  }
+  document.querySelectorAll('input[name="cnt-2-2"]').forEach(el => el.addEventListener('change', render22));
+  if (document.getElementById('slots-2-2')) render22();
+
+  // ---- DEMO Joy Agent 抽缩对照(章节 2 末) ----
+  if (document.getElementById('slots-2-6-a')) fillSlots(document.getElementById('slots-2-6-a'), 4, { selectedIndex: 1 });
+  if (document.getElementById('slots-2-6-b')) fillSlotsWithIsland(document.getElementById('slots-2-6-b'), 4, 'normal', null, { selectedIndex: 0 });
+
+  // ---- DEMO 同频色切换(章节 3 末) ----
+  function render33() {
+    const radio = document.querySelector('input[name="pal-3-3"]:checked');
+    if (!radio) return;
+    const pal = radio.value;
+    fillSlotsWithIsland(document.getElementById('slots-3-3'), 5, 'operation', pal, { selectedIndex: 0 });
+    const p = PALETTES[pal];
+    const readout = document.getElementById('swatch-readout');
+    readout.innerHTML = '';
+    [
+      { label: 'A 区背景', hex: p.a },
+      { label: 'B 区背景', hex: p.b },
+      { label: '文本', hex: p.text },
+    ].forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'swatch-card';
+      div.innerHTML = '<div class="sq" style="background:' + item.hex + '"></div><div><div class="label-mini">' + item.label + '</div><div class="hex">' + item.hex + '</div></div>';
+      readout.appendChild(div);
+    });
+  }
+  document.querySelectorAll('input[name="pal-3-3"]').forEach(el => el.addEventListener('change', render33));
+  if (document.getElementById('slots-3-3')) render33();
+
+  // ---- DEMO 4 类应用场景(章节 4 末) ----
+  if (document.getElementById('slots-4-a')) fillSlots(document.getElementById('slots-4-a'), 4, { selectedIndex: 1 });
+  if (document.getElementById('slots-4-b')) fillSlotsWithIsland(document.getElementById('slots-4-b'), 4, 'normal', null, { selectedIndex: 0 });
+  if (document.getElementById('slots-4-c')) fillSlotsWithIsland(document.getElementById('slots-4-c'), 4, 'operation', 'green', { selectedIndex: 0 });
+  if (document.getElementById('slots-4-d')) fillSlots(document.getElementById('slots-4-d'), 4, { selectedIndex: 1, badgeIndex: 3, badge: 'red-dot' });
+
+  // ---- DEMO 多端材质 + 背景切换(章节 5 末) ----
+  if (document.getElementById('slots-5-a')) fillSlotsWithIsland(document.getElementById('slots-5-a'), 5, 'normal', null, { selectedIndex: 0 });
+  if (document.getElementById('slots-5-b')) fillSlotsWithIsland(document.getElementById('slots-5-b'), 5, 'normal', null, { selectedIndex: 0 });
+  function render5() {
+    const radio = document.querySelector('input[name="bg-5"]:checked');
+    if (!radio) return;
+    const bg = radio.value;
+    if (document.getElementById('phone-5-a')) document.getElementById('phone-5-a').dataset.bg = bg;
+    if (document.getElementById('phone-5-b')) document.getElementById('phone-5-b').dataset.bg = bg;
+  }
+  document.querySelectorAll('input[name="bg-5"]').forEach(el => el.addEventListener('change', render5));
 })();
 </script>
 
