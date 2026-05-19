@@ -1,6 +1,46 @@
 # Frontmatter Spec
 
-> SKILL.md Step 8 调用本文件。每个 design.md 的 frontmatter 必须满足以下字段约束。
+> SKILL.md Step 5.5 / Step 8 调用本文件。`design-outline.md` 与 `design.md` 使用不同 frontmatter 约束。
+
+---
+
+## `design-outline.md`（确认稿，不进 traceability）
+
+```yaml
+---
+file: design-outline
+level: component-base
+bg: horizontal
+slug: "navbar-search-day"
+name_zh: "搜索条日间"
+name_en: "NavBar / SearchBar Day"
+last_synced: "2026-05-19"
+
+auto_detected:
+  level: component-base
+  bg: horizontal
+  slug: "navbar-search-day"
+
+relay_source:
+  file_id: "..."
+  page_id: "..."
+  node_id: "..."
+  node_name: "..."
+  node_type: FRAME
+  bounds: { w: 375, h: 224 }
+  url: "https://relay.jd.com/..."
+---
+```
+
+约束：
+
+1. `file` 固定为 `design-outline`
+2. outline 只用于确认门，不参与 `INDEX.md`、`used_by`、Relay sharedPluginData
+3. outline 可保留待确认项 / 风险项，**不要求**像正式 `design.md` 一样补齐所有 TODO
+
+---
+
+## `design.md`（正式稿，进入 traceability）
 
 ---
 

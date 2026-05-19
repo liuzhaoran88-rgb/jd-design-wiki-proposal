@@ -1,33 +1,43 @@
 ---
 name: relay-to-design-md
-description: 把 Relay 设计稿一键转成 design.md。零输入，自动推断 level/bg/slug，自动反查 V16 token，自动维护双向追溯索引。设计师只需 review。
+description: 先产出 Relay 设计稿 outline 供设计师确认，再生成 design.md。零输入，自动推断 level/bg/slug，自动反查 V16 token，自动维护双向追溯索引。
 allowed-tools: [mcp__zero-design__get_design_metadata, mcp__zero-design__get_design_context, mcp__zero-design__get_screenshot, mcp__zero-design__get_variables, mcp__zero-design__use_design_script, Bash, Read, Write, Edit]
 ---
 
-# /relay-to-design-md · Relay → design.md 一键同步
+# /relay-to-design-md · Relay → outline → design.md 两阶段同步
 
 ## 这个 skill 做什么
 
-设计师传一个 Relay URL，输出一份**结构化、token 化、可 review** 的 `design.md`：
+设计师传一个 Relay URL，默认先输出一份**结构化、token 化、可 review** 的 `design-outline.md`，待设计师确认后再生成正式 `design.md`：
 
 - 自动从 Relay 抽取节点视觉数据（fills / typography / radius / spacing / materials / instances / children）
 - 自动反查 V16 token（hex → `color_*` / fontSize+weight → `font_size_N_W` / radius → `radius_*` 等）
 - 自动推断 `level` / `bg` / `slug` / `name_zh` 字段
-- 自动维护双向追溯：`design.md ↔ INDEX.md ↔ Relay sharedPluginData (v0.3+)`
+- 默认先输出章节/状态/组合/缺失项大纲，帮助设计师确认边界
+- 设计师确认后再维护双向追溯：`design.md ↔ INDEX.md ↔ Relay sharedPluginData (v0.3+)`
 - 自动 flag 视觉问题：token-miss / 半步间距 / 子组件未录入
 
 ## 调用方式
 
 ```
 /relay-to-design-md <relay_url>
+/relay-to-design-md <relay_url> --confirm-outline
 ```
 
 例：
 ```
 /relay-to-design-md https://relay.jd.com/file/design?id=2029484645871009793&page_id=47%3A1&node_id=542%3A6495
+/relay-to-design-md https://relay.jd.com/file/design?id=2029484645871009793&page_id=47%3A1&node_id=542%3A6495 --confirm-outline
 ```
 
-只接受 1 个参数（URL）。**不要**问设计师额外问题 —— 全部字段自动推断。
+默认只接受 1 个参数（URL）并进入 outline 模式。`--confirm-outline` 表示"设计师已确认大纲，可以写正式文档"。**不要**问设计师额外问题 —— 全部字段自动推断。
+
+### 两阶段规则（v0.6 新加）
+
+- **Phase 1 / 默认**：写 `design-outline.md`，展示结构范围、状态矩阵、章节拆分、已识别 token、待确认项、自动发现的风险
+- **Phase 2 / `--confirm-outline`**：在设计师确认 outline 后，再写正式 `design.md` 或 page-doc bundle，并更新 traceability
+
+> 目标：把"当前设计稿里明确存在的信息"和"仍待设计师确认的信息"分开展示，避免一上来就把不确定内容写进正式 design.md。
 
 ## v0.1 范围（被 v0.4 / v0.5 扩展）
 
@@ -47,6 +57,8 @@ allowed-tools: [mcp__zero-design__get_design_metadata, mcp__zero-design__get_des
 ---
 
 ## 执行流程（严格按步骤跑）
+
+> 默认先执行 Outline Gate。只有显式传入 `--confirm-outline`，才继续执行正式写入和双向追溯。
 
 ### Step 1: Parse URL
 
@@ -142,7 +154,28 @@ return {
 
 > 目的:**让上游不静悄悄把已知 / 新冲突 token 写进 design.md** 让 design-review 后置才发现。
 
-### Step 6: 导出 preview.png
+### Step 5.5: 生成 outline（默认一定执行）
+
+读 [templates/outline.md](./templates/outline.md)，先输出 `{slug}/design-outline.md`，包含：
+
+- 本次识别范围（当前节点实际覆盖的原子 / 组合 / 页面示意）
+- 结构大纲（章节 / frame / 关键子节点）
+- 状态 / 变体 / 组合维度
+- 已识别 token / materials / uses_components 摘要
+- **待设计师确认**：只列"当前证据不足、截图未取到、上下文未读全、交互未标注"这类真实缺口，**不要**写成泛泛建议
+- **自动发现的风险**：token-miss / naming-conflict / 半步间距 / 子组件未录入 / pageDocMode 判定不稳等
+
+#### Outline 模式写入约束
+
+- 默认只写 `design-outline.md`
+- **不写** `design.md`
+- **不更新** `INDEX.md`
+- **不回写** Relay sharedPluginData
+- **不维护** `used_by`
+
+如果未传 `--confirm-outline`，到此结束并输出 outline 模式终端提示。
+
+### Step 6: 导出 preview.png（仅 `--confirm-outline` 时执行）
 
 按 [references/preview-export.md](./references/preview-export.md) 步骤：
 
@@ -151,9 +184,9 @@ return {
 3. Bash `echo '<base64>' | base64 -d > <output-dir>/preview.png`
 4. Bash `file <path>` 验证 PNG 头
 
-> v0.2 链路通了。如果导出报错（节点不可见 / MCP 抖动），**继续往下走**，design.md 留 placeholder + 终端 warn，**不要 abort**。
+> v0.2 链路通了。如果导出报错（节点不可见 / MCP 抖动），**继续往下走**，design.md 留 placeholder + 终端 warn，**不要 abort**。outline 模式下截图可选，不应阻断确认门。
 
-### Step 7: 决定输出路径
+### Step 7: 决定正式输出路径（仅 `--confirm-outline` 时执行）
 
 按 [references/auto-detect-rules.md](./references/auto-detect-rules.md) 第 4 节路径规则：
 
@@ -184,7 +217,7 @@ flow + {bg}                  → jd-design-system-md-v16/product-architecture/{b
 
 如果路径已存在 `design.md`，**不要覆盖**：改名为 `design.md.NEW`，让设计师手动 diff。终端输出："⚠️ {path}/design.md 已存在，新版本写入 design.md.NEW，请 diff 后合并。"
 
-### Step 8: 套模板生成 design.md
+### Step 8: 套模板生成 design.md（仅 `--confirm-outline` 时执行）
 
 #### v0.5.1 模板分流（首先决定走哪套模板）
 
@@ -333,11 +366,11 @@ frontmatter 必填字段见 [references/frontmatter-spec.md](./references/frontm
 | `{{skill_version}}` | 当前 skill 版本号字符串（如 `v0.4.1`、`v0.5`），从 SKILL.md 版本历史最新一行取 |
 | `{{todo_count}}` | 实际剩余 TODO 数（基础 5，page-doc 模式 + Donts 自动填 → 4） |
 
-### Step 9: 更新 INDEX.md
+### Step 9: 更新 INDEX.md（仅 `--confirm-outline` 时执行）
 
 [references/traceability.md](./references/traceability.md) 第 1 节"INDEX.md 维护"。读 `.claude/skills/relay-to-design-md/INDEX.md`，按 BG 分组追加新条目（如已存在 slug → 更新 last_synced 行不是追加）。
 
-### Step 10: 维护反向引用
+### Step 10: 维护反向引用（仅 `--confirm-outline` 时执行）
 
 如果新 design.md 的 `references.uses_components` 列表非空，需要去每个被引用组件的 design.md 里把当前路径加到它们的 `used_by[]`。
 
@@ -349,7 +382,7 @@ frontmatter 必填字段见 [references/frontmatter-spec.md](./references/frontm
 
 如果被引用的 design.md 还不存在（典型：子组件还没录入），**跳过**，只在新文件的 frontmatter 留注释 `# 注：A 尚未录入 design.md，待后续`。
 
-### Step 10.5: 回写 Relay sharedPluginData (v0.3 新加)
+### Step 10.5: 回写 Relay sharedPluginData（仅 `--confirm-outline` 时执行）
 
 成功写完 design.md 后，把元数据回写到 Relay 节点。**namespace 固定 `jd-design-wiki`**(注册表与生命周期见 [`../../shared/references/relay-namespaces.md`](../../shared/references/relay-namespaces.md))。
 
@@ -383,6 +416,25 @@ return { keys: node.getSharedPluginDataKeys('jd-design-wiki') }
 详见 [references/traceability.md](./references/traceability.md) 第 ③ 节。
 
 ### Step 11: 终端输出（给设计师）
+
+#### 11A. 默认 outline 模式
+
+```text
+📝 已生成大纲: {输出路径}/design-outline.md
+   ├─ level: {自动推断} {如走兜底 → 加 ⚠️}
+   ├─ bg:    {自动推断} {同上}
+   ├─ slug:  {自动推断} {同上}
+   ├─ 待确认项: {N}
+   └─ 风险项: {M}
+
+⏸ 当前为 outline 模式，未写入 design.md
+   未更新 INDEX.md / Relay sharedPluginData / used_by
+
+下一步：设计师确认大纲后执行
+/relay-to-design-md <relay_url> --confirm-outline
+```
+
+#### 11B. `--confirm-outline` 正式写入模式
 
 完成后输出格式如下（中文，含 emoji，简短）：
 
