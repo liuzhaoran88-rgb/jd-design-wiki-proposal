@@ -22,6 +22,8 @@
       --glass-dark-base: #cccccc;
       --glass-light-a: rgba(245, 245, 245, 0.6);
       --glass-light-base: #262626;
+      --glass-light-visual-a: rgba(255, 255, 255, 0.96);
+      --glass-light-visual-b: rgba(247, 248, 250, 0.9);
       --glass-line: rgba(255, 255, 255, 0.34);
       --glass-line-light: rgba(17, 20, 26, 0.08);
       --green: #019508;
@@ -326,9 +328,10 @@
 
     .ordinary-nav.is-light::before {
       background:
+        linear-gradient(180deg, var(--glass-light-visual-a), var(--glass-light-visual-b)),
         linear-gradient(0deg, var(--glass-light-a), var(--glass-light-a)),
         var(--glass-light-base);
-      background-blend-mode: color-dodge, normal;
+      background-blend-mode: normal, color-dodge, normal;
       opacity: 1;
     }
 
@@ -341,9 +344,9 @@
 
     .ordinary-nav.is-light::after {
       background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.74), rgba(255, 255, 255, 0.1) 42%, rgba(255, 255, 255, 0.42)),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0) 20%, rgba(255, 255, 255, 0) 80%, rgba(255, 255, 255, 0.58));
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82), inset 0 -1px 0 rgba(17, 20, 26, 0.05);
+        linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.12) 48%, rgba(255, 255, 255, 0.36)),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0) 18%, rgba(255, 255, 255, 0) 82%, rgba(255, 255, 255, 0.64));
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.94), inset 0 -1px 0 rgba(17, 20, 26, 0.04);
     }
 
     .nav-item {
@@ -608,7 +611,7 @@
         <section>
           <h2>视觉状态</h2>
           <p>默认态使用普通字重文本，选中态使用 <code>color_primary</code>，文本字重提升到 600。玻璃容器需要区分浅色背景与暗色背景两套参数，不应混用。</p>
-          <p>浅色背景下，Liquid Glass 使用 <code>模式=日间</code>，底层为 <code>rgba(245,245,245,.60)</code> 叠加 <code>#262626</code>，混合模式为 <code>color-dodge, normal</code>；选中坑位底板为 <code>#F2F4F7</code>。</p>
+          <p>浅色背景下，Liquid Glass 使用 <code>模式=日间</code>，Zero 源参数为 <code>rgba(245,245,245,.60)</code> 叠加 <code>#262626</code>，混合模式为 <code>color-dodge, normal</code>；HTML 演示按截图观感叠加洁净白色玻璃视觉层，避免浏览器混合后出现灰脏。选中坑位底板为 <code>#F2F4F7</code>。</p>
           <p>暗色背景下，Liquid Glass 使用 <code>模式=暗黑</code>，底层透明度为 <code>.60</code>，背景层为 <code>rgba(255,255,255,.06)</code>、<code>rgba(0,0,0,.60)</code>、<code>#CCCCCC</code>，混合模式为 <code>color-burn, normal, normal</code>；选中坑位底板为 <code>#14171A</code>。</p>
           <p>普通坑位文案最多展示 4 个汉字，超出需业务侧改短，不建议自动缩小字号。单个底导之间保持 8 DP 间距；灵动岛与相邻普通坑位之间同样保持 8 DP 间距。灵动岛是独立原子，不作为普通坑位等宽分配；日常/运营宽度为 131，大促宽版为 144，且只能配置在中间强化位，不允许配置到两侧坑位。</p>
         </section>
