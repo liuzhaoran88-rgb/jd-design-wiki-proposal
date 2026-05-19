@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zone 05 · 🚀 横向专项 — JD V16 设计系统</title>
+<style>
+  :root {
+    --c-text: #171a26;
+    --c-text-2: #3d414d;
+    --c-text-3: #828794;
+    --c-line: #00000014;
+    --c-bg: #ffffff;
+    --c-bg-sunken: #f5f6fa;
+    --c-brand: #ff0f23;
+    --c-info: #0073ff;
+    --c-info-bg: #e5f5ff;
+    --c-success: #2aa32a;
+    --c-success-bg: #ebfbeb;
+    --c-warn: #c47900;
+    --c-warn-bg: #fff6e0;
+    --r-base: 6px;
+    --r-xl: 12px;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--c-bg-sunken);
+    color: var(--c-text);
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+    font-size: 15px; line-height: 1.7;
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  }
+  a { color: var(--c-info); }
+  code {
+    font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+    font-size: 13px; background: var(--c-bg-sunken);
+    padding: 2px 6px; border-radius: 4px;
+    color: var(--c-brand);
+  }
+
+  .top-bar {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; gap: 16px;
+    padding: 0 24px;
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+    flex-wrap: wrap;
+  }
+  .top-bar__brand {
+    padding: 14px 0; margin-right: 12px;
+    font-size: 13px; font-weight: 600;
+    color: var(--c-text); text-decoration: none;
+    letter-spacing: 0.02em;
+  }
+  .top-bar__brand small { color: var(--c-text-3); font-weight: 500; margin-left: 6px; }
+  .top-bar__nav { display: flex; align-items: stretch; gap: 4px; flex-wrap: wrap; }
+  .top-bar__nav-link {
+    padding: 14px 14px 12px; font-size: 13px;
+    color: var(--c-text-2); text-decoration: none;
+    font-weight: 500; line-height: 1.4;
+    white-space: nowrap; position: relative;
+    transition: color 150ms;
+  }
+  .top-bar__nav-link:hover { color: var(--c-text); }
+  .top-bar__nav-link.is-current { color: var(--c-text); font-weight: 600; }
+  .top-bar__nav-link.is-placeholder { color: var(--c-text-3); cursor: default; font-style: italic; }
+  .top-bar__nav-link.is-placeholder:hover { color: var(--c-text-3); }
+  .top-bar__spacer { flex: 1; }
+
+  .layout {
+    max-width: 1400px; margin: 0 auto;
+    padding: 24px 24px 80px;
+    display: grid; grid-template-columns: 240px 1fr;
+    gap: 24px; align-items: start;
+  }
+  .sidebar {
+    position: sticky; top: 64px;
+    align-self: start;
+    max-height: calc(100vh - 88px);
+    overflow-y: auto;
+    background: var(--c-bg);
+    padding: 20px 12px;
+    border-radius: var(--r-xl);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  }
+  .sidebar__zone-tag {
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--c-text-3);
+    padding: 6px 12px 12px;
+    border-bottom: 1px solid var(--c-line);
+    margin-bottom: 12px;
+  }
+  .sidebar__group { margin-bottom: 14px; }
+  .sidebar__link {
+    display: block; padding: 7px 12px;
+    font-size: 13px; color: var(--c-text-2);
+    text-decoration: none; border-radius: var(--r-base);
+    font-weight: 500; line-height: 1.5;
+    transition: background 150ms, color 150ms;
+  }
+  .sidebar__link:hover { background: rgba(0, 0, 0, 0.04); color: var(--c-text); }
+  .sidebar__link.is-current { background: var(--c-text); color: var(--c-bg); }
+  .sidebar__link.is-placeholder { color: var(--c-text-3); cursor: default; font-style: italic; }
+  .sidebar__sub {
+    margin: 4px 0 8px 12px; padding-left: 8px;
+    border-left: 1px solid var(--c-line);
+  }
+  .sidebar__sub-link {
+    display: block; padding: 4px 10px;
+    font-size: 12px; color: var(--c-text-3);
+    text-decoration: none; border-radius: 4px;
+    line-height: 1.6;
+  }
+  .sidebar__sub-link:hover { background: rgba(0, 0, 0, 0.03); color: var(--c-text-2); }
+
+  .main {
+    background: var(--c-bg);
+    padding: 56px 64px 64px;
+    border-radius: var(--r-xl);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    min-width: 0;
+  }
+  .main h1 {
+    font-size: 32px; font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0 0 12px;
+  }
+  .main h1 small {
+    font-size: 14px; font-weight: 500;
+    color: var(--c-text-3); margin-left: 12px;
+  }
+  .main > p:first-of-type {
+    color: var(--c-text-2); font-size: 16px; line-height: 1.7;
+    max-width: 720px;
+    margin: 0 0 36px;
+  }
+  .main h2 {
+    font-size: 20px; font-weight: 600;
+    margin: 36px 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--c-line);
+  }
+  .main h2 .count {
+    font-size: 12px; font-weight: 500;
+    color: var(--c-text-3); margin-left: 8px;
+  }
+
+  .arch-section { margin-bottom: 28px; }
+  .arch-section__intro {
+    color: var(--c-text-2); font-size: 14px;
+    margin: 8px 0 14px;
+    max-width: 720px;
+  }
+  .comp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+    margin: 14px 0 24px;
+  }
+  .comp-card {
+    background: var(--c-bg-sunken);
+    border-radius: var(--r-xl);
+    padding: 18px 20px;
+    transition: box-shadow 200ms, transform 200ms;
+    text-decoration: none; color: inherit;
+    display: block;
+  }
+  .comp-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
+  }
+  .comp-card__head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .comp-card__name {
+    font-size: 15px; font-weight: 600;
+    color: var(--c-text);
+  }
+  .comp-card__status {
+    font-size: 10px; font-weight: 600;
+    padding: 2px 8px; border-radius: 999px;
+    letter-spacing: 0.05em;
+  }
+  .comp-card__status--ready { background: var(--c-success-bg); color: var(--c-success); }
+  .comp-card__status--draft { background: var(--c-info-bg); color: var(--c-info); }
+  .comp-card__status--todo { background: var(--c-bg-sunken); color: var(--c-text-3); border: 1px solid var(--c-line); }
+  .comp-card__status--planned { background: var(--c-warn-bg); color: var(--c-warn); }
+  .comp-card__desc {
+    font-size: 13px; color: var(--c-text-2);
+    margin: 0; line-height: 1.6;
+  }
+  .empty-row {
+    color: var(--c-text-3); font-style: italic;
+    font-size: 13px;
+    padding: 12px 16px;
+    background: var(--c-bg-sunken);
+    border-radius: var(--r-base);
+    margin: 8px 0;
+  }
+
+  .scenario-band {
+    background: var(--c-bg-sunken);
+    border-radius: var(--r-xl);
+    padding: 18px 22px;
+    margin: 0 0 24px;
+    color: var(--c-text-2);
+    font-size: 14px;
+  }
+  .scenario-band strong { color: var(--c-text); }
+
+  @media (max-width: 960px) {
+    .layout { grid-template-columns: 1fr; gap: 16px; padding: 16px 12px 32px; }
+    .sidebar { position: static; max-height: none; }
+    .main { padding: 32px 24px 40px; }
+    .main h1 { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a href="../../docs/jd-design-wiki-knowledge-tree.html" class="top-bar__brand">JD Design Wiki <small>· V16</small></a>
+  <nav class="top-bar__nav" aria-label="5 大分区导航">
+    <a href="../knowledge/spec-page.html" class="top-bar__nav-link">📚 Design 知识</a>
+    <a href="../foundations/spec-page.html" class="top-bar__nav-link">🎨 Design 基础</a>
+    <a href="../ai-mechanism/spec-page.html" class="top-bar__nav-link">🤖 AI 机制</a>
+    <a href="../product-architecture/spec-page.html" class="top-bar__nav-link">🏗 产品架构</a>
+    <a href="./spec-page.html" class="top-bar__nav-link is-current">🚀 横向专项</a>
+  </nav>
+  <span class="top-bar__spacer"></span>
+</div>
+
+<div class="layout">
+
+<aside class="sidebar" aria-label="🚀 横向专项 - 子目录">
+  <div class="sidebar__zone-tag">ZONE 05 · 🚀 横向专项</div>
+
+  <div class="sidebar__group">
+    <a href="#active" class="sidebar__link is-current">active/ 进行中</a>
+  </div>
+
+  <div class="sidebar__group">
+    <a href="#archive" class="sidebar__link">archive/ 已归档</a>
+  </div>
+
+  <div class="sidebar__group">
+    <a href="#protocols" class="sidebar__link">protocols/ 治理协议</a>
+  </div>
+
+  <div class="sidebar__group">
+    <a href="#handoff" class="sidebar__link">handoff/ 反哺接口</a>
+  </div>
+</aside>
+
+<main class="main">
+  <h1>🚀 横向专项 <small>Zone 05 · 跨部门治理</small></h1>
+  <p>"我要发起 / 跟进 / 查阅一个治理项目"。横向专项不是某个部门的组件,而是跨部门的<strong>设计治理动作</strong> —— 比如双列卡家族体系、视频卡/直播卡统一、跨场景识别等。本分区按 4 个子目录组织:<code>active/</code> 进行中、<code>archive/</code> 已归档、<code>protocols/</code> 治理协议、<code>handoff/</code> 反哺接口。当前处于骨架阶段,具体内容正在录入。</p>
+
+  <div class="scenario-band">
+    <strong>这里跟其它 Zone 不一样的地方</strong> —— 其它 4 个 Zone 收纳的是"做完的规范"(token / 组件 / 业务结构 / 知识),横向专项收纳的是"<strong>做的过程</strong>":一个治理项目从立项 → Review → 落地 → 反哺到其它 Zone 的全周期沉淀。所以子目录是按"专项生命周期阶段"切,不是按"组件类型"切。
+  </div>
+
+  <h2 id="active">active/ <span class="count">进行中专项,0 个录入 / 1 个规划样本</span></h2>
+  <div class="arch-section">
+    <p class="arch-section__intro">正在跑的治理项目。每个专项一个目录,包含 README(概述)、DESIGN(设计语言)、variants(变体案例)、skill(对应 AI Skill)、ADR(决策记录)、screenshots(真实样本)。</p>
+    <div class="comp-grid">
+      <a href="../../docs/jd-design-wiki-master-diagram.html#zone-5" target="_blank" rel="noopener" class="comp-card">
+        <div class="comp-card__head">
+          <span class="comp-card__name">⭐ double-column-card</span>
+          <span class="comp-card__status comp-card__status--planned">PLANNED</span>
+        </div>
+        <p class="comp-card__desc">双列卡家族体系 — 计划作为 Zone 05 第一个跑通样本,验证"五大家族 + 跨场景识别"方法论。架构大图里已留位,等正式立项。</p>
+      </a>
+      <div class="comp-card">
+        <div class="comp-card__head">
+          <span class="comp-card__name">视频卡治理</span>
+          <span class="comp-card__status comp-card__status--todo">TBD</span>
+        </div>
+        <p class="comp-card__desc">规划中,等双列卡跑通后启动。</p>
+      </div>
+      <div class="comp-card">
+        <div class="comp-card__head">
+          <span class="comp-card__name">直播卡治理</span>
+          <span class="comp-card__status comp-card__status--todo">TBD</span>
+        </div>
+        <p class="comp-card__desc">规划中,等双列卡跑通后启动。</p>
+      </div>
+    </div>
+  </div>
+
+  <h2 id="archive">archive/ <span class="count">已完成归档,0 个录入</span></h2>
+  <div class="arch-section">
+    <p class="arch-section__intro">已经落地的专项搬到这里冻结,按季度切目录(<code>2025-Q1/</code> / <code>2025-Q2/</code> / ...),保留过程产物供后续专项参考。</p>
+    <div class="empty-row">⏳ V16 阶段尚无归档专项</div>
+  </div>
+
+  <h2 id="protocols">protocols/ <span class="count">治理协议,0 / 5 录入</span></h2>
+  <div class="arch-section">
+    <p class="arch-section__intro">把"怎么发起 / Review / 落地 / 反哺 / 跨部门协调"写成可执行流程,不是口头共识。新专项立项前先看这里。</p>
+    <div class="comp-grid">
+      <div class="comp-card">
+        <div class="comp-card__head">
+          <span class="comp-card__name">怎么发起.md</span>
+          <span class="comp-card__status comp-card__status--todo">TBD</span>
+        </div>
+        <p class="comp-card__desc">专项立项流程 — 谁能发起、立项门槛、模板。</p>
+      </div>
+      <div class="comp-card">
+        <div class="comp-card__head">
+          <span class="comp-card__name">Review 流程.md</span>
+          <span class="comp-card__status comp-card__status--todo">TBD</span>
+        </div>
+        <p class="comp-card__desc">评审协议 — 评审节点、参与方、产出物。</p>
+      </div>
+      <div class="comp-card">
+        <div class="comp-card__head">
+          <span class="comp-card__name">落地协议.md</span>
+          <span class="comp-card__status comp-card__status--todo">TBD</span>
+        </div>
+        <p class="comp-card__desc">推广路径 — 灰度、回滚、跨业务迁移。</p>
+      </div>
+      <div class="comp-card">
+        <div class="comp-card__head">
+          <span class="comp-card__name">反哺机制.md</span>
+          <span class="comp-card__status comp-card__status--todo">TBD</span>
+        </div>
+        <p class="comp-card__desc">产出回流规则 — 新组件 / 新 token / 新 Skill 怎么进对应 Zone。</p>
+      </div>
+      <div class="comp-card">
+        <div class="comp-card__head">
+          <span class="comp-card__name">跨部门协调.md</span>
+          <span class="comp-card__status comp-card__status--todo">TBD</span>
+        </div>
+        <p class="comp-card__desc">多部门冲突解决 — 谁拍板、升级路径。</p>
+      </div>
+    </div>
+  </div>
+
+  <h2 id="handoff">handoff/ <span class="count">反哺接口,0 / 3 录入</span></h2>
+  <div class="arch-section">
+    <p class="arch-section__intro">专项产出回流到其它 Zone 的接口约定 —— 横向专项不囤产物,跑完就 handoff。这里列每条回流路径的字段映射、命名规则、检查清单。</p>
+    <div class="comp-grid">
+      <div class="comp-card">
+        <div class="comp-card__head">
+          <span class="comp-card__name">产出回流 → 🏗 产品架构</span>
+          <span class="comp-card__status comp-card__status--todo">TBD</span>
+        </div>
+        <p class="comp-card__desc">新组件 / 新页面结构进 <code>product-architecture/domains/</code>。</p>
+      </div>
+      <div class="comp-card">
+        <div class="comp-card__head">
+          <span class="comp-card__name">产出回流 → 🤖 AI 机制</span>
+          <span class="comp-card__status comp-card__status--todo">TBD</span>
+        </div>
+        <p class="comp-card__desc">新 Skill 进 <code>ai-mechanism/</code>,挂 Skill Registry。</p>
+      </div>
+      <div class="comp-card">
+        <div class="comp-card__head">
+          <span class="comp-card__name">产出回流 → 🎨 Design 基础</span>
+          <span class="comp-card__status comp-card__status--todo">TBD</span>
+        </div>
+        <p class="comp-card__desc">新 token / 新基础组件进 <code>foundations/</code>。</p>
+      </div>
+    </div>
+  </div>
+
+  <h2>相关链接</h2>
+  <div class="arch-section">
+    <p class="arch-section__intro">详细骨架与字段定义见架构大图 Zone 5 段;消费路径与 owner 见知识树。</p>
+    <ul style="color:var(--c-text-2);font-size:14px;margin:0;padding-left:20px;">
+      <li><a href="../../docs/jd-design-wiki-master-diagram.html" target="_blank" rel="noopener">架构大图 — Zone 5 横向专项</a></li>
+      <li><a href="../../docs/jd-design-wiki-knowledge-tree.html" target="_blank" rel="noopener">知识树总览 — 5 大分区 & 消费路径</a></li>
+      <li><a href="https://github.com/ShuaiMXu/jd-design-wiki-proposal/tree/main/jd-design-system-md-v16/horizontal" target="_blank" rel="noopener">↗ GitHub 源目录</a></li>
+    </ul>
+  </div>
+</main>
+
+</div><!-- /layout -->
+</body>
+</html>

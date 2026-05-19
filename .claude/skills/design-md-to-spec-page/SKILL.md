@@ -151,6 +151,19 @@ bundle 模式下追加读取 `spec.md` / `variants.md` / `behaviors.md`，按 [r
 
 > Pro/Basic 切换本质是模板层关注点 —— 决策表搬到 view-toggle.md 真相源后,SKILL.md 这章保持薄 4 行而非展开。改 class 策略 → 改 view-toggle.md,不动 SKILL.md。
 
+### Step 4d: 顶部 5-zone nav(v0.5.1)
+
+模板自带顶部 sticky bar（5 大 Zone tab），渲染时填两类 placeholder：
+
+| placeholder | 值 | 怎么算 |
+|---|---|---|
+| `{{rel_root}}` | 从 spec-page 所在目录回到 `jd-design-system-md-v16/` 根的相对前缀 | 数 bundle 相对 v16 根的路径段数,每段一个 `../`。例:`horizontal/components-base/tabbar/spec-page.html` → `../../../` |
+| `{{cls_zone_<id>}}` × 5 | 5 选 1 填 `is-current`,其余 4 个填空串 | bundle 路径顶层目录决定:`knowledge/` / `foundations/` / `ai-mechanism/` / `product-architecture/` / `horizontal/` 分别对应 id `knowledge` / `foundations` / `ai` / `arch` / `horizontal` |
+
+5 大 Zone 介绍页均已建,Step 4d 不再保留任何 `is-placeholder` —— 包括 🚀 横向专项,2026-05-19 起 `horizontal/spec-page.html` 已上线,旧 placeholder 写法(`href` 指向 master-diagram + `is-placeholder` 类)已弃用。
+
+> sidebar(zone-内子目录导航)目前不在模板里:那是 zone-内自定义结构,差异大,先留给手工补。后续若要做,放 Step 4e。
+
 ### Step 5: 演示 stage 处理
 
 3 种 stage 形态（按优先级）:
@@ -532,4 +545,10 @@ echo "✓ Pages 重 build 完成: $s"
   - **④ `--dry-run` flag**：Step 4 渲染后只 diff 不写文件（前 200 行 unified diff），跳过 Step 9 部署，便于预览改动；新文件则报体积估算
   - **⑤ Step 8 终端输出加"增量模式"字段**：full / incremental，切图段加"（跳过重导）"标识
   - 实测：tabbar 只改文字时，从 3-5 min（full）→ < 10 s（incremental）；本次改动只触及 SKILL.md 流程文档，无 reference 文件改动
+- **v0.5.1** (2026-05-19) 顶部 5-zone nav 进模板:
+  - **① 模板新增**:`<body>` 后直接加 sticky `top-bar` 块(brand + 5 zone nav + spacer),CSS 一并写进 `<style>`,跟其它 zone 页风格一致
+  - **② 2 个 placeholder**:`{{rel_root}}` 算路径深度 + 5 个 `{{cls_zone_<id>}}` 5 选 1 标 `is-current`(详 [Step 4d](#step-4d-顶部-5-zone-navv051))
+  - **③ 🚀 横向专项 解禁**:2026-05-19 `horizontal/spec-page.html` 已上线,nav 链直接指过去,弃用 `is-placeholder` + 指向 master-diagram 的旧写法
+  - **④ 不进模板的**:sidebar(zone-内子目录) — 5 个 zone 各自结构差异大,先手工补,有共性后再升级 Step 4e
+  - 实战:回填 `tabbar/spec-page.html` 顶部 nav 的 🚀 链路 + class,符合新契约
 - v0.6 (planned) 批量模式(一次跑多组件)+ TOC 自动嵌套(含 h3 子标题)+ 切图节点自动选择(避免每次手枚举)

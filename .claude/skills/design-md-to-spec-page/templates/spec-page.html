@@ -442,9 +442,52 @@
     border-bottom: 1px dashed var(--c-line);
   }
   .stage--image a.zoom-link:hover { color: var(--c-brand); border-bottom-color: var(--c-brand); }
+
+  /* ========== 顶部 5-zone nav(v0.5.1 起内置,SKILL.md Step 4d 填 placeholder)========== */
+  .top-bar {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; gap: 16px;
+    padding: 0 24px;
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+    flex-wrap: wrap;
+  }
+  .top-bar__brand {
+    padding: 14px 0; margin-right: 12px;
+    font-size: 13px; font-weight: 600;
+    color: var(--c-text); text-decoration: none;
+    letter-spacing: 0.02em;
+  }
+  .top-bar__brand small { color: var(--c-text-3); font-weight: 500; margin-left: 6px; }
+  .top-bar__nav { display: flex; align-items: stretch; gap: 4px; flex-wrap: wrap; }
+  .top-bar__nav-link {
+    padding: 14px 14px 12px; font-size: 13px;
+    color: var(--c-text-2); text-decoration: none;
+    font-weight: 500; line-height: 1.4;
+    white-space: nowrap; transition: color 150ms;
+  }
+  .top-bar__nav-link:hover { color: var(--c-text); }
+  .top-bar__nav-link.is-current { color: var(--c-text); font-weight: 600; }
+  .top-bar__spacer { flex: 1; }
 </style>
 </head>
 <body>
+
+<!-- 顶部 5 大 Zone nav(SKILL.md Step 4d 填 rel_root + current zone)-->
+<div class="top-bar">
+  <a href="{{rel_root}}docs/jd-design-wiki-knowledge-tree.html" class="top-bar__brand">JD Design Wiki <small>· V16</small></a>
+  <nav class="top-bar__nav" aria-label="5 大分区导航">
+    <a href="{{rel_root}}knowledge/spec-page.html" class="top-bar__nav-link {{cls_zone_knowledge}}">📚 Design 知识</a>
+    <a href="{{rel_root}}foundations/spec-page.html" class="top-bar__nav-link {{cls_zone_foundations}}">🎨 Design 基础</a>
+    <a href="{{rel_root}}ai-mechanism/spec-page.html" class="top-bar__nav-link {{cls_zone_ai}}">🤖 AI 机制</a>
+    <a href="{{rel_root}}product-architecture/spec-page.html" class="top-bar__nav-link {{cls_zone_arch}}">🏗 产品架构</a>
+    <a href="{{rel_root}}horizontal/spec-page.html" class="top-bar__nav-link {{cls_zone_horizontal}}">🚀 横向专项</a>
+  </nav>
+  <span class="top-bar__spacer"></span>
+</div>
+
 <div class="doc">
 
 <div class="title-row">
