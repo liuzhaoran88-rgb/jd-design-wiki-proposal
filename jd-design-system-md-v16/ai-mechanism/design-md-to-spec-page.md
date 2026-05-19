@@ -31,6 +31,7 @@ V16 体系下"发布面"的两个 skill 之一(另一个是 `design-md-to-portal
 - **Pro / Basic 双视图切换**(v0.3):Basic 入门暖场版,Pro 完整规范版
 - **切图能力**(v0.2):chunked b64 export + sharedPluginData 中转 + jq 解 dump file → `_assets/sec-N-*.png`
 - **v0.5 增量启发**:默认跳过切图重导(`_assets/*.png` 最旧 mtime vs `frontmatter.last_synced`),3-5min → <10s
+- **版本标签护栏**:V16 目录生成页头 / meta / 临时演示页时必须显示 `JD APP 16.0` / `V16.0`,不得继承旧 V15 示例页的 `JD APP 15.0` 文案。
 
 ---
 

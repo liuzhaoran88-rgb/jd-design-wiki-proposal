@@ -123,6 +123,22 @@ bundle 模式下追加读取 `spec.md` / `variants.md` / `behaviors.md`，按 [r
 - 缺失数据 → 标 TBD，不留 `{{}}`
 - 段落性内容（如 `{{section_2_behavior_list}}`）由模型构造完整 HTML 字符串塞进去
 
+#### 版本标签契约
+
+生成或手工补齐 HTML 页头 / eyebrow / meta 时，**版本标签必须从目标目录或 frontmatter 推导，不允许从旧页面示例直接继承**。
+
+| 输入位置 / 线索 | 页面展示 |
+|---|---|
+| `jd-design-system-md-v16/**` | `JD APP 16.0 GUIDELINE` / `Relay V16.0 GUIDELINE` |
+| `jd-design-system-md/**` | `JD APP 15.0 GUIDELINE` / `Relay V15.0 GUIDELINE` |
+| frontmatter 显式 `guideline_version` | 使用该字段，格式化为 `JD APP {version} GUIDELINE` |
+
+防回归要求：
+
+- V16 单组件页、临时预览页、交互演示页的可见页头不得出现 `JD APP 15.0`。
+- 如果参考了旧 HTML / `jd-toast-spec(1).html` 的结构，只能复用布局与样式，不得复用其中的版本文案。
+- 写入前用 `rg -n "JD APP 15\\.0|V15\\.0" <output-html>` 自检；除非目标目录明确是 `jd-design-system-md/`，否则视为阻断项。
+
 ### Step 4c: 视图分层(v0.3)
 
 模板自带 Pro / Basic 视图切换 UI(标题旁紧凑 segmented + JS + localStorage 持久化)。**Pro/Basic class 决策 + 元素级 / inline 双粒度规则全部在** [references/view-toggle.md](./references/view-toggle.md) **真相源**(235 行,含 7 章节标记策略 + class 决策表 + 失败模式)。
