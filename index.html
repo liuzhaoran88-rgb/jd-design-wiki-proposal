@@ -319,20 +319,20 @@
       position: relative;
       display: flex;
       align-items: flex-start;
-      gap: 8px;
+      gap: 0;
       padding: 4px;
       border-radius: 16px;
       background: transparent;
       box-shadow: var(--shadow);
-      outline: 1px solid var(--glass-line);
-      backdrop-filter: blur(22px) saturate(145%);
-      -webkit-backdrop-filter: blur(22px) saturate(145%);
       overflow: hidden;
+    }
+
+    .ordinary-nav.is-island {
+      gap: 4px;
     }
 
     .ordinary-nav.is-light {
       color: var(--nav-text-light);
-      outline-color: var(--glass-line-light);
       box-shadow: 0 8px 40px rgba(17, 20, 26, 0.1);
     }
 
@@ -350,31 +350,24 @@
         linear-gradient(0deg, var(--glass-dark-a), var(--glass-dark-a)),
         linear-gradient(0deg, var(--glass-dark-b), var(--glass-dark-b)),
         linear-gradient(0deg, var(--glass-dark-base), var(--glass-dark-base));
-      background-blend-mode: normal, normal, color-burn;
+      background-blend-mode: color-burn, normal, normal;
       opacity: 0.6;
     }
 
     .ordinary-nav.is-light::before {
       background:
-        linear-gradient(180deg, var(--glass-light-visual-a), var(--glass-light-visual-b)),
         linear-gradient(0deg, var(--glass-light-a), var(--glass-light-a)),
         var(--glass-light-base);
-      background-blend-mode: normal, color-dodge, normal;
+      background-blend-mode: color-dodge, normal;
       opacity: 1;
     }
 
     .ordinary-nav::after {
-      background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 38%, rgba(255, 255, 255, 0.1)),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 18%, rgba(255, 255, 255, 0) 82%, rgba(255, 255, 255, 0.16));
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+      box-shadow: none;
     }
 
     .ordinary-nav.is-light::after {
-      background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.12) 48%, rgba(255, 255, 255, 0.36)),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0) 18%, rgba(255, 255, 255, 0) 82%, rgba(255, 255, 255, 0.64));
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.94), inset 0 -1px 0 rgba(17, 20, 26, 0.04);
+      box-shadow: none;
     }
 
     .nav-item {
@@ -395,7 +388,13 @@
       z-index: 1;
     }
 
-    .nav-item svg {
+    .nav-icon {
+      width: 20px;
+      height: 20px;
+      display: block;
+    }
+
+    .nav-icon svg {
       width: 20px;
       height: 20px;
       display: block;
@@ -411,8 +410,13 @@
     }
 
     .nav-item.is-active {
-      background: rgba(37, 48, 45, 0.92);
+      background: #14171a;
+      background-blend-mode: plus-lighter;
       color: var(--jd-red);
+    }
+
+    .nav-item.is-active.is-plain-active {
+      background: transparent;
     }
 
     .ordinary-nav.is-light .nav-item {
@@ -626,12 +630,12 @@
               <tr><th>类型</th><th>内部布局</th><th>单坑宽度</th></tr>
             </thead>
             <tbody>
-              <tr><td>5 个</td><td>普通坑位 x 5，间距 x 4</td><td>62.2</td></tr>
-              <tr><td>4 个</td><td>普通坑位 x 4，间距 x 3</td><td>79.75</td></tr>
-              <tr><td>3 个</td><td>普通坑位 x 3，间距 x 2</td><td>109</td></tr>
-              <tr><td>2 个</td><td>普通坑位 x 2，间距 x 1</td><td>167.5</td></tr>
-              <tr><td>日常/运营</td><td>普通坑位 x 4 + 运营灵动岛 x 1，间距 x 4</td><td>普通坑位 45，灵动岛 131</td></tr>
-              <tr><td>大促灵动岛</td><td>普通坑位 x 4 + 大促灵动岛宽版 x 1，间距 x 4</td><td>普通坑位 41.75，灵动岛 144</td></tr>
+              <tr><td>5 个</td><td>普通坑位 x 5，内部 flex 均分</td><td>71.8</td></tr>
+              <tr><td>4 个</td><td>普通坑位 x 4，内部 flex 均分</td><td>88.75</td></tr>
+              <tr><td>3 个</td><td>普通坑位 x 3，内部 flex 均分</td><td>117</td></tr>
+              <tr><td>2 个</td><td>普通坑位 x 2，内部 flex 均分</td><td>173.5</td></tr>
+              <tr><td>日常/运营</td><td>普通坑位 x 4 + 运营灵动岛 x 1，内部 gap 4</td><td>普通坑位 49，灵动岛 131</td></tr>
+              <tr><td>大促灵动岛</td><td>普通坑位 x 4 + 大促灵动岛宽版 x 1，内部 gap 4</td><td>普通坑位 45.75，灵动岛 144</td></tr>
             </tbody>
           </table>
         </section>
@@ -655,8 +659,8 @@
               <tr><th>材质模式</th><th>Zero 源参数</th><th>HTML 演示处理</th></tr>
             </thead>
             <tbody>
-              <tr><td>日间</td><td><code>rgba(245,245,245,.60)</code> + <code>#262626</code>；混合模式 <code>color-dodge, normal</code>。</td><td>按截图观感叠加洁净白色玻璃视觉层，避免浏览器混合后出现灰脏。</td></tr>
-              <tr><td>暗黑</td><td>底层透明度 <code>.60</code>；背景层为 <code>rgba(255,255,255,.06)</code>、<code>rgba(0,0,0,.60)</code>、<code>#CCCCCC</code>；混合模式 <code>normal, normal, color-burn</code>。</td><td>按深色背景前端代码还原三层背景、圆角 16 DP、阴影与底层透明度。</td></tr>
+              <tr><td>日间</td><td><code>rgba(245,245,245,.60)</code> + <code>#262626</code>；混合模式 <code>color-dodge, normal</code>。</td><td>按 Zero 代码直接还原，不额外叠加视觉修饰层。</td></tr>
+              <tr><td>暗黑</td><td>底层透明度 <code>.60</code>；背景层为 <code>rgba(255,255,255,.06)</code>、<code>rgba(0,0,0,.60)</code>、<code>#CCCCCC</code>；混合模式 <code>color-burn, normal, normal</code>。</td><td>按 Zero 深色背景前端代码还原三层背景、圆角 16 DP、阴影与底层透明度。</td></tr>
               <tr><td>通用</td><td>玻璃外层阴影 <code>0 8 40 rgba(0,0,0,.12)</code>；圆角 16 DP。</td><td>主容器保持 351 x 52 DP，内部 padding 4 DP。</td></tr>
             </tbody>
           </table>
@@ -688,7 +692,7 @@
         </div>
         <div class="metrics">
           <div class="metric"><b id="barSize">351 x 52</b><span>主容器尺寸</span></div>
-          <div class="metric"><b id="itemSize">62.2</b><span>当前单坑宽度</span></div>
+          <div class="metric"><b id="itemSize">71.8</b><span>当前单坑宽度</span></div>
         </div>
       </aside>
     </div>
@@ -698,12 +702,12 @@
 
   <script>
     const modes = [
-      { id: "five", label: "5个", itemWidth: "62.2", items: ["普通", "选中", "普通", "普通", "普通"] },
-      { id: "four", label: "4个", itemWidth: "79.75", items: ["普通", "选中", "普通", "普通"] },
-      { id: "three", label: "3个", itemWidth: "109", items: ["普通", "选中", "普通"] },
-      { id: "two", label: "2个", itemWidth: "167.5", items: ["普通", "选中"] },
-      { id: "daily", label: "日常/运营", itemWidth: "45 / 131", items: ["普通", "选中", "daily", "普通", "普通"] },
-      { id: "promo", label: "大促灵动岛", itemWidth: "41.75 / 144", items: ["普通", "选中", "promo", "普通", "普通"] }
+      { id: "five", label: "5个", itemWidth: "71.8", items: ["普通", "选中", "普通", "普通", "普通"] },
+      { id: "four", label: "4个", itemWidth: "88.75", items: ["普通", "选中", "普通", "普通"] },
+      { id: "three", label: "3个", itemWidth: "117", items: ["普通", "选中", "普通"] },
+      { id: "two", label: "2个", itemWidth: "173.5", items: ["普通", "选中"] },
+      { id: "daily", label: "日常/运营", itemWidth: "49 / 131", items: ["普通", "选中", "daily", "普通", "普通"], island: true },
+      { id: "promo", label: "大促灵动岛", itemWidth: "45.75 / 144", items: ["普通", "选中", "promo", "普通", "普通"], island: true }
     ];
 
     let currentMode = modes[0];
@@ -716,14 +720,18 @@
     const phoneFrame = document.getElementById("phoneFrame");
     const itemSize = document.getElementById("itemSize");
 
-    function homeIcon() {
-      return `
-        <svg viewBox="0 0 20 20" aria-hidden="true">
-          <path d="M2.2 8.8 9.5 2.4a.8.8 0 0 1 1 0l7.3 6.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M4.2 8.4v7.2c0 .9.7 1.6 1.6 1.6h8.4c.9 0 1.6-.7 1.6-1.6V8.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-          <path d="M8 17.1v-4.2h4v4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      `;
+    const zeroIconSvg = {
+      lightDefault: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" width="20" height="20" viewBox="0 0 20 20"><path d="M19.775 7.993L11.053 0.40900001C10.739 0.13600001 10.375 0 9.9589996 0C9.5430002 0 9.1789999 0.13600001 8.8649998 0.40900001L0.14300001 7.993C-0.029999999 8.1440001 -0.048999999 8.4069996 0.102 8.5810003L0.67400002 9.2379999C0.81099999 9.3959999 1.051 9.4130001 1.209 9.2749996L1.209 15.562C1.209 16.483 1.534 17.268 2.1849999 17.919001C2.836 18.57 3.622 18.896 4.5419998 18.896L15.375 18.896C16.296 18.896 17.082001 18.57 17.733 17.919001C18.382999 17.268 18.709 16.483 18.709 15.562L18.709 9.2749996C18.867001 9.4130001 19.107 9.3959999 19.245001 9.2379999L19.816 8.5810003C19.966999 8.4069996 19.948 8.1440001 19.775 7.993ZM12.459 17.229L15.375 17.229C15.836 17.229 16.229 17.066 16.554001 16.740999C16.879999 16.415001 17.042 16.021999 17.042 15.562L17.042 7.8260002L9.9589996 1.6670001L2.875 7.8260002L2.875 15.562C2.875 16.021999 3.0380001 16.415001 3.3640001 16.740999C3.6889999 17.066 4.0819998 17.229 4.5419998 17.229L7.4590001 17.229L7.4590001 14.729C7.4590001 13.348 8.5780001 12.229 9.9589996 12.229C11.34 12.229 12.459 13.348 12.459 14.729L12.459 17.229ZM9.1260004 17.229L10.793 17.229L10.793 14.729C10.793 14.499 10.711 14.302 10.548 14.14C10.386 13.977 10.189 13.896 9.9589996 13.896C9.7290001 13.896 9.533 13.977 9.3699999 14.14C9.2069998 14.302 9.1260004 14.499 9.1260004 14.729L9.1260004 17.229Z" fill-rule="evenodd" transform="translate(0.041, 0.271)" fill="#11141a"/></svg>`,
+      darkDefault: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" width="20" height="20" viewBox="0 0 20 20"><path d="M19.775 7.993L11.053 0.40900001C10.739 0.13600001 10.375 0 9.9589996 0C9.5430002 0 9.1789999 0.13600001 8.8649998 0.40900001L0.14300001 7.993C-0.029999999 8.1440001 -0.048999999 8.4069996 0.102 8.5810003L0.67400002 9.2379999C0.81099999 9.3959999 1.051 9.4130001 1.209 9.2749996L1.209 15.562C1.209 16.483 1.534 17.268 2.1849999 17.919001C2.836 18.57 3.622 18.896 4.5419998 18.896L15.375 18.896C16.296 18.896 17.082001 18.57 17.733 17.919001C18.382999 17.268 18.709 16.483 18.709 15.562L18.709 9.2749996C18.867001 9.4130001 19.107 9.3959999 19.245001 9.2379999L19.816 8.5810003C19.966999 8.4069996 19.948 8.1440001 19.775 7.993ZM12.459 17.229L15.375 17.229C15.836 17.229 16.229 17.066 16.554001 16.740999C16.879999 16.415001 17.042 16.021999 17.042 15.562L17.042 7.8260002L9.9589996 1.6670001L2.875 7.8260002L2.875 15.562C2.875 16.021999 3.0380001 16.415001 3.3640001 16.740999C3.6889999 17.066 4.0819998 17.229 4.5419998 17.229L7.4590001 17.229L7.4590001 14.729C7.4590001 13.348 8.5780001 12.229 9.9589996 12.229C11.34 12.229 12.459 13.348 12.459 14.729L12.459 17.229ZM9.1260004 17.229L10.793 17.229L10.793 14.729C10.793 14.499 10.711 14.302 10.548 14.14C10.386 13.977 10.189 13.896 9.9589996 13.896C9.7290001 13.896 9.533 13.977 9.3699999 14.14C9.2069998 14.302 9.1260004 14.499 9.1260004 14.729L9.1260004 17.229Z" fill-rule="evenodd" transform="translate(0.041, 0.271)" fill="#e1e6eb"/></svg>`,
+      selected: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" width="20" height="20" viewBox="0 0 20 20"><path d="M11.053 0.40900001L19.775 7.993C19.948999 8.1440001 19.966999 8.4069996 19.816 8.5810003L19.245001 9.2379999C19.107 9.3959999 18.867001 9.4130001 18.709 9.2749996L18.709 15.562C18.709 16.483 18.382999 17.268 17.733 17.919001C17.082001 18.57 16.296 18.896 15.376 18.896L4.5419998 18.896C3.622 18.896 2.836 18.57 2.1860001 17.919001C1.534 17.268 1.209 16.483 1.209 15.562L1.209 9.2749996C1.051 9.4130001 0.81099999 9.3959999 0.67400002 9.2379999L0.102 8.5810003C-0.048999999 8.4069996 -0.029999999 8.1440001 0.14300001 7.993L8.8660002 0.40900001C9.1789999 0.13600001 9.5430002 0 9.9589996 0C10.375 0 10.739 0.13600001 11.053 0.40900001Z" fill-rule="evenodd" transform="translate(0.041, 0.271)" fill="#ff0f23"/><path d="M3.362 0.80500001C2.5829999 0.80500001 1.901 0.57200003 1.3150001 0.106C1.135 -0.037 0.87300003 -0.039000001 0.70999998 0.123L0.121 0.713C-0.041999999 0.875 -0.043000001 1.141 0.133 1.29C0.537 1.633 0.986 1.905 1.4809999 2.1059999C2.0829999 2.349 2.71 2.471 3.362 2.471C4.0139999 2.471 4.6409998 2.349 5.243 2.1059999C5.7379999 1.905 6.1869998 1.633 6.5910001 1.29C6.7670002 1.141 6.7659998 0.875 6.6030002 0.713L6.0139999 0.123C5.8509998 -0.039000001 5.5879998 -0.037 5.408 0.106C4.823 0.57200003 4.1409998 0.80500001 3.362 0.80500001Z" fill-rule="evenodd" transform="translate(6.638, 12.113)" fill="var(--zero-selected-mouth, #ffffff)"/></svg>`
+    };
+
+    function homeIcon(active) {
+      const nodeId = active
+        ? (surface === "light" ? "54:330;49:211" : "54:382;49:235;49:211")
+        : (surface === "light" ? "54:329;49:207" : "54:382;49:234;49:207");
+      const svg = active ? zeroIconSvg.selected : (surface === "light" ? zeroIconSvg.lightDefault : zeroIconSvg.darkDefault);
+      return `<span class="nav-icon" data-node-id="${nodeId}" data-zero-resource="icon">${svg}</span>`;
     }
 
     function renderButtons() {
@@ -778,15 +786,18 @@
       navPreview.innerHTML = currentMode.items.map((item, index) => {
         if (item === "daily" || item === "promo") return renderIsland(item);
         const active = index === activeIndex;
+        const plainActive = active && currentMode.island;
         return `
-          <button class="nav-item ${active ? "is-active" : ""}" type="button" style="flex:1 1 0" data-index="${index}" aria-current="${active ? "page" : "false"}">
-            ${homeIcon()}
+          <button class="nav-item ${active ? "is-active" : ""} ${plainActive ? "is-plain-active" : ""}" type="button" style="flex:1 1 0" data-index="${index}" aria-current="${active ? "page" : "false"}">
+            ${homeIcon(active)}
             <span>文案</span>
           </button>
         `;
       }).join("");
 
       navPreview.classList.toggle("is-light", surface === "light");
+      navPreview.classList.toggle("is-island", Boolean(currentMode.island));
+      navPreview.style.setProperty("--zero-selected-mouth", surface === "light" ? "#ffffff" : "#1f2226");
       phoneFrame.classList.toggle("is-light", surface === "light");
 
       navPreview.querySelectorAll(".nav-item").forEach((button) => {
