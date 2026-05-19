@@ -75,6 +75,33 @@
       font-size: 16px;
     }
 
+    .demo-entry {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 38px;
+      margin: 0 0 18px;
+      padding: 8px 14px;
+      border: 1px solid rgba(255, 15, 35, 0.24);
+      border-radius: 8px;
+      background: #fff2f3;
+      color: var(--jd-red);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .demo-entry::after {
+      content: "→";
+      font-size: 15px;
+      line-height: 1;
+    }
+
+    .demo-entry:hover {
+      border-color: rgba(255, 15, 35, 0.42);
+      background: #ffe8eb;
+    }
+
     .layout {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 430px;
@@ -535,6 +562,7 @@
     <p class="eyebrow">JD APP 15.0 GUIDELINE · Bottom Navigation</p>
     <h1>3.1 普通底导组合</h1>
     <p class="lead">本页尝试用 Markdown 内容生成一份可读 HTML 规范，并优先通过设计稿变量与节点结构重建可交互组件。当前聚焦普通底导组合，不包含 Joy Agent 特殊形态。</p>
+    <a class="demo-entry" href="./bottom-nav-interactive-demo.html">打开交互演示台</a>
 
     <div class="layout">
       <article>
