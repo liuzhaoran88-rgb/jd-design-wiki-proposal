@@ -164,6 +164,33 @@
       font-size: 12px;
     }
 
+    .rule-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 8px;
+    }
+
+    .rule-list li {
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.66);
+      font-size: 13px;
+    }
+
+    .rule-list b {
+      color: var(--text-strong);
+      font-weight: 600;
+    }
+
+    .section-note {
+      margin: 4px 0 12px;
+      color: var(--text-help);
+      font-size: 13px;
+    }
+
     .demo-card {
       position: sticky;
       top: 24px;
@@ -610,10 +637,35 @@
 
         <section>
           <h2>视觉状态</h2>
-          <p>默认态使用普通字重文本，选中态使用 <code>color_primary</code>，文本字重提升到 600。玻璃容器需要区分浅色背景与暗色背景两套参数，不应混用。</p>
-          <p>浅色背景下，Liquid Glass 使用 <code>模式=日间</code>，Zero 源参数为 <code>rgba(245,245,245,.60)</code> 叠加 <code>#262626</code>，混合模式为 <code>color-dodge, normal</code>；HTML 演示按截图观感叠加洁净白色玻璃视觉层，避免浏览器混合后出现灰脏。选中坑位底板为 <code>#F2F4F7</code>。</p>
-          <p>暗色背景下，Liquid Glass 使用 <code>模式=暗黑</code>，底层透明度为 <code>.60</code>，背景层为 <code>rgba(255,255,255,.06)</code>、<code>rgba(0,0,0,.60)</code>、<code>#CCCCCC</code>，混合模式为 <code>color-burn, normal, normal</code>；选中坑位底板为 <code>#14171A</code>。</p>
-          <p>普通坑位文案最多展示 4 个汉字，超出需业务侧改短，不建议自动缩小字号。单个底导之间保持 8 DP 间距；灵动岛与相邻普通坑位之间同样保持 8 DP 间距。灵动岛是独立原子，不作为普通坑位等宽分配；日常/运营宽度为 131，大促宽版为 144，且只能配置在中间强化位，不允许配置到两侧坑位。</p>
+          <p class="section-note">视觉规则分为坑位状态、玻璃材质和配置约束三类。浅色与暗色背景必须使用各自参数，不应混用。</p>
+          <table>
+            <thead>
+              <tr><th>对象</th><th>默认态</th><th>选中态</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>普通坑位</td><td>普通字重文本；图标与文字使用当前背景下的默认文本色。</td><td>文字使用 <code>color_primary</code>，字重提升到 600；显示 12 DP 圆角选中底板。</td></tr>
+              <tr><td>浅色背景</td><td>默认文字/图标使用 <code>color_title</code>。</td><td>选中坑位底板为 <code>#F2F4F7</code>。</td></tr>
+              <tr><td>暗色背景</td><td>默认文字/图标使用浅色文本 <code>#E1E6EB</code>。</td><td>选中坑位底板为 <code>#14171A</code>。</td></tr>
+            </tbody>
+          </table>
+
+          <table>
+            <thead>
+              <tr><th>材质模式</th><th>Zero 源参数</th><th>HTML 演示处理</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>日间</td><td><code>rgba(245,245,245,.60)</code> + <code>#262626</code>；混合模式 <code>color-dodge, normal</code>。</td><td>按截图观感叠加洁净白色玻璃视觉层，避免浏览器混合后出现灰脏。</td></tr>
+              <tr><td>暗黑</td><td>底层透明度 <code>.60</code>；背景层为 <code>rgba(255,255,255,.06)</code>、<code>rgba(0,0,0,.60)</code>、<code>#CCCCCC</code>；混合模式 <code>color-burn, normal, normal</code>。</td><td>保留暗黑三层背景与高光描边，强化深色背景下的玻璃质感。</td></tr>
+              <tr><td>通用</td><td>玻璃外层阴影 <code>0 8 40 rgba(0,0,0,.12)</code>；圆角 16 DP。</td><td>主容器保持 351 x 52 DP，内部 padding 4 DP。</td></tr>
+            </tbody>
+          </table>
+
+          <ul class="rule-list">
+            <li><b>文案长度：</b>普通坑位文案最多展示 4 个汉字，超出需业务侧改短，不建议自动缩小字号。</li>
+            <li><b>坑位间距：</b>单个底导之间保持 8 DP 间距；灵动岛与相邻普通坑位之间同样保持 8 DP 间距。</li>
+            <li><b>灵动岛位置：</b>日常/运营与大促灵动岛只能配置在中间强化位，不允许配置到两侧坑位。</li>
+            <li><b>灵动岛尺寸：</b>灵动岛是独立原子，不作为普通坑位等宽分配；日常/运营宽度为 131，大促宽版为 144。</li>
+          </ul>
         </section>
 
         <section>
