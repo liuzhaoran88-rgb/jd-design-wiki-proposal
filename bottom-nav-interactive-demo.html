@@ -187,12 +187,12 @@
     }
 
     .ordinary-nav::before {
-      opacity: var(--glass-opacity, 0.6);
+      opacity: 0.6;
       background:
         linear-gradient(0deg, var(--glass-dark-a), var(--glass-dark-a)),
-        var(--glass-dark-b),
-        var(--glass-dark-base);
-      background-blend-mode: color-burn, normal, normal;
+        linear-gradient(0deg, var(--glass-dark-b), var(--glass-dark-b)),
+        linear-gradient(0deg, var(--glass-dark-base), var(--glass-dark-base));
+      background-blend-mode: normal, normal, color-burn;
     }
 
     .ordinary-nav::after {
@@ -571,10 +571,6 @@
           <label for="detailRange">背景复杂度</label>
           <input id="detailRange" type="range" min="0" max="1" value="0.8" step="0.1">
         </div>
-        <div class="field" id="opacityField">
-          <label for="opacityRange">暗色玻璃底层透明度</label>
-          <input id="opacityRange" type="range" min="0.3" max="0.9" value="0.6" step="0.05">
-        </div>
       </section>
 
       <section class="panel">
@@ -628,8 +624,6 @@
     const preview = document.getElementById("preview");
     const scene = document.getElementById("scene");
     const detailRange = document.getElementById("detailRange");
-    const opacityRange = document.getElementById("opacityRange");
-    const opacityField = document.getElementById("opacityField");
     const labelInput = document.getElementById("labelInput");
     const tokenList = document.getElementById("tokenList");
     const slotMetric = document.getElementById("slotMetric");
@@ -737,7 +731,7 @@
             ["模式", "暗黑"],
             ["透明度", state.opacity.toFixed(2)],
             ["底层", "rgba(255,255,255,.06) + rgba(0,0,0,.60) + #CCCCCC"],
-            ["混合", "color-burn, normal, normal"],
+            ["混合", "normal, normal, color-burn"],
             ["选中", "#14171A"],
             ["间距", "8px"]
           ];
@@ -757,21 +751,13 @@
       nav.classList.toggle("is-light", isLight);
       phone.classList.toggle("is-light", isLight);
       preview.classList.toggle("is-light", isLight);
-      opacityField.hidden = isLight;
       scene.style.setProperty("--scene-detail", state.detail);
-      nav.style.setProperty("--glass-opacity", state.opacity);
       slotMetric.textContent = currentMode().slot;
     }
 
     detailRange.addEventListener("input", () => {
       state.detail = Number(detailRange.value);
       scene.style.setProperty("--scene-detail", state.detail);
-    });
-
-    opacityRange.addEventListener("input", () => {
-      state.opacity = Number(opacityRange.value);
-      nav.style.setProperty("--glass-opacity", state.opacity);
-      renderTokens();
     });
 
     labelInput.addEventListener("input", () => {

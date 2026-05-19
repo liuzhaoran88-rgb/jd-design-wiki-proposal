@@ -348,9 +348,9 @@
     .ordinary-nav::before {
       background:
         linear-gradient(0deg, var(--glass-dark-a), var(--glass-dark-a)),
-        var(--glass-dark-b),
-        var(--glass-dark-base);
-      background-blend-mode: color-burn, normal, normal;
+        linear-gradient(0deg, var(--glass-dark-b), var(--glass-dark-b)),
+        linear-gradient(0deg, var(--glass-dark-base), var(--glass-dark-base));
+      background-blend-mode: normal, normal, color-burn;
       opacity: 0.6;
     }
 
@@ -656,7 +656,7 @@
             </thead>
             <tbody>
               <tr><td>日间</td><td><code>rgba(245,245,245,.60)</code> + <code>#262626</code>；混合模式 <code>color-dodge, normal</code>。</td><td>按截图观感叠加洁净白色玻璃视觉层，避免浏览器混合后出现灰脏。</td></tr>
-              <tr><td>暗黑</td><td>底层透明度 <code>.60</code>；背景层为 <code>rgba(255,255,255,.06)</code>、<code>rgba(0,0,0,.60)</code>、<code>#CCCCCC</code>；混合模式 <code>color-burn, normal, normal</code>。</td><td>保留暗黑三层背景与高光描边，强化深色背景下的玻璃质感。</td></tr>
+              <tr><td>暗黑</td><td>底层透明度 <code>.60</code>；背景层为 <code>rgba(255,255,255,.06)</code>、<code>rgba(0,0,0,.60)</code>、<code>#CCCCCC</code>；混合模式 <code>normal, normal, color-burn</code>。</td><td>按深色背景前端代码还原三层背景、圆角 16 DP、阴影与底层透明度。</td></tr>
               <tr><td>通用</td><td>玻璃外层阴影 <code>0 8 40 rgba(0,0,0,.12)</code>；圆角 16 DP。</td><td>主容器保持 351 x 52 DP，内部 padding 4 DP。</td></tr>
             </tbody>
           </table>
