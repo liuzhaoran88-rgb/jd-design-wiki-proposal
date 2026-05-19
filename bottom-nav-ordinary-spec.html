@@ -363,7 +363,12 @@
     }
 
     .ordinary-nav::after {
-      box-shadow: none;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.02) 42%, rgba(255, 255, 255, 0.06)),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 18%, rgba(255, 255, 255, 0) 82%, rgba(255, 255, 255, 0.12));
+      box-shadow:
+        inset 0 1px 0 rgba(225, 230, 235, 0.28),
+        inset 0 -1px 0 rgba(225, 230, 235, 0.16);
     }
 
     .ordinary-nav.is-light::after {
@@ -665,7 +670,7 @@
             </thead>
             <tbody>
               <tr><td>日间</td><td><code>rgba(245,245,245,.60)</code> + <code>#262626</code>；混合模式 <code>color-dodge, normal</code>。</td><td>底层使用 <code>54:336;49:10</code> 参数；玻璃高光层参考完整 <code>54:336</code> 截图补齐。</td></tr>
-              <tr><td>暗黑</td><td>底层透明度 <code>.60</code>；背景层为 <code>rgba(255,255,255,.06)</code>、<code>rgba(0,0,0,.60)</code>、<code>#CCCCCC</code>；混合模式 <code>color-burn, normal, normal</code>。</td><td>按 Zero 深色背景前端代码还原三层背景、圆角 16 DP、阴影与底层透明度。</td></tr>
+              <tr><td>暗黑</td><td>底层透明度 <code>.60</code>；背景层为 <code>rgba(255,255,255,.06)</code>、<code>rgba(0,0,0,.60)</code>、<code>#CCCCCC</code>；混合模式 <code>color-burn, normal, normal</code>。</td><td>底层使用 <code>54:382;49:233;49:13</code> 参数；玻璃边缘高光层参考完整 <code>54:382;49:233</code> 截图补齐。</td></tr>
               <tr><td>通用</td><td>玻璃外层阴影 <code>0 8 40 rgba(0,0,0,.12)</code>；圆角 16 DP。</td><td>主容器保持 351 x 52 DP，内部 padding 4 DP。</td></tr>
             </tbody>
           </table>
@@ -702,7 +707,7 @@
       </aside>
     </div>
 
-    <p class="source-note">数据来源：Relay 节点 <code>54:325</code>、<code>54:336</code>、<code>54:336;49:10</code>、<code>54:376</code>、<code>54:382</code> 的 Zero 设计上下文与截图。当前 HTML 优先使用 Zero 返回的结构、变量与 SVG 代码生成组件；当玻璃效果层未展开参数时，使用对应节点截图补齐视觉效果。</p>
+    <p class="source-note">数据来源：Relay 节点 <code>54:325</code>、<code>54:336</code>、<code>54:336;49:10</code>、<code>54:376</code>、<code>54:382</code>、<code>54:382;49:233</code> 的 Zero 设计上下文与截图。当前 HTML 优先使用 Zero 返回的结构、变量与 SVG 代码生成组件；当玻璃效果层未展开参数时，使用对应节点截图补齐视觉效果。</p>
   </main>
 
   <script>
