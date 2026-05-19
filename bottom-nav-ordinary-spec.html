@@ -359,7 +359,7 @@
         linear-gradient(0deg, var(--glass-light-a), var(--glass-light-a)),
         var(--glass-light-base);
       background-blend-mode: color-dodge, normal;
-      opacity: 1;
+      opacity: 0.36;
     }
 
     .ordinary-nav::after {
@@ -373,8 +373,8 @@
 
     .ordinary-nav.is-light::after {
       background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.58) 44%, rgba(255, 255, 255, 0.9)),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0) 16%, rgba(255, 255, 255, 0) 84%, rgba(255, 255, 255, 0.5));
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.84) 44%, rgba(255, 255, 255, 0.96)),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.16) 16%, rgba(255, 255, 255, 0.16) 84%, rgba(255, 255, 255, 0.66));
       box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.95),
         inset 0 -1px 0 rgba(255, 255, 255, 0.42);
@@ -457,7 +457,7 @@
 
     .ordinary-nav.is-light .nav-item.is-active::before {
       background: #f2f4f7;
-      mix-blend-mode: plus-darker;
+      mix-blend-mode: normal;
     }
 
     .nav-item.is-active .nav-label {
@@ -681,7 +681,7 @@
             </thead>
             <tbody>
               <tr><td>普通坑位</td><td>普通字重文本；图标与文字使用当前背景下的默认文本色。</td><td>文字使用 <code>color_primary</code>，字重提升到 600；显示 12 DP 圆角选中底板。</td></tr>
-              <tr><td>浅色背景</td><td>默认文字/图标使用 <code>color_title</code>。</td><td>选中坑位底板为 <code>#F2F4F7</code>，以 <code>plus_darker</code> 与玻璃底层叠加。</td></tr>
+              <tr><td>浅色背景</td><td>默认文字/图标使用 <code>color_title</code>。</td><td>选中坑位底板源参数为 <code>#F2F4F7 + plus_darker</code>；HTML 预览使用 <code>#F2F4F7</code> 视觉 fallback，避免浏览器不稳定支持 <code>plus_darker</code> 时变脏。</td></tr>
               <tr><td>暗色背景</td><td>默认文字/图标使用浅色文本 <code>#E1E6EB</code>。</td><td>选中坑位底板为 <code>#14171A</code>，以 <code>plus_lighter</code> 与玻璃底层叠加。</td></tr>
             </tbody>
           </table>
@@ -691,7 +691,7 @@
               <tr><th>材质模式</th><th>Zero 源参数</th><th>HTML 演示处理</th></tr>
             </thead>
             <tbody>
-              <tr><td>日间</td><td><code>rgba(245,245,245,.60)</code> + <code>#262626</code>；混合模式 <code>color-dodge, normal</code>。</td><td>底层使用 <code>54:336;49:10</code> 参数；玻璃高光层参考完整 <code>54:336</code> 截图补齐。</td></tr>
+              <tr><td>日间</td><td><code>rgba(245,245,245,.60)</code> + <code>#262626</code>；混合模式 <code>color-dodge, normal</code>。</td><td>底层使用 <code>54:336;49:10</code> 参数；为贴近完整 <code>54:336</code> 的白色玻璃截图，HTML 中降低底层显性灰度并补强高光层。</td></tr>
               <tr><td>暗黑</td><td>底层透明度 <code>.60</code>；背景层为 <code>rgba(255,255,255,.06)</code>、<code>rgba(0,0,0,.60)</code>、<code>#CCCCCC</code>；混合模式 <code>color-burn, normal, normal</code>。</td><td>底层使用 <code>54:382;49:233;49:13</code> 参数；玻璃边缘高光层参考完整 <code>54:382;49:233</code> 截图补齐。</td></tr>
               <tr><td>通用</td><td>玻璃外层阴影 <code>0 8 40 rgba(0,0,0,.12)</code>；圆角 16 DP。</td><td>主容器保持 351 x 52 DP，内部 padding 4 DP。</td></tr>
             </tbody>
