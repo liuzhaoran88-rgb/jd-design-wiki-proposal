@@ -402,6 +402,8 @@
       width: 20px;
       height: 20px;
       display: block;
+      position: relative;
+      z-index: 1;
     }
 
     .nav-icon svg {
@@ -417,16 +419,32 @@
       font-weight: 400;
       white-space: nowrap;
       letter-spacing: 0;
+      position: relative;
+      z-index: 1;
     }
 
     .nav-item.is-active {
-      background: #14171a;
-      background-blend-mode: plus-lighter;
+      background: transparent;
       color: var(--jd-red);
+      overflow: hidden;
+    }
+
+    .nav-item.is-active::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      border-radius: inherit;
+      background: #14171a;
+      mix-blend-mode: plus-lighter;
     }
 
     .nav-item.is-active.is-plain-active {
       background: transparent;
+    }
+
+    .nav-item.is-active.is-plain-active::before {
+      content: none;
     }
 
     .ordinary-nav.is-light .nav-item {
@@ -435,7 +453,11 @@
 
     .ordinary-nav.is-light .nav-item.is-active {
       color: var(--jd-red);
+    }
+
+    .ordinary-nav.is-light .nav-item.is-active::before {
       background: #f2f4f7;
+      mix-blend-mode: plus-darker;
     }
 
     .nav-item.is-active .nav-label {
@@ -659,8 +681,8 @@
             </thead>
             <tbody>
               <tr><td>普通坑位</td><td>普通字重文本；图标与文字使用当前背景下的默认文本色。</td><td>文字使用 <code>color_primary</code>，字重提升到 600；显示 12 DP 圆角选中底板。</td></tr>
-              <tr><td>浅色背景</td><td>默认文字/图标使用 <code>color_title</code>。</td><td>选中坑位底板为 <code>#F2F4F7</code>。</td></tr>
-              <tr><td>暗色背景</td><td>默认文字/图标使用浅色文本 <code>#E1E6EB</code>。</td><td>选中坑位底板为 <code>#14171A</code>。</td></tr>
+              <tr><td>浅色背景</td><td>默认文字/图标使用 <code>color_title</code>。</td><td>选中坑位底板为 <code>#F2F4F7</code>，以 <code>plus_darker</code> 与玻璃底层叠加。</td></tr>
+              <tr><td>暗色背景</td><td>默认文字/图标使用浅色文本 <code>#E1E6EB</code>。</td><td>选中坑位底板为 <code>#14171A</code>，以 <code>plus_lighter</code> 与玻璃底层叠加。</td></tr>
             </tbody>
           </table>
 
