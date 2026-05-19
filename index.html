@@ -367,7 +367,12 @@
     }
 
     .ordinary-nav.is-light::after {
-      box-shadow: none;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.58) 44%, rgba(255, 255, 255, 0.9)),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0) 16%, rgba(255, 255, 255, 0) 84%, rgba(255, 255, 255, 0.5));
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.95),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.42);
     }
 
     .nav-item {
@@ -659,7 +664,7 @@
               <tr><th>材质模式</th><th>Zero 源参数</th><th>HTML 演示处理</th></tr>
             </thead>
             <tbody>
-              <tr><td>日间</td><td><code>rgba(245,245,245,.60)</code> + <code>#262626</code>；混合模式 <code>color-dodge, normal</code>。</td><td>按 Zero 代码直接还原，不额外叠加视觉修饰层。</td></tr>
+              <tr><td>日间</td><td><code>rgba(245,245,245,.60)</code> + <code>#262626</code>；混合模式 <code>color-dodge, normal</code>。</td><td>底层使用 <code>54:336;49:10</code> 参数；玻璃高光层参考完整 <code>54:336</code> 截图补齐。</td></tr>
               <tr><td>暗黑</td><td>底层透明度 <code>.60</code>；背景层为 <code>rgba(255,255,255,.06)</code>、<code>rgba(0,0,0,.60)</code>、<code>#CCCCCC</code>；混合模式 <code>color-burn, normal, normal</code>。</td><td>按 Zero 深色背景前端代码还原三层背景、圆角 16 DP、阴影与底层透明度。</td></tr>
               <tr><td>通用</td><td>玻璃外层阴影 <code>0 8 40 rgba(0,0,0,.12)</code>；圆角 16 DP。</td><td>主容器保持 351 x 52 DP，内部 padding 4 DP。</td></tr>
             </tbody>
@@ -697,7 +702,7 @@
       </aside>
     </div>
 
-    <p class="source-note">数据来源：Relay 节点 <code>54:325</code>、<code>54:376</code>、<code>54:382</code> 的 Zero 设计上下文与截图。当前 HTML 优先使用 Zero 返回的结构、变量与 SVG 代码生成组件；截图仅作为核对依据，暂未嵌入页面。</p>
+    <p class="source-note">数据来源：Relay 节点 <code>54:325</code>、<code>54:336</code>、<code>54:336;49:10</code>、<code>54:376</code>、<code>54:382</code> 的 Zero 设计上下文与截图。当前 HTML 优先使用 Zero 返回的结构、变量与 SVG 代码生成组件；当玻璃效果层未展开参数时，使用对应节点截图补齐视觉效果。</p>
   </main>
 
   <script>
