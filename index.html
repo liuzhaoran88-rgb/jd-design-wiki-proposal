@@ -400,7 +400,7 @@
       display: block;
     }
 
-    .nav-item span {
+    .nav-label {
       height: 14px;
       font-size: 10px;
       line-height: 14px;
@@ -428,7 +428,7 @@
       background: #f2f4f7;
     }
 
-    .nav-item.is-active span {
+    .nav-item.is-active .nav-label {
       font-weight: 600;
     }
 
@@ -697,7 +697,7 @@
       </aside>
     </div>
 
-    <p class="source-note">数据来源：Relay 节点 <code>49:187</code> 的设计上下文与截图。当前 HTML 优先使用变量和结构生成组件；截图仅作为核对依据，暂未嵌入页面。</p>
+    <p class="source-note">数据来源：Relay 节点 <code>54:325</code>、<code>54:376</code>、<code>54:382</code> 的 Zero 设计上下文与截图。当前 HTML 优先使用 Zero 返回的结构、变量与 SVG 代码生成组件；截图仅作为核对依据，暂未嵌入页面。</p>
   </main>
 
   <script>
@@ -788,9 +788,9 @@
         const active = index === activeIndex;
         const plainActive = active && currentMode.island;
         return `
-          <button class="nav-item ${active ? "is-active" : ""} ${plainActive ? "is-plain-active" : ""}" type="button" style="flex:1 1 0" data-index="${index}" aria-current="${active ? "page" : "false"}">
+          <button class="nav-item ${active ? "is-active" : ""} ${plainActive ? "is-plain-active" : ""}" type="button" style="flex:1 1 0; gap:4px" data-index="${index}" data-zero-gap="4" aria-current="${active ? "page" : "false"}">
             ${homeIcon(active)}
-            <span>文案</span>
+            <span class="nav-label">文案</span>
           </button>
         `;
       }).join("");
