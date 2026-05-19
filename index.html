@@ -262,7 +262,7 @@
       position: relative;
       display: flex;
       align-items: flex-start;
-      gap: 0;
+      gap: 8px;
       padding: 4px;
       border-radius: 16px;
       background: transparent;
@@ -553,6 +553,7 @@
               <tr><td>外层整栏</td><td>375 x 69/70</td><td>对齐移动端页面宽度，底部预留 17 DP。</td></tr>
               <tr><td>主容器</td><td>351 x 52</td><td>左右各 12 DP，圆角 16。</td></tr>
               <tr><td>内边距</td><td>4 DP</td><td>坑位放置在玻璃容器内。</td></tr>
+              <tr><td>坑位间距</td><td>8 DP</td><td>普通坑位之间保持 8 DP；灵动岛与相邻普通坑位之间也保持 8 DP。</td></tr>
               <tr><td>普通坑位</td><td>44 DP 高</td><td>图标 20 DP，文本 10 号字，图文间距 4 DP。</td></tr>
               <tr><td>选中坑位</td><td>44 DP 高</td><td>背后可出现 12 DP 圆角的选中底板。</td></tr>
             </tbody>
@@ -566,12 +567,12 @@
               <tr><th>类型</th><th>内部布局</th><th>单坑宽度</th></tr>
             </thead>
             <tbody>
-              <tr><td>5 个</td><td>普通坑位 x 5</td><td>71.8</td></tr>
-              <tr><td>4 个</td><td>普通坑位 x 4</td><td>88.75</td></tr>
-              <tr><td>3 个</td><td>普通坑位 x 3</td><td>117</td></tr>
-              <tr><td>2 个</td><td>普通坑位 x 2</td><td>173.5</td></tr>
-              <tr><td>日常/运营</td><td>普通坑位 x 4 + 运营灵动岛 x 1</td><td>普通坑位 49，灵动岛 131</td></tr>
-              <tr><td>大促灵动岛</td><td>普通坑位 x 4 + 大促灵动岛宽版 x 1</td><td>普通坑位 45.75，灵动岛 144</td></tr>
+              <tr><td>5 个</td><td>普通坑位 x 5，间距 x 4</td><td>62.2</td></tr>
+              <tr><td>4 个</td><td>普通坑位 x 4，间距 x 3</td><td>79.75</td></tr>
+              <tr><td>3 个</td><td>普通坑位 x 3，间距 x 2</td><td>109</td></tr>
+              <tr><td>2 个</td><td>普通坑位 x 2，间距 x 1</td><td>167.5</td></tr>
+              <tr><td>日常/运营</td><td>普通坑位 x 4 + 运营灵动岛 x 1，间距 x 4</td><td>普通坑位 45，灵动岛 131</td></tr>
+              <tr><td>大促灵动岛</td><td>普通坑位 x 4 + 大促灵动岛宽版 x 1，间距 x 4</td><td>普通坑位 41.75，灵动岛 144</td></tr>
             </tbody>
           </table>
         </section>
@@ -581,7 +582,7 @@
           <p>默认态使用普通字重文本，选中态使用 <code>color_primary</code>，文本字重提升到 600。玻璃容器需要区分浅色背景与暗色背景两套参数，不应混用。</p>
           <p>浅色背景下，Liquid Glass 使用 <code>模式=日间</code>，底层为 <code>rgba(245,245,245,.60)</code> 叠加 <code>#262626</code>，混合模式为 <code>color-dodge, normal</code>；选中坑位底板为 <code>#F2F4F7</code>。</p>
           <p>暗色背景下，Liquid Glass 使用 <code>模式=暗黑</code>，底层透明度为 <code>.60</code>，背景层为 <code>rgba(255,255,255,.06)</code>、<code>rgba(0,0,0,.60)</code>、<code>#CCCCCC</code>，混合模式为 <code>color-burn, normal, normal</code>；选中坑位底板为 <code>#14171A</code>。</p>
-          <p>普通坑位文案最多展示 4 个汉字，超出需业务侧改短，不建议自动缩小字号。灵动岛是独立原子，不作为普通坑位等宽分配；日常/运营宽度为 131，大促宽版为 144，且只能配置在中间强化位，不允许配置到两侧坑位。</p>
+          <p>普通坑位文案最多展示 4 个汉字，超出需业务侧改短，不建议自动缩小字号。单个底导之间保持 8 DP 间距；灵动岛与相邻普通坑位之间同样保持 8 DP 间距。灵动岛是独立原子，不作为普通坑位等宽分配；日常/运营宽度为 131，大促宽版为 144，且只能配置在中间强化位，不允许配置到两侧坑位。</p>
         </section>
 
         <section>
@@ -603,7 +604,7 @@
         </div>
         <div class="metrics">
           <div class="metric"><b id="barSize">351 x 52</b><span>主容器尺寸</span></div>
-          <div class="metric"><b id="itemSize">71.8</b><span>当前单坑宽度</span></div>
+          <div class="metric"><b id="itemSize">62.2</b><span>当前单坑宽度</span></div>
         </div>
       </aside>
     </div>
@@ -613,12 +614,12 @@
 
   <script>
     const modes = [
-      { id: "five", label: "5个", itemWidth: "71.8", items: ["普通", "选中", "普通", "普通", "普通"] },
-      { id: "four", label: "4个", itemWidth: "88.75", items: ["普通", "选中", "普通", "普通"] },
-      { id: "three", label: "3个", itemWidth: "117", items: ["普通", "选中", "普通"] },
-      { id: "two", label: "2个", itemWidth: "173.5", items: ["普通", "选中"] },
-      { id: "daily", label: "日常/运营", itemWidth: "49 / 131", items: ["普通", "选中", "daily", "普通", "普通"] },
-      { id: "promo", label: "大促灵动岛", itemWidth: "45.75 / 144", items: ["普通", "选中", "promo", "普通", "普通"] }
+      { id: "five", label: "5个", itemWidth: "62.2", items: ["普通", "选中", "普通", "普通", "普通"] },
+      { id: "four", label: "4个", itemWidth: "79.75", items: ["普通", "选中", "普通", "普通"] },
+      { id: "three", label: "3个", itemWidth: "109", items: ["普通", "选中", "普通"] },
+      { id: "two", label: "2个", itemWidth: "167.5", items: ["普通", "选中"] },
+      { id: "daily", label: "日常/运营", itemWidth: "45 / 131", items: ["普通", "选中", "daily", "普通", "普通"] },
+      { id: "promo", label: "大促灵动岛", itemWidth: "41.75 / 144", items: ["普通", "选中", "promo", "普通", "普通"] }
     ];
 
     let currentMode = modes[0];

@@ -164,7 +164,7 @@
       position: relative;
       display: flex;
       align-items: flex-start;
-      gap: 0;
+      gap: 8px;
       padding: 4px;
       border-radius: 16px;
       color: var(--nav-text-dark);
@@ -553,7 +553,7 @@
       <div class="title">
         <p class="eyebrow">BOTTOM NAV DEMO</p>
         <h1>普通底导组合交互演示</h1>
-        <p class="lead">基于 Relay 节点 49:174 / 49:187 的日间与暗黑 Liquid Glass 参数生成，可切换组合、背景和选中态。</p>
+        <p class="lead">基于 Relay 节点 49:174 / 49:187 的日间与暗黑 Liquid Glass 参数生成，可切换组合、背景和选中态；坑位之间固定保持 8px 间距。</p>
       </div>
 
       <section class="panel">
@@ -589,19 +589,19 @@
 
       <div class="metrics">
         <div class="metric"><b>351 x 52</b><span>玻璃容器</span></div>
-        <div class="metric"><b id="slotMetric">71.8</b><span>单坑 / 强化位宽度</span></div>
+        <div class="metric"><b id="slotMetric">62.2</b><span>单坑 / 强化位宽度</span></div>
       </div>
     </aside>
   </main>
 
   <script>
     const modes = [
-      { id: "five", label: "5个", slot: "71.8", items: ["nav", "nav", "nav", "nav", "nav"] },
-      { id: "four", label: "4个", slot: "88.75", items: ["nav", "nav", "nav", "nav"] },
-      { id: "three", label: "3个", slot: "117", items: ["nav", "nav", "nav"] },
-      { id: "two", label: "2个", slot: "173.5", items: ["nav", "nav"] },
-      { id: "daily", label: "日常", slot: "49 / 131", items: ["nav", "nav", "daily", "nav", "nav"] },
-      { id: "promo", label: "大促", slot: "45.75 / 144", items: ["nav", "nav", "promo", "nav", "nav"] }
+      { id: "five", label: "5个", slot: "62.2", items: ["nav", "nav", "nav", "nav", "nav"] },
+      { id: "four", label: "4个", slot: "79.75", items: ["nav", "nav", "nav", "nav"] },
+      { id: "three", label: "3个", slot: "109", items: ["nav", "nav", "nav"] },
+      { id: "two", label: "2个", slot: "167.5", items: ["nav", "nav"] },
+      { id: "daily", label: "日常", slot: "45 / 131", items: ["nav", "nav", "daily", "nav", "nav"] },
+      { id: "promo", label: "大促", slot: "41.75 / 144", items: ["nav", "nav", "promo", "nav", "nav"] }
     ];
 
     const surfaces = [
@@ -726,14 +726,16 @@
             ["模式", "日间"],
             ["底层", "rgba(245,245,245,.60) + #262626"],
             ["混合", "color-dodge, normal"],
-            ["选中", "#F2F4F7"]
+            ["选中", "#F2F4F7"],
+            ["间距", "8px"]
           ]
         : [
             ["模式", "暗黑"],
             ["透明度", state.opacity.toFixed(2)],
             ["底层", "rgba(255,255,255,.06) + rgba(0,0,0,.60) + #CCCCCC"],
             ["混合", "color-burn, normal, normal"],
-            ["选中", "#14171A"]
+            ["选中", "#14171A"],
+            ["间距", "8px"]
           ];
 
       tokenList.innerHTML = tokens.map(([name, value]) => `
