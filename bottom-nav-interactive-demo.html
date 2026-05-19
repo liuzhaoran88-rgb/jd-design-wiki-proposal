@@ -1,0 +1,780 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>底导普通组合交互演示</title>
+  <style>
+    :root {
+      --jd-red: #ff0f23;
+      --ink: #151821;
+      --muted: #6f7480;
+      --line: rgba(17, 20, 26, 0.1);
+      --page: #f3f5f8;
+      --panel: #ffffff;
+      --stage-dark: #14171a;
+      --stage-light: #f7f8fa;
+      --nav-text-dark: #e1e6eb;
+      --nav-text-light: #11141a;
+      --glass-dark-a: rgba(255, 255, 255, 0.06);
+      --glass-dark-b: rgba(0, 0, 0, 0.6);
+      --glass-dark-base: #cccccc;
+      --glass-light-a: rgba(245, 245, 245, 0.6);
+      --glass-light-base: #262626;
+      --shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+      --green: #019508;
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      color-scheme: light;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      background: linear-gradient(180deg, #fff, var(--page));
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .app {
+      width: min(1180px, 100%);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 28px 24px 36px;
+      display: grid;
+      grid-template-columns: minmax(420px, 1fr) 380px;
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .preview {
+      min-height: 680px;
+      position: relative;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 42%),
+        var(--stage-dark);
+    }
+
+    .preview.is-light {
+      background:
+        linear-gradient(180deg, rgba(255, 15, 35, 0.06), transparent 38%),
+        var(--stage-light);
+    }
+
+    .phone {
+      width: 390px;
+      height: 620px;
+      position: relative;
+      border-radius: 30px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 22% 16%, rgba(255, 15, 35, 0.2), transparent 28%),
+        linear-gradient(180deg, #20252a, #101316);
+      outline: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.22);
+    }
+
+    .phone.is-light {
+      background:
+        radial-gradient(circle at 24% 12%, rgba(255, 15, 35, 0.12), transparent 30%),
+        linear-gradient(180deg, #ffffff, #edf0f4);
+      outline-color: rgba(17, 20, 26, 0.08);
+    }
+
+    .scene {
+      position: absolute;
+      inset: 18px 16px 100px;
+      border-radius: 22px;
+      overflow: hidden;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+        linear-gradient(180deg, rgba(255, 15, 35, 0.22), transparent 46%),
+        #171b20;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .phone.is-light .scene {
+      background:
+        linear-gradient(180deg, rgba(255, 15, 35, 0.08), transparent 44%),
+        #ffffff;
+      border-color: rgba(17, 20, 26, 0.08);
+    }
+
+    .scene::before,
+    .scene::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: var(--scene-detail, 0.8);
+      pointer-events: none;
+    }
+
+    .scene::before {
+      background:
+        repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0 1px, transparent 1px 14px),
+        radial-gradient(circle at 78% 18%, rgba(255, 255, 255, 0.16), transparent 22%),
+        radial-gradient(circle at 18% 78%, rgba(255, 15, 35, 0.2), transparent 24%);
+      mix-blend-mode: screen;
+    }
+
+    .phone.is-light .scene::before {
+      background:
+        repeating-linear-gradient(135deg, rgba(17, 20, 26, 0.06) 0 1px, transparent 1px 14px),
+        radial-gradient(circle at 78% 18%, rgba(255, 15, 35, 0.12), transparent 22%),
+        radial-gradient(circle at 18% 78%, rgba(17, 20, 26, 0.08), transparent 24%);
+      mix-blend-mode: normal;
+    }
+
+    .content-row {
+      height: 58px;
+      margin: 18px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .phone.is-light .content-row {
+      background: rgba(17, 20, 26, 0.05);
+    }
+
+    .nav-wrap {
+      width: 375px;
+      height: 69px;
+      position: absolute;
+      left: 50%;
+      bottom: 16px;
+      transform: translateX(-50%);
+      padding: 0 12px 17px;
+    }
+
+    .ordinary-nav {
+      width: 351px;
+      height: 52px;
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      padding: 4px;
+      border-radius: 16px;
+      color: var(--nav-text-dark);
+      box-shadow: var(--shadow);
+      outline: 1px solid rgba(255, 255, 255, 0.34);
+      backdrop-filter: blur(22px) saturate(145%);
+      -webkit-backdrop-filter: blur(22px) saturate(145%);
+      overflow: hidden;
+    }
+
+    .ordinary-nav::before,
+    .ordinary-nav::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+    }
+
+    .ordinary-nav::before {
+      opacity: var(--glass-opacity, 0.6);
+      background:
+        linear-gradient(0deg, var(--glass-dark-a), var(--glass-dark-a)),
+        var(--glass-dark-b),
+        var(--glass-dark-base);
+      background-blend-mode: color-burn, normal, normal;
+    }
+
+    .ordinary-nav::after {
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 38%, rgba(255, 255, 255, 0.1)),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 18%, rgba(255, 255, 255, 0) 82%, rgba(255, 255, 255, 0.16));
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .ordinary-nav.is-light {
+      color: var(--nav-text-light);
+      outline-color: rgba(17, 20, 26, 0.08);
+      box-shadow: 0 8px 40px rgba(17, 20, 26, 0.1);
+    }
+
+    .ordinary-nav.is-light::before {
+      opacity: 1;
+      background:
+        linear-gradient(0deg, var(--glass-light-a), var(--glass-light-a)),
+        var(--glass-light-base);
+      background-blend-mode: color-dodge, normal;
+    }
+
+    .ordinary-nav.is-light::after {
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.74), rgba(255, 255, 255, 0.1) 42%, rgba(255, 255, 255, 0.42)),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0) 20%, rgba(255, 255, 255, 0) 80%, rgba(255, 255, 255, 0.58));
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82), inset 0 -1px 0 rgba(17, 20, 26, 0.05);
+    }
+
+    .nav-item {
+      height: 44px;
+      min-width: 0;
+      position: relative;
+      z-index: 1;
+      border: 0;
+      border-radius: 12px;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+    }
+
+    .nav-item:hover {
+      transform: translateY(-1px);
+    }
+
+    .nav-item svg {
+      width: 20px;
+      height: 20px;
+      display: block;
+    }
+
+    .nav-item span {
+      height: 14px;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 10px;
+      line-height: 14px;
+      letter-spacing: 0;
+    }
+
+    .nav-item.is-active {
+      background: #14171a;
+      color: var(--jd-red);
+    }
+
+    .ordinary-nav.is-light .nav-item.is-active {
+      background: #f2f4f7;
+      color: var(--jd-red);
+    }
+
+    .nav-item.is-active span {
+      font-weight: 600;
+    }
+
+    .island {
+      height: 44px;
+      position: relative;
+      z-index: 1;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px;
+      overflow: hidden;
+      border: 0;
+    }
+
+    .island.daily {
+      background:
+        linear-gradient(180deg, rgba(221, 255, 204, 0.85), rgba(183, 250, 150, 0.85)),
+        #f0f2f7;
+      background-blend-mode: plus-darker, normal;
+      outline: 0.5px solid #fff;
+      color: var(--green);
+    }
+
+    .island.promo {
+      width: 144px;
+      background: linear-gradient(180deg, #fff6f7, #ffb6be);
+      outline: 0.5px solid rgba(255, 15, 35, 0.3);
+      color: var(--jd-red);
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      flex: 0 0 32px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: linear-gradient(135deg, #ff0f23, #ff7845);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .daily .avatar {
+      background: linear-gradient(135deg, #70d34d, #019508);
+    }
+
+    .copy {
+      min-width: 0;
+      display: grid;
+      gap: 0;
+      text-align: left;
+    }
+
+    .copy strong {
+      width: 82px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 14px;
+      line-height: 18px;
+    }
+
+    .copy small {
+      font-size: 10px;
+      line-height: 14px;
+      font-weight: 600;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .title {
+      padding: 2px 0 6px;
+    }
+
+    .eyebrow {
+      margin: 0 0 4px;
+      color: var(--jd-red);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 26px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      padding: 14px;
+    }
+
+    .panel h2 {
+      margin: 0 0 10px;
+      font-size: 15px;
+      line-height: 1.4;
+      letter-spacing: 0;
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .segmented.two {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .option {
+      min-height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      color: #3d414d;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .option[aria-pressed="true"] {
+      border-color: rgba(255, 15, 35, 0.34);
+      background: #fff2f3;
+      color: var(--jd-red);
+      font-weight: 600;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    label {
+      color: #3d414d;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0 10px;
+      color: var(--ink);
+      background: #fff;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--jd-red);
+    }
+
+    .tokens {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 8px;
+    }
+
+    .tokens li {
+      display: grid;
+      grid-template-columns: 90px minmax(0, 1fr);
+      gap: 8px;
+      align-items: start;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .tokens b {
+      color: #3d414d;
+      font-weight: 600;
+    }
+
+    code {
+      padding: 2px 5px;
+      border-radius: 5px;
+      background: #f5f6fa;
+      color: #b30b18;
+      font-size: 12px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .metric {
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .metric b {
+      display: block;
+      color: var(--ink);
+      font-size: 16px;
+      line-height: 1.2;
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 920px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .preview {
+        min-height: 600px;
+      }
+
+      .controls {
+        order: -1;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .app {
+        padding: 16px;
+      }
+
+      .phone {
+        width: 100%;
+        max-width: 390px;
+      }
+
+      .nav-wrap {
+        width: 100%;
+      }
+
+      .ordinary-nav {
+        width: calc(100vw - 56px);
+        max-width: 351px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="preview" id="preview" aria-label="底部导航预览">
+      <div class="phone" id="phone">
+        <div class="scene" id="scene" aria-hidden="true">
+          <div class="content-row"></div>
+          <div class="content-row"></div>
+          <div class="content-row"></div>
+        </div>
+        <div class="nav-wrap">
+          <nav class="ordinary-nav" id="nav" aria-label="普通底导组合"></nav>
+        </div>
+      </div>
+    </section>
+
+    <aside class="controls" aria-label="交互控制">
+      <div class="title">
+        <p class="eyebrow">BOTTOM NAV DEMO</p>
+        <h1>普通底导组合交互演示</h1>
+        <p class="lead">基于 Relay 节点 49:174 / 49:187 的日间与暗黑 Liquid Glass 参数生成，可切换组合、背景和选中态。</p>
+      </div>
+
+      <section class="panel">
+        <h2>组合类型</h2>
+        <div class="segmented" id="modeControls"></div>
+      </section>
+
+      <section class="panel">
+        <h2>背景与材质</h2>
+        <div class="segmented two" id="surfaceControls"></div>
+        <div class="field">
+          <label for="detailRange">背景复杂度</label>
+          <input id="detailRange" type="range" min="0" max="1" value="0.8" step="0.1">
+        </div>
+        <div class="field" id="opacityField">
+          <label for="opacityRange">暗色玻璃底层透明度</label>
+          <input id="opacityRange" type="range" min="0.3" max="0.9" value="0.6" step="0.05">
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>坑位文案</h2>
+        <div class="field">
+          <label for="labelInput">普通坑位文案，最多 4 个汉字</label>
+          <input id="labelInput" type="text" value="文案" maxlength="4" aria-describedby="labelHelp">
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>当前参数</h2>
+        <ul class="tokens" id="tokenList"></ul>
+      </section>
+
+      <div class="metrics">
+        <div class="metric"><b>351 x 52</b><span>玻璃容器</span></div>
+        <div class="metric"><b id="slotMetric">71.8</b><span>单坑 / 强化位宽度</span></div>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    const modes = [
+      { id: "five", label: "5个", slot: "71.8", items: ["nav", "nav", "nav", "nav", "nav"] },
+      { id: "four", label: "4个", slot: "88.75", items: ["nav", "nav", "nav", "nav"] },
+      { id: "three", label: "3个", slot: "117", items: ["nav", "nav", "nav"] },
+      { id: "two", label: "2个", slot: "173.5", items: ["nav", "nav"] },
+      { id: "daily", label: "日常", slot: "49 / 131", items: ["nav", "nav", "daily", "nav", "nav"] },
+      { id: "promo", label: "大促", slot: "45.75 / 144", items: ["nav", "nav", "promo", "nav", "nav"] }
+    ];
+
+    const surfaces = [
+      { id: "dark", label: "暗色背景" },
+      { id: "light", label: "浅色背景" }
+    ];
+
+    const state = {
+      mode: "five",
+      surface: "dark",
+      activeIndex: 1,
+      label: "文案",
+      detail: 0.8,
+      opacity: 0.6
+    };
+
+    const modeControls = document.getElementById("modeControls");
+    const surfaceControls = document.getElementById("surfaceControls");
+    const nav = document.getElementById("nav");
+    const phone = document.getElementById("phone");
+    const preview = document.getElementById("preview");
+    const scene = document.getElementById("scene");
+    const detailRange = document.getElementById("detailRange");
+    const opacityRange = document.getElementById("opacityRange");
+    const opacityField = document.getElementById("opacityField");
+    const labelInput = document.getElementById("labelInput");
+    const tokenList = document.getElementById("tokenList");
+    const slotMetric = document.getElementById("slotMetric");
+
+    function icon() {
+      return `
+        <svg viewBox="0 0 20 20" aria-hidden="true">
+          <path d="M2.2 8.8 9.5 2.4a.8.8 0 0 1 1 0l7.3 6.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M4.2 8.4v7.2c0 .9.7 1.6 1.6 1.6h8.4c.9 0 1.6-.7 1.6-1.6V8.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M8 17.1v-4.2h4v4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      `;
+    }
+
+    function currentMode() {
+      return modes.find((mode) => mode.id === state.mode);
+    }
+
+    function navIndexes() {
+      return currentMode().items.map((item, index) => item === "nav" ? index : -1).filter((index) => index >= 0);
+    }
+
+    function renderModeControls() {
+      modeControls.innerHTML = modes.map((mode) => `
+        <button class="option" type="button" data-mode="${mode.id}" aria-pressed="${mode.id === state.mode}">
+          ${mode.label}
+        </button>
+      `).join("");
+
+      modeControls.querySelectorAll("button").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.mode = button.dataset.mode;
+          const indexes = navIndexes();
+          if (!indexes.includes(state.activeIndex)) state.activeIndex = indexes[Math.min(1, indexes.length - 1)];
+          render();
+        });
+      });
+    }
+
+    function renderSurfaceControls() {
+      surfaceControls.innerHTML = surfaces.map((surface) => `
+        <button class="option" type="button" data-surface="${surface.id}" aria-pressed="${surface.id === state.surface}">
+          ${surface.label}
+        </button>
+      `).join("");
+
+      surfaceControls.querySelectorAll("button").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.surface = button.dataset.surface;
+          render();
+        });
+      });
+    }
+
+    function island(type) {
+      if (type === "daily") {
+        return `
+          <div class="island daily" style="flex:0 0 131px" aria-label="运营灵动岛">
+            <div class="avatar">折</div>
+            <div class="copy"><strong>抢5折商品</strong><small>京东超市</small></div>
+          </div>
+        `;
+      }
+      return `
+        <div class="island promo" style="flex:0 0 144px" aria-label="大促灵动岛">
+          <div class="avatar">礼</div>
+          <div class="copy"><strong>领取专属福利</strong><small>抢万元红包</small></div>
+        </div>
+      `;
+    }
+
+    function renderNav() {
+      nav.innerHTML = currentMode().items.map((item, index) => {
+        if (item !== "nav") return island(item);
+        const active = index === state.activeIndex;
+        return `
+          <button class="nav-item ${active ? "is-active" : ""}" type="button" style="flex:1 1 0" data-index="${index}" aria-current="${active ? "page" : "false"}">
+            ${icon()}
+            <span>${state.label}</span>
+          </button>
+        `;
+      }).join("");
+
+      nav.querySelectorAll(".nav-item").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.activeIndex = Number(button.dataset.index);
+          renderNav();
+          renderTokens();
+        });
+      });
+    }
+
+    function renderTokens() {
+      const isLight = state.surface === "light";
+      const tokens = isLight
+        ? [
+            ["模式", "日间"],
+            ["底层", "rgba(245,245,245,.60) + #262626"],
+            ["混合", "color-dodge, normal"],
+            ["选中", "#F2F4F7"]
+          ]
+        : [
+            ["模式", "暗黑"],
+            ["透明度", state.opacity.toFixed(2)],
+            ["底层", "rgba(255,255,255,.06) + rgba(0,0,0,.60) + #CCCCCC"],
+            ["混合", "color-burn, normal, normal"],
+            ["选中", "#14171A"]
+          ];
+
+      tokenList.innerHTML = tokens.map(([name, value]) => `
+        <li><b>${name}</b><code>${value}</code></li>
+      `).join("");
+    }
+
+    function render() {
+      const isLight = state.surface === "light";
+      renderModeControls();
+      renderSurfaceControls();
+      renderNav();
+      renderTokens();
+
+      nav.classList.toggle("is-light", isLight);
+      phone.classList.toggle("is-light", isLight);
+      preview.classList.toggle("is-light", isLight);
+      opacityField.hidden = isLight;
+      scene.style.setProperty("--scene-detail", state.detail);
+      nav.style.setProperty("--glass-opacity", state.opacity);
+      slotMetric.textContent = currentMode().slot;
+    }
+
+    detailRange.addEventListener("input", () => {
+      state.detail = Number(detailRange.value);
+      scene.style.setProperty("--scene-detail", state.detail);
+    });
+
+    opacityRange.addEventListener("input", () => {
+      state.opacity = Number(opacityRange.value);
+      nav.style.setProperty("--glass-opacity", state.opacity);
+      renderTokens();
+    });
+
+    labelInput.addEventListener("input", () => {
+      state.label = labelInput.value.slice(0, 4) || "文案";
+      labelInput.value = state.label;
+      renderNav();
+    });
+
+    render();
+  </script>
+</body>
+</html>
