@@ -1,0 +1,693 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>底导普通组合规范</title>
+  <style>
+    :root {
+      --jd-red: #ff0f23;
+      --text-strong: #171a26;
+      --text: #3d414d;
+      --text-help: #828794;
+      --line: #00000014;
+      --page: #f2f4f7;
+      --panel: #ffffff;
+      --stage: #14171a;
+      --stage-light: #f7f8fa;
+      --nav-text: #e1e6eb;
+      --nav-text-light: #11141a;
+      --glass: rgba(0, 0, 0, 0.6);
+      --glass-light: rgba(255, 255, 255, 0.78);
+      --glass-line: rgba(255, 255, 255, 0.34);
+      --glass-line-light: rgba(17, 20, 26, 0.08);
+      --green: #019508;
+      --green-bg-a: rgba(221, 255, 204, 0.92);
+      --green-bg-b: rgba(183, 250, 150, 0.92);
+      --pink-bg-a: #ffe8ea;
+      --pink-bg-b: #ffafb7;
+      --shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+      color-scheme: light;
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 14% 0%, rgba(255, 15, 35, 0.09), transparent 26rem),
+        linear-gradient(180deg, #ffffff 0%, var(--page) 100%);
+      line-height: 1.6;
+    }
+
+    .shell {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 48px 24px 72px;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--jd-red);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--text-strong);
+      font-size: 34px;
+      line-height: 1.18;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 760px;
+      margin: 16px 0 28px;
+      color: #4a4f5c;
+      font-size: 16px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 430px;
+      gap: 28px;
+      align-items: start;
+    }
+
+    section {
+      margin-top: 22px;
+      padding: 22px 0 0;
+      border-top: 1px solid var(--line);
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      color: var(--text-strong);
+      font-size: 20px;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0 0 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    th,
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      font-size: 13px;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--text-strong);
+      background: #f7f8fa;
+      font-weight: 600;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    code {
+      padding: 2px 5px;
+      border-radius: 5px;
+      background: #f5f6fa;
+      color: #b30b18;
+      font-size: 12px;
+    }
+
+    .demo-card {
+      position: sticky;
+      top: 24px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.86);
+      box-shadow: 0 20px 60px rgba(17, 20, 26, 0.08);
+      overflow: hidden;
+    }
+
+    .demo-toolbar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      padding: 14px;
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .surface-switch {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      padding: 0 14px 14px;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .mode-button {
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      color: #3d414d;
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .mode-button[aria-pressed="true"] {
+      border-color: rgba(255, 15, 35, 0.3);
+      background: #fff2f3;
+      color: var(--jd-red);
+      font-weight: 600;
+    }
+
+    .surface-button {
+      height: 32px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      color: #3d414d;
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .surface-button[aria-pressed="true"] {
+      border-color: rgba(255, 15, 35, 0.3);
+      background: #fff2f3;
+      color: var(--jd-red);
+      font-weight: 600;
+    }
+
+    .stage {
+      min-height: 560px;
+      padding: 40px 16px 36px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 34%),
+        var(--stage);
+      display: grid;
+      place-items: center;
+    }
+
+    .phone-frame {
+      width: min(100%, 390px);
+      height: 480px;
+      position: relative;
+      border-radius: 28px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 32%),
+        #101316;
+      outline: 1px solid rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    .phone-frame.is-light {
+      background: linear-gradient(180deg, #ffffff, #f2f4f7);
+      outline-color: rgba(17, 20, 26, 0.08);
+    }
+
+    .phone-content {
+      position: absolute;
+      inset: 18px 16px 96px;
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, rgba(255, 15, 35, 0.16), transparent 46%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .phone-frame.is-light .phone-content {
+      background:
+        linear-gradient(180deg, rgba(255, 15, 35, 0.08), transparent 46%),
+        #ffffff;
+      border-color: rgba(17, 20, 26, 0.08);
+    }
+
+    .ordinary-nav-wrap {
+      width: 375px;
+      height: 69px;
+      position: absolute;
+      left: 50%;
+      bottom: 16px;
+      transform: translateX(-50%);
+      padding: 0 12px 17px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    .ordinary-nav {
+      width: 351px;
+      height: 52px;
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      padding: 4px;
+      border-radius: 16px;
+      background:
+        linear-gradient(0deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06)),
+        var(--glass);
+      box-shadow: var(--shadow);
+      outline: 1px solid var(--glass-line);
+      overflow: hidden;
+    }
+
+    .ordinary-nav.is-light {
+      color: var(--nav-text-light);
+      background:
+        linear-gradient(0deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.4)),
+        var(--glass-light);
+      outline-color: var(--glass-line-light);
+      box-shadow: 0 8px 40px rgba(17, 20, 26, 0.1);
+    }
+
+    .ordinary-nav::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+      pointer-events: none;
+    }
+
+    .nav-item {
+      height: 44px;
+      min-width: 0;
+      border: 0;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--nav-text);
+      font: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .nav-item svg {
+      width: 20px;
+      height: 20px;
+      display: block;
+    }
+
+    .nav-item span {
+      height: 14px;
+      font-size: 10px;
+      line-height: 14px;
+      font-weight: 400;
+      white-space: nowrap;
+      letter-spacing: 0;
+    }
+
+    .nav-item.is-active {
+      background: rgba(37, 48, 45, 0.92);
+      color: var(--jd-red);
+    }
+
+    .ordinary-nav.is-light .nav-item {
+      color: var(--nav-text-light);
+    }
+
+    .ordinary-nav.is-light .nav-item.is-active {
+      color: var(--jd-red);
+      background: #f2f4f7;
+    }
+
+    .nav-item.is-active span {
+      font-weight: 600;
+    }
+
+    .island {
+      height: 44px;
+      border: 0;
+      border-radius: 12px;
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow: hidden;
+      padding: 6px;
+      color: var(--green);
+      font-family: inherit;
+    }
+
+    .island .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 255, 255, 0.84);
+      flex: 0 0 auto;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .island .copy {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .island strong {
+      font-size: 14px;
+      line-height: 22px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .island small {
+      font-size: 10px;
+      line-height: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .island.daily {
+      width: 131px;
+      background: linear-gradient(180deg, var(--green-bg-a), var(--green-bg-b)), #2a2f36;
+      outline: 0.5px solid #fff;
+    }
+
+    .island.daily .avatar {
+      background: linear-gradient(135deg, #40c45b, #f6c044);
+    }
+
+    .island.promo {
+      width: 144px;
+      padding: 0 8px;
+      background: linear-gradient(180deg, var(--pink-bg-a), var(--pink-bg-b));
+      color: var(--jd-red);
+    }
+
+    .island.promo .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #ff0f23, #ff7781);
+    }
+
+    .island.promo small {
+      width: max-content;
+      margin-top: 1px;
+      padding: 1px 5px;
+      border-radius: 999px;
+      color: #ffe6d9;
+      background: linear-gradient(90deg, #ff0f23 0%, #ff4252 100%);
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      padding: 14px;
+      background: #fff;
+      border-top: 1px solid var(--line);
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fbfcfd;
+    }
+
+    .metric b {
+      display: block;
+      color: var(--text-strong);
+      font-size: 16px;
+      line-height: 1.2;
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 3px;
+      color: var(--text-help);
+      font-size: 12px;
+    }
+
+    .source-note {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      background: #fff7e8;
+      color: #795019;
+      font-size: 13px;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .demo-card {
+        position: static;
+      }
+    }
+
+    @media (max-width: 460px) {
+      .shell {
+        padding: 32px 14px 48px;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      .demo-toolbar {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .stage {
+        padding-left: 8px;
+        padding-right: 8px;
+      }
+
+      .phone-frame {
+        width: 100%;
+        border-radius: 22px;
+      }
+
+      .ordinary-nav-wrap {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <p class="eyebrow">JD APP 15.0 GUIDELINE · Bottom Navigation</p>
+    <h1>3.1 普通底导组合</h1>
+    <p class="lead">本页尝试用 Markdown 内容生成一份可读 HTML 规范，并优先通过设计稿变量与节点结构重建可交互组件。当前聚焦普通底导组合，不包含 Joy Agent 特殊形态。</p>
+
+    <div class="layout">
+      <article>
+        <section>
+          <h2>定义</h2>
+          <p>普通底导组合用于承载底部一级导航入口。组件外层保持 375 DP 宽的页面基准，内部使用 351 x 52 DP 的 Liquid Glass 容器承载坑位。不同数量配置不改变外层宽度，只改变内部坑位的均分宽度或替换中部强化入口。</p>
+        </section>
+
+        <section>
+          <h2>结构</h2>
+          <table>
+            <thead>
+              <tr><th>层级</th><th>尺寸 / 规则</th><th>说明</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>外层整栏</td><td>375 x 69/70</td><td>对齐移动端页面宽度，底部预留 17 DP。</td></tr>
+              <tr><td>主容器</td><td>351 x 52</td><td>左右各 12 DP，圆角 16。</td></tr>
+              <tr><td>内边距</td><td>4 DP</td><td>坑位放置在玻璃容器内。</td></tr>
+              <tr><td>普通坑位</td><td>44 DP 高</td><td>图标 20 DP，文本 10 号字，图文间距 4 DP。</td></tr>
+              <tr><td>选中坑位</td><td>44 DP 高</td><td>背后可出现 12 DP 圆角的选中底板。</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section>
+          <h2>组合类型</h2>
+          <table>
+            <thead>
+              <tr><th>类型</th><th>内部布局</th><th>单坑宽度</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>5 个</td><td>普通坑位 x 5</td><td>71.8</td></tr>
+              <tr><td>4 个</td><td>普通坑位 x 4</td><td>88.75</td></tr>
+              <tr><td>3 个</td><td>普通坑位 x 3</td><td>117</td></tr>
+              <tr><td>2 个</td><td>普通坑位 x 2</td><td>173.5</td></tr>
+              <tr><td>日常/运营</td><td>普通坑位 x 4 + 运营灵动岛 x 1</td><td>普通坑位 49，灵动岛 131</td></tr>
+              <tr><td>大促灵动岛</td><td>普通坑位 x 4 + 大促灵动岛宽版 x 1</td><td>普通坑位 45.75，灵动岛 144</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section>
+          <h2>视觉状态</h2>
+          <p>默认态使用普通字重文本，选中态使用 <code>color_primary</code>，文本字重提升到 600。玻璃容器需要区分浅色背景与暗色背景两套参数，不应混用。</p>
+          <p>浅色背景下，Liquid Glass 使用 <code>模式=日间</code>，选中坑位底板为 <code>#F2F4F7</code>；暗色背景下，Liquid Glass 使用 <code>模式=暗黑</code>，选中坑位底板为 <code>#14171A</code>。</p>
+          <p>普通坑位文案最多展示 4 个汉字，超出需业务侧改短，不建议自动缩小字号。灵动岛是独立原子，不作为普通坑位等宽分配；日常/运营宽度为 131，大促宽版为 144，且只能配置在中间强化位，不允许配置到两侧坑位。</p>
+        </section>
+
+        <section>
+          <h2>待确认</h2>
+          <p>当前 3.1 普通底导组合暂无剩余待确认项。</p>
+        </section>
+      </article>
+
+      <aside class="demo-card" aria-label="普通底导组合交互演示">
+        <div class="demo-toolbar" id="modeButtons"></div>
+        <div class="surface-switch" id="surfaceButtons"></div>
+        <div class="stage">
+          <div class="phone-frame" id="phoneFrame">
+            <div class="phone-content" aria-hidden="true"></div>
+            <div class="ordinary-nav-wrap">
+              <nav class="ordinary-nav" id="navPreview" aria-label="底部导航演示"></nav>
+            </div>
+          </div>
+        </div>
+        <div class="metrics">
+          <div class="metric"><b id="barSize">351 x 52</b><span>主容器尺寸</span></div>
+          <div class="metric"><b id="itemSize">71.8</b><span>当前单坑宽度</span></div>
+        </div>
+      </aside>
+    </div>
+
+    <p class="source-note">数据来源：Relay 节点 <code>49:187</code> 的设计上下文与截图。当前 HTML 优先使用变量和结构生成组件；截图仅作为核对依据，暂未嵌入页面。</p>
+  </main>
+
+  <script>
+    const modes = [
+      { id: "five", label: "5个", itemWidth: "71.8", items: ["普通", "选中", "普通", "普通", "普通"] },
+      { id: "four", label: "4个", itemWidth: "88.75", items: ["普通", "选中", "普通", "普通"] },
+      { id: "three", label: "3个", itemWidth: "117", items: ["普通", "选中", "普通"] },
+      { id: "two", label: "2个", itemWidth: "173.5", items: ["普通", "选中"] },
+      { id: "daily", label: "日常/运营", itemWidth: "49 / 131", items: ["普通", "选中", "daily", "普通", "普通"] },
+      { id: "promo", label: "大促灵动岛", itemWidth: "45.75 / 144", items: ["普通", "选中", "promo", "普通", "普通"] }
+    ];
+
+    let currentMode = modes[0];
+    let activeIndex = 1;
+    let surface = "dark";
+
+    const modeButtons = document.getElementById("modeButtons");
+    const surfaceButtons = document.getElementById("surfaceButtons");
+    const navPreview = document.getElementById("navPreview");
+    const phoneFrame = document.getElementById("phoneFrame");
+    const itemSize = document.getElementById("itemSize");
+
+    function homeIcon() {
+      return `
+        <svg viewBox="0 0 20 20" aria-hidden="true">
+          <path d="M2.2 8.8 9.5 2.4a.8.8 0 0 1 1 0l7.3 6.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M4.2 8.4v7.2c0 .9.7 1.6 1.6 1.6h8.4c.9 0 1.6-.7 1.6-1.6V8.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M8 17.1v-4.2h4v4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      `;
+    }
+
+    function renderButtons() {
+      modeButtons.innerHTML = modes.map((mode) => `
+        <button class="mode-button" type="button" data-mode="${mode.id}" aria-pressed="${mode.id === currentMode.id}">
+          ${mode.label}
+        </button>
+      `).join("");
+
+      modeButtons.querySelectorAll("button").forEach((button) => {
+        button.addEventListener("click", () => {
+          currentMode = modes.find((mode) => mode.id === button.dataset.mode);
+          activeIndex = currentMode.items.findIndex((item) => item === "选中");
+          render();
+        });
+      });
+    }
+
+    function renderSurfaceButtons() {
+      surfaceButtons.innerHTML = ["light", "dark"].map((mode) => `
+        <button class="surface-button" type="button" data-surface="${mode}" aria-pressed="${surface === mode}">
+          ${mode === "light" ? "浅色背景" : "暗色背景"}
+        </button>
+      `).join("");
+
+      surfaceButtons.querySelectorAll("button").forEach((button) => {
+        button.addEventListener("click", () => {
+          surface = button.dataset.surface;
+          render();
+        });
+      });
+    }
+
+    function renderIsland(type) {
+      if (type === "daily") {
+        return `
+          <div class="island daily" style="flex:0 0 131px" aria-label="运营灵动岛">
+            <div class="avatar">折</div>
+            <div class="copy"><strong>抢5折商品</strong><small>京东超市</small></div>
+          </div>
+        `;
+      }
+      return `
+        <div class="island promo" style="flex:0 0 144px" aria-label="大促灵动岛">
+          <div class="avatar">礼</div>
+          <div class="copy"><strong>领取专属福利</strong><small>抢万元红包</small></div>
+        </div>
+      `;
+    }
+
+    function renderNav() {
+      navPreview.innerHTML = currentMode.items.map((item, index) => {
+        if (item === "daily" || item === "promo") return renderIsland(item);
+        const active = index === activeIndex;
+        return `
+          <button class="nav-item ${active ? "is-active" : ""}" type="button" style="flex:1 1 0" data-index="${index}" aria-current="${active ? "page" : "false"}">
+            ${homeIcon()}
+            <span>文案</span>
+          </button>
+        `;
+      }).join("");
+
+      navPreview.classList.toggle("is-light", surface === "light");
+      phoneFrame.classList.toggle("is-light", surface === "light");
+
+      navPreview.querySelectorAll(".nav-item").forEach((button) => {
+        button.addEventListener("click", () => {
+          activeIndex = Number(button.dataset.index);
+          renderNav();
+        });
+      });
+    }
+
+    function render() {
+      renderButtons();
+      renderSurfaceButtons();
+      renderNav();
+      itemSize.textContent = currentMode.itemWidth;
+    }
+
+    render();
+  </script>
+</body>
+</html>
