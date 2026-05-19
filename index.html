@@ -17,8 +17,11 @@
       --stage-light: #f7f8fa;
       --nav-text: #e1e6eb;
       --nav-text-light: #11141a;
-      --glass: rgba(0, 0, 0, 0.6);
-      --glass-light: rgba(255, 255, 255, 0.78);
+      --glass-dark-a: rgba(255, 255, 255, 0.06);
+      --glass-dark-b: rgba(0, 0, 0, 0.6);
+      --glass-dark-base: #cccccc;
+      --glass-light-a: rgba(245, 245, 245, 0.6);
+      --glass-light-base: #262626;
       --glass-line: rgba(255, 255, 255, 0.34);
       --glass-line-light: rgba(17, 20, 26, 0.08);
       --green: #019508;
@@ -262,30 +265,58 @@
       gap: 0;
       padding: 4px;
       border-radius: 16px;
-      background:
-        linear-gradient(0deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06)),
-        var(--glass);
+      background: transparent;
       box-shadow: var(--shadow);
       outline: 1px solid var(--glass-line);
+      backdrop-filter: blur(22px) saturate(145%);
+      -webkit-backdrop-filter: blur(22px) saturate(145%);
       overflow: hidden;
     }
 
     .ordinary-nav.is-light {
       color: var(--nav-text-light);
-      background:
-        linear-gradient(0deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.4)),
-        var(--glass-light);
       outline-color: var(--glass-line-light);
       box-shadow: 0 8px 40px rgba(17, 20, 26, 0.1);
     }
 
+    .ordinary-nav::before,
     .ordinary-nav::after {
       content: "";
       position: absolute;
       inset: 0;
       border-radius: inherit;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 0 rgba(255, 255, 255, 0.08);
       pointer-events: none;
+    }
+
+    .ordinary-nav::before {
+      background:
+        linear-gradient(0deg, var(--glass-dark-a), var(--glass-dark-a)),
+        var(--glass-dark-b),
+        var(--glass-dark-base);
+      background-blend-mode: color-burn, normal, normal;
+      opacity: 0.6;
+    }
+
+    .ordinary-nav.is-light::before {
+      background:
+        linear-gradient(0deg, var(--glass-light-a), var(--glass-light-a)),
+        var(--glass-light-base);
+      background-blend-mode: color-dodge, normal;
+      opacity: 1;
+    }
+
+    .ordinary-nav::after {
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 38%, rgba(255, 255, 255, 0.1)),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 18%, rgba(255, 255, 255, 0) 82%, rgba(255, 255, 255, 0.16));
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .ordinary-nav.is-light::after {
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.74), rgba(255, 255, 255, 0.1) 42%, rgba(255, 255, 255, 0.42)),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0) 20%, rgba(255, 255, 255, 0) 80%, rgba(255, 255, 255, 0.58));
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82), inset 0 -1px 0 rgba(17, 20, 26, 0.05);
     }
 
     .nav-item {
@@ -548,7 +579,8 @@
         <section>
           <h2>视觉状态</h2>
           <p>默认态使用普通字重文本，选中态使用 <code>color_primary</code>，文本字重提升到 600。玻璃容器需要区分浅色背景与暗色背景两套参数，不应混用。</p>
-          <p>浅色背景下，Liquid Glass 使用 <code>模式=日间</code>，选中坑位底板为 <code>#F2F4F7</code>；暗色背景下，Liquid Glass 使用 <code>模式=暗黑</code>，选中坑位底板为 <code>#14171A</code>。</p>
+          <p>浅色背景下，Liquid Glass 使用 <code>模式=日间</code>，底层为 <code>rgba(245,245,245,.60)</code> 叠加 <code>#262626</code>，混合模式为 <code>color-dodge, normal</code>；选中坑位底板为 <code>#F2F4F7</code>。</p>
+          <p>暗色背景下，Liquid Glass 使用 <code>模式=暗黑</code>，底层透明度为 <code>.60</code>，背景层为 <code>rgba(255,255,255,.06)</code>、<code>rgba(0,0,0,.60)</code>、<code>#CCCCCC</code>，混合模式为 <code>color-burn, normal, normal</code>；选中坑位底板为 <code>#14171A</code>。</p>
           <p>普通坑位文案最多展示 4 个汉字，超出需业务侧改短，不建议自动缩小字号。灵动岛是独立原子，不作为普通坑位等宽分配；日常/运营宽度为 131，大促宽版为 144，且只能配置在中间强化位，不允许配置到两侧坑位。</p>
         </section>
 
