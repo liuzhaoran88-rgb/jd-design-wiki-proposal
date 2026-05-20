@@ -119,15 +119,21 @@ return {
 
 ```typescript
 {
-  fills: string[],           // ["#FFFFFF", "#000000@20%", ...]
-  textStyles: TextStyle[],   // [{chars, fontSize, family, style}]
-  radii: number[],
+  rootInfo: RootInfo,        // id/name/type/page_name/w/h/description/pageDocMode/nodeCount
+  fileKey: string,
+  uniqueFills: string[],     // ["#FFFFFF", "#000000@20%", ...]
+  textStyles: TextStyle[],   // [{chars, fontSize, family, style, bucket, chapter}]
+  uniqueRadii: number[],
   instances: Instance[],     // 子组件 / 材质 INSTANCE 引用
   layouts: Layout[],         // autoLayout padding / spacing
-  variants: string[],        // COMPONENT_SET children 名
+  variants: Variant[],       // COMPONENT_SET children（{id, name}）
+  variantProps: object|null, // INSTANCE/COMPONENT 的 VARIANT 属性
+  chapters: Chapter[]|null,  // 仅 page-doc 模式
   imageNodes: ImageNode[],   // v0.5.2: 带 IMAGE fill 的切图节点
 }
 ```
+
+> 字段名 / 结构**以 [node-type-mapping.md](./references/node-type-mapping.md) 第 2 节脚本的实际 `return` 为准** —— 该文件是唯一契约，本块仅速览。
 
 ### Step 4.5: 稿件预检门（v0.5.3）
 
