@@ -26,6 +26,10 @@ relay_source:
 
 > 自动同步 {{today_iso}} · skill {{skill_version}} · Relay [`{{node_id}}`]({{relay_url}})
 
+## 稿件预检
+
+{{section_preflight}}
+
 ## 本次识别范围
 
 {{section_scope_summary}}

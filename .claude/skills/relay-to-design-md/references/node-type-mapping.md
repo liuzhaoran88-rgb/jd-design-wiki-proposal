@@ -223,6 +223,7 @@ return {
     w: Math.round(root.width), h: Math.round(root.height),
     description: root.description || null,
     pageDocMode,                     // v0.4
+    nodeCount: all.length,           // v0.5.3: 预检门规模维度用
   },
   fileKey: relay.fileKey,
   uniqueFills: [...fills],
@@ -256,6 +257,10 @@ return {
 > - 每条含 `id / name / type / size / imageHash / scaleMode / chapter`；`imageHash` 相同说明同一张切图被多处复用，登记时可去重
 > - 返回新增 `imageNodes`（上限 100）。**原脚本只收 SOLID fill、IMAGE fill 被静默丢弃**，导致切图资产无法被自动识别 —— 本次修复
 > - 下游处理见 [cutout-detection.md](./cutout-detection.md) + SKILL.md Step 5.2 / 8.5
+
+> **v0.5.3 升级（2026-05-20）** —— 稿件预检门：
+> - `rootInfo` 新增 `nodeCount`（= `all.length`，root + 全部 descendants 数）
+> - 供 SKILL.md Step 4.5 预检门「节点规模」维度判断单次抽取是否会 token 超限，见 [preflight-gate.md](./preflight-gate.md)
 
 > 返回数据结构稳定，本文档同时也是这个脚本的**契约**。
 

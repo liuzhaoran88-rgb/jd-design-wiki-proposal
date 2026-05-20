@@ -61,6 +61,8 @@ allowed-tools: [mcp__zero-design__get_design_metadata, mcp__zero-design__get_des
 ## 执行流程（严格按步骤跑）
 
 > 默认先执行 Outline Gate。只有显式传入 `--confirm-outline`，才继续执行正式写入和双向追溯。
+>
+> Step 4.5 另有一道**稿件预检门**：预检整体结论 `⛔ 阻断` 时，即使传了 `--confirm-outline` 也不写入，要求设计师修稿后重跑。
 
 ### Step 1: Parse URL
 
@@ -127,6 +129,20 @@ return {
 }
 ```
 
+### Step 4.5: 稿件预检门（v0.5.3）
+
+Step 4 抽完数据后、进 Step 5 之前，按 [references/preflight-gate.md](./references/preflight-gate.md) 跑一次**稿件就绪度预检**：
+
+- 用 Step 4 已抽数据（`rootInfo` / `textStyles` / `chapters` / `instances`）+ Step 2 节点信息，对 5 个维度做**机械规则判断**：节点规模 / 命名可信度 / 标注完整度 / 截图可得性 / 结构清晰度
+- 每个维度结论 `✅ 通过` / `⚠️ 待补充` / `⛔ 阻断`，聚合出整体结论
+- 评估写进 outline 的 `## 稿件预检` 段（`{{section_preflight}}`），`⚠️` 项并入「待设计师确认」
+
+**Phase 2 闸门**：整体结论 `⛔ 阻断`（仅节点规模严重超限会触发）时，即使传了 `--confirm-outline` 也**不写 design.md** —— 终端输出严重缺口，要求设计师修稿 / 分块后重跑。`✅` / `⚠️` 正常继续。
+
+> 预检只做**规则判断**，不评价设计质量;`⛔` 只留给规模超限这种「转换必然产出垃圾」的致命情况，命名 / 标注 / 截图 / 结构等模糊维度一律 `⚠️` 不阻断 —— 避免误报把设计师挡在门外。
+
+> **为什么要这道门**:skill 此前抽完数据直接转换，把「稿件没就绪」的代价后置到 design.md 里靠人反复 review（issue #56）。预检在动手前先把缺口列清楚。
+
 ### Step 5: Token 反查
 
 按 [references/token-reverse-lookup.md](./references/token-reverse-lookup.md) 把抽到的实际值反查到 V16 token：
@@ -174,6 +190,7 @@ return {
 
 读 [templates/outline.md](./templates/outline.md)，先输出 `{slug}/design-outline.md`，包含：
 
+- **稿件预检**：Step 4.5 的五维度就绪度评估，渲染到 `{{section_preflight}}`
 - 本次识别范围（当前节点实际覆盖的原子 / 组合 / 页面示意）
 - 结构大纲（章节 / frame / 关键子节点）
 - 状态 / 变体 / 组合维度
@@ -192,7 +209,9 @@ return {
 
 如果未传 `--confirm-outline`，到此结束并输出 outline 模式终端提示。
 
-### Step 6: 导出 preview.png（仅 `--confirm-outline` 时执行）
+**如果传了 `--confirm-outline` 但 Step 4.5 预检整体结论为 `⛔ 阻断`**：同样到此结束 —— **不执行 Step 6 及之后任何写入**，不写 design.md / INDEX.md / sharedPluginData，终端输出预检阻断提示（见 Step 11B 末尾）。设计师修稿 / 分块后重跑。
+
+### Step 6: 导出 preview.png（仅 `--confirm-outline` 且预检未阻断时执行）
 
 按 [references/preview-export.md](./references/preview-export.md) 步骤：
 
@@ -392,6 +411,12 @@ frontmatter 必填字段见 [references/frontmatter-spec.md](./references/frontm
 | `{{bundle_part_of_line_or_empty}}` | `templates/_assets-cdn.md` frontmatter | page-doc bundle → `bundle_part_of: design.md\n`；单 md → 空字符串 |
 | `{{assets_cdn_link_or_empty}}` | `component.md` / `page-doc/design.md` 关联段 | 侦测到切图 → `- 位图切图清单：[_assets-cdn.md](./_assets-cdn.md)`；无切图 → 空字符串 |
 
+#### v0.5.3 稿件预检占位符
+
+| 占位符 | 用在 | 替换值 |
+|---|---|---|
+| `{{section_preflight}}` | `templates/outline.md` | Step 4.5 预检评估：整体结论 + 五维度逐行（`✅/⚠️/⛔` + 一句话），`⚠️` 项另在「待设计师确认」段展开 |
+
 ### Step 8.5: 生成 / 更新 _assets-cdn.md（仅 `--confirm-outline`，侦测到切图时）
 
 如果 Step 5.2 侦测到切图(`imageNodes` 非空),按 [references/cutout-detection.md](./references/cutout-detection.md) §4 把切图清单写进输出目录的 `_assets-cdn.md`:
@@ -467,6 +492,13 @@ return { keys: node.getSharedPluginDataKeys('jd-design-wiki') }
    ├─ 切图: {C} 处待上传 CDN {仅 C>0 时显示此行}
    └─ 风险项: {M}
 
+🔍 稿件预检:{整体结论 ✅ 通过 / ⚠️ 待补充 / ⛔ 阻断}
+   ├─ 节点规模:{✅/⚠️/⛔} {一句话}
+   ├─ 命名可信度:{✅/⚠️} {可疑名个数}
+   ├─ 标注完整度:{✅/⚠️} {一句话}
+   ├─ 截图可得性:{✅/⚠️} {一句话}
+   └─ 结构清晰度:{✅/⚠️} {一句话}
+
 ⏸ 当前为 outline 模式，未写入 design.md
    未更新 INDEX.md / Relay sharedPluginData / used_by
 
@@ -479,6 +511,8 @@ return { keys: node.getSharedPluginDataKeys('jd-design-wiki') }
 完成后输出格式如下（中文，含 emoji，简短）：
 
 ```
+🔍 稿件预检:{整体结论 ✅ 通过 / ⚠️ 待补充}
+
 ✅ 已生成: {输出路径}
    ├─ level: {自动推断} {如走兜底 → 加 ⚠️}
    ├─ bg:    {自动推断} {同上}
@@ -497,6 +531,17 @@ return { keys: node.getSharedPluginDataKeys('jd-design-wiki') }
    ├─ {用途1}  ({w}×{h})  节点 {id}   ⏳ 待上传
    └─ ...
    已登记到 {slug}/_assets-cdn.md，请设计师 export → 上传京东 CDN → 回填 URL
+```
+
+**预检 `⛔ 阻断` 时**（Step 4.5 整体结论为阻断）改为输出，**不写任何文件**：
+
+```
+🔍 稿件预检:⛔ 阻断
+   └─ 节点规模:⛔ {h / nodeCount 超限说明}
+
+⛔ 稿件预检未过 —— 已停止,未写 design.md。
+   严重缺口:{规模超限说明,建议分块录入}
+   请设计师修稿 / 分块后重跑 /relay-to-design-md <relay_url> --confirm-outline
 ```
 
 **TODO 计数 N 动态计算**：基础 5 处（一句话定义 / 应用场景 / 视觉预览 / 交互 / Donts / AI Schema 中无数据 placeholder）— 本次实际自动填上的（v0.4：page-doc 模式扫到 ≥1 条 dont_rule 时 Donts 自动填，N 减 1）。最少 4 处，最多 5 处。
@@ -537,6 +582,7 @@ return { keys: node.getSharedPluginDataKeys('jd-design-wiki') }
 | [references/auto-detect-rules.md](./references/auto-detect-rules.md) | 推断 level / bg / slug / name_zh 的规则表（v0.2 加 slug 变体后缀） |
 | [references/node-type-mapping.md](./references/node-type-mapping.md) | Relay 节点属性 → design.md section 对照 + 统一抽取脚本 |
 | [references/cutout-detection.md](./references/cutout-detection.md) | 切图侦测判据 + `_assets-cdn.md` 登记规则（v0.5.2） |
+| [references/preflight-gate.md](./references/preflight-gate.md) | 稿件预检门五维度判据 + Phase 2 闸门规则（v0.5.3） |
 | [references/token-reverse-lookup.md](./references/token-reverse-lookup.md) | hex / fontSize+weight / radius / spacing 反查 V16 token 算法（v0.2 加 rgba 容差） |
 | [references/frontmatter-spec.md](./references/frontmatter-spec.md) | Frontmatter 字段定义 + 校验规则 |
 | [references/traceability.md](./references/traceability.md) | INDEX.md 维护 + 反向引用维护 + （v0.3）Relay sharedPluginData |
@@ -602,4 +648,10 @@ return { keys: node.getSharedPluginDataKeys('jd-design-wiki') }
   - **③ 新增 Step 8.5 生成 `_assets-cdn.md`**：侦测到切图时套 [templates/_assets-cdn.md](./templates/_assets-cdn.md) 写辅助资产清单，「存在则合并」保留设计师已回填 URL；下划线前缀辅助文件，不计入 6 文件封板
   - **④ outline + 终端提醒**：outline 加「切图清单」段，`--confirm-outline` 终端打 `🖼 检测到 N 处切图` checklist
   - **⑤ 边界**：skill 只侦测 + 登记 + 提醒，京东 CDN 上传仍需设计师手动；新建 [references/cutout-detection.md](./references/cutout-detection.md)
+- **v0.5.3** (2026-05-20) 稿件预检门 —— 兑现 issue #56：
+  - **① 新增 Step 4.5 稿件预检门**：Step 4 抽取后、Step 5 前跑一次五维度就绪度评估（节点规模 / 命名可信度 / 标注完整度 / 截图可得性 / 结构清晰度），每维度 `✅/⚠️/⛔`
+  - **② Phase 2 闸门**：整体 `⛔ 阻断`（仅节点规模严重超限触发）时，即使传 `--confirm-outline` 也不写 design.md，要求设计师修稿 / 分块后重跑
+  - **③ outline + 终端**：outline 顶部加 `## 稿件预检` 段，终端打 `🔍 稿件预检` 五维度结论
+  - **④ 抽取脚本加 `nodeCount`**：`rootInfo.nodeCount` = `all.length`，供规模维度判断
+  - **⑤ 新建 [references/preflight-gate.md](./references/preflight-gate.md)**：五维度机械判据 + 闸门规则；只做规则判断不评设计质量，`⛔` 仅留给致命情况避免误报
 - v0.6 (planned) 加 page.md / flow.md 模板 + batch 模式 + Diff 模式（只更新机器抽取段，保留人写段）
