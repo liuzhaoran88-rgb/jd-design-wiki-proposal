@@ -26,7 +26,7 @@ last_updated: 2026-04-29
 | Zone | 关注 |
 |---|---|
 | Zone 2 Foundations | 全公司共用的 Token + 原子组件 |
-| Zone 4 产品架构 | 各事业部各自维护 |
+| Zone 4 组织架构 | 各事业部各自维护 |
 | **Zone 5 Horizontal** | 跨事业部规则 + 横向资产 + 治理 |
 
 ---

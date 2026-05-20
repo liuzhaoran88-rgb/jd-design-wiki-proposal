@@ -35,7 +35,7 @@
 ├── 📚 Design 知识        知识/研究/案例(按部门切)
 ├── 🎨 Design 基础        Token / 原子组件(全公司共用)
 ├── 🤖 AI 机制            Skill / 协议 / Agent 守则
-├── 🏗 产品架构 ★         部门 → 业务 → 组件目录(业务线设计师主战场)
+├── 🏗 组织架构 ★         部门 → 业务 → 组件目录(业务线设计师主战场)
 └── 🚀 横向专项           跨部门治理 / 反哺机制
 ```
 
@@ -107,7 +107,7 @@ V16 录入开始铺 HTML 发布物。每个 Zone 都有一份 `spec-page.html`,�
 | 📚 Design 知识 | `jd-design-system-md-v16/knowledge/spec-page.html` | placeholder(3 子目录占位) |
 | 🎨 Design 基础 | `jd-design-system-md-v16/foundations/spec-page.html` | **8 token 类别 + 通用组件(tabbar/button)** |
 | 🤖 AI 机制 | `jd-design-system-md-v16/ai-mechanism/spec-page.html` | **4 个 skill 索引卡片**(README + 3 个 V16 skill md) |
-| 🏗 产品架构 | `jd-design-system-md-v16/product-architecture/spec-page.html` | placeholder(domains/pages/relations 占位) |
+| 🏗 组织架构 | `jd-design-system-md-v16/product-architecture/spec-page.html` | placeholder(domains/pages/relations 占位) |
 | 🚀 横向专项 | 未建页 | top-bar 标灰 |
 
 落地组件实例:[tabbar/spec-page.html](./jd-design-system-md-v16/horizontal/components-base/tabbar/spec-page.html) — 单组件 7 章节规范页,Pro/Basic 双视图、原稿切图、应用场景、Donts、AI Schema。共用同套 top-bar + sidebar 壳。

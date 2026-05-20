@@ -3,7 +3,7 @@ zone: product-architecture
 last_updated: 2026-04-29
 ---
 
-# 🏗 产品架构 · Product Architecture
+# 🏗 组织架构 · Organizational Architecture
 
 > **业务线设计师的主战场**。本 Zone 的内容按"部门 → 业务 → 组件"三级组织,与京东组织架构对齐。
 >

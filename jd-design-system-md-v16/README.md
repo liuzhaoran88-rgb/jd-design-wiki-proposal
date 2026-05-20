@@ -81,12 +81,12 @@ V16 录入开始铺 HTML 发布物。每个 Zone 都有一份 `spec-page.html`,�
 | 📚 Design 知识 | `knowledge/spec-page.html` | placeholder(3 子目录占位) |
 | 🎨 Design 基础 | `foundations/spec-page.html` | 8 token 类别 + 通用组件(tabbar/button)group |
 | 🤖 AI 机制 | `ai-mechanism/spec-page.html` | Skill Registry 4 卡片 + README + 3 个 V16 skill md |
-| 🏗 产品架构 | `product-architecture/spec-page.html` | placeholder(domains/pages/relations 占位) |
+| 🏗 组织架构 | `product-architecture/spec-page.html` | placeholder(domains/pages/relations 占位) |
 | 🚀 横向专项 | 未建页 | top-bar 标灰 |
 
 横向 components-base 的实战落地:[horizontal/components-base/tabbar/](./horizontal/components-base/tabbar/) — V16 第一个完整的 page-doc bundle(6 文件 + 12 张原稿切图 + spec-page.html)。
 
-> **shared/ 重分类**:跨部门通用组件(Tabbar / Button)挂在 Zone 02 🎨 Design 基础 > 通用组件,而不是 Zone 04 🏗 产品架构 > shared/(原 ant-design 模板有 shared,V16 移到 Foundation 侧更贴近"原子/基础"语义)。
+> **shared/ 重分类**:跨部门通用组件(Tabbar / Button)挂在 Zone 02 🎨 Design 基础 > 通用组件,而不是 Zone 04 🏗 组织架构 > shared/(原 ant-design 模板有 shared,V16 移到 Foundation 侧更贴近"原子/基础"语义)。
 
 ---
 

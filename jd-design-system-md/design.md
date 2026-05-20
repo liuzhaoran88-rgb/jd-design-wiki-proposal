@@ -37,7 +37,7 @@ zone_index: ["foundations", "knowledge", "ai-mechanism", "product-architecture",
 ├── 📚 Zone 1 · Design 知识        → 设计哲学 / 用研产出 / 标杆调研 / 历史决策
 ├── 🎨 Zone 2 · Design 基础        → Token / 原子组件 / 视觉规范(全公司共用)
 ├── 🤖 Zone 3 · AI 机制            → Skill / 协议 / Agent 守则 / Schema 约定
-├── 🏗 Zone 4 · 产品架构 ★         → 部门 → 业务 → 业务组件目录(各业务线主战场)
+├── 🏗 Zone 4 · 组织架构 ★         → 部门 → 业务 → 业务组件目录(各业务线主战场)
 └── 🚀 Zone 5 · 横向专项           → 跨部门治理(双列卡 / 大促 / 深色模式 / 无障碍)
 ```
 
