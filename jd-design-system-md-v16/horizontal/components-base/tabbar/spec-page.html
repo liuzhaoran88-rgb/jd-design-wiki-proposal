@@ -420,11 +420,12 @@
      不再加 margin-bottom — design.md 的「距 phone 底 17 DP」由 phone iOS 安全区承担,跟 tabbar 同位 */
   .agent {
     width: 52px; height: 52px;
-    margin-left: -16px;
+    /* 向外抽缩 16 DP = 狗头左缘越过屏幕边 16;margin-left 需额外吃掉 .tabbar-host 的 12 padding */
+    margin-left: -28px;
     flex-shrink: 0; position: relative;
     transition: margin-left 0.25s;
   }
-  .agent.inflate-28 { margin-left: -28px; }
+  .agent.inflate-28 { margin-left: -40px; }
   .agent img {
     width: 100%; height: 100%;
     display: block;
@@ -442,7 +443,8 @@
     z-index: 3;
   }
 
-  .tabbar { flex: 1; height: 52px; border-radius: 16px; display: flex; align-items: center; padding: 0 12px; transition: 0.2s; }
+  /* 容器描边:对应 Relay 第二层 color-dodge fill(导出丢层),液态玻璃边缘 hairline 高光 */
+  .tabbar { flex: 1; height: 52px; border-radius: 16px; display: flex; align-items: center; padding: 0 12px; transition: 0.2s; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.6); }
   .slots { display: flex; flex: 1; height: 44px; align-items: stretch; }
   .slot {
     flex: 1; height: 44px; border-radius: 12px;
@@ -457,17 +459,27 @@
     -webkit-mask: url('https://img11.360buyimg.com/img/jfs/t1/435818/38/8886/1500/6a0c64ceFf9186b68/027603c0398a7c74.png') no-repeat center / contain;
     mask: url('https://img11.360buyimg.com/img/jfs/t1/435818/38/8886/1500/6a0c64ceFf9186b68/027603c0398a7c74.png') no-repeat center / contain;
   }
-  .slot.selected .icon-home { background-color: #ff0f23; /* jdred 选中态 */ }
+  /* 选中态用设计师彩色切图(自带 jdred + 笑脸),不再走 mask 染色 */
+  .slot.selected .icon-home {
+    -webkit-mask: none; mask: none;
+    background: url('https://img14.360buyimg.com/img/jfs/t1/435193/37/14737/1001/6a0d284cF8944e60e/027603c03c327d14.png') no-repeat center / contain;
+  }
   .slot .label-text { font-size: 10px; line-height: 14px; font-weight: 400; }
   .slot.selected .label-text { font-weight: 600; }
   .slot.marketing .icon-svg { display: none; }
-  .slot.marketing::before { content: ''; width: 38px; height: 38px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #ffe1bd, #ff8c61 60%, #c54f2a); display: block; }
+  .slot.marketing::before { content: ''; width: 38px; height: 38px; border-radius: 50%; background: url('https://img11.360buyimg.com/img/jfs/t1/437910/36/498/25382/6a0d4838Fd985a38b/0276072072721e5e.png') no-repeat center / cover; display: block; }
   .slot.marketing .label-text { display: none; }
 
-  .slot .badge { position: absolute; pointer-events: none; z-index: 3; }
-  .slot .badge.red-dot { width: 8px; height: 8px; border-radius: 50%; background: #ff0f23; left: calc(50% + 5px); bottom: calc(50% + 4px); }
-  .slot .badge.number { min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px 8px 8px 4px; background: #ff0f23; color: #fff; font-size: 10px; line-height: 16px; font-weight: 600; text-align: center; left: calc(50% + 1px); bottom: calc(50% + 0px); }
-  .slot .badge.text { padding: 0 6px; height: 16px; border-radius: 8px 8px 8px 4px; background: #ff0f23; color: #fff; font-size: 10px; line-height: 16px; font-weight: 500; white-space: nowrap; left: calc(50% + 1px); bottom: calc(50% + 0px); }
+  /* badge 样式 .slot 与 atom 矩阵共用 —— atom 矩阵不补 position:absolute 的话,
+     badge 会落进 .atom-slot 弹性列挤掉空的 .icon-home */
+  .slot .badge,
+  .atom-matrix .atom-cell .badge { position: absolute; pointer-events: none; z-index: 3; }
+  .slot .badge.red-dot,
+  .atom-matrix .atom-cell .badge.red-dot { width: 8px; height: 8px; border-radius: 50%; background: #ff0f23; left: calc(50% + 5px); bottom: calc(50% + 4px); }
+  .slot .badge.number,
+  .atom-matrix .atom-cell .badge.number { min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px 8px 8px 4px; background: #ff0f23; color: #fff; font-size: 10px; line-height: 16px; font-weight: 600; text-align: center; left: calc(50% + 1px); bottom: calc(50% + 0px); }
+  .slot .badge.text,
+  .atom-matrix .atom-cell .badge.text { padding: 0 6px; height: 16px; border-radius: 8px 8px 8px 4px; background: #ff0f23; color: #fff; font-size: 10px; line-height: 16px; font-weight: 500; white-space: nowrap; left: calc(50% + 1px); bottom: calc(50% + 0px); }
 
   /* island */
   .slot.island { flex: none; flex-direction: row; padding: 0 6px; gap: 6px; border-radius: 12px; }
@@ -500,7 +512,7 @@
   .atom-matrix .atom-head { font-size: 11px; color: var(--c-text-3); font-weight: 500; text-align: center; padding-bottom: 6px; border-bottom: 1px solid var(--c-line); }
   .atom-matrix .atom-label { font-size: 12px; color: var(--c-text-2); font-weight: 600; text-align: right; padding-right: 4px; }
   .atom-matrix .atom-cell { display: flex; align-items: center; justify-content: center; min-height: 72px; background: #fff; border: 1px solid var(--c-line); border-radius: 8px; position: relative; }
-  .atom-matrix .atom-cell.marketing-bg::before { content: ''; width: 38px; height: 38px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #ffe1bd, #ff8c61 60%, #c54f2a); }
+  .atom-matrix .atom-cell.marketing-bg::before { content: ''; width: 38px; height: 38px; border-radius: 50%; background: url('https://img11.360buyimg.com/img/jfs/t1/437910/36/498/25382/6a0d4838Fd985a38b/0276072072721e5e.png') no-repeat center / cover; }
   .atom-matrix .atom-cell .badge.red-dot { left: calc(50% + 8px); bottom: calc(50% + 6px); }
   .atom-matrix .atom-cell .badge.number, .atom-matrix .atom-cell .badge.text { left: calc(50% + 2px); bottom: calc(50% + 2px); }
   .atom-matrix .atom-cell.marketing-bg .badge.red-dot { left: calc(50% + 14px); bottom: calc(50% + 14px); }
@@ -513,7 +525,10 @@
     -webkit-mask: url('https://img11.360buyimg.com/img/jfs/t1/435818/38/8886/1500/6a0c64ceFf9186b68/027603c0398a7c74.png') no-repeat center / contain;
     mask: url('https://img11.360buyimg.com/img/jfs/t1/435818/38/8886/1500/6a0c64ceFf9186b68/027603c0398a7c74.png') no-repeat center / contain;
   }
-  .atom-slot.selected .icon-home { background-color: #ff0f23; }
+  .atom-slot.selected .icon-home {
+    -webkit-mask: none; mask: none;
+    background: url('https://img14.360buyimg.com/img/jfs/t1/435193/37/14737/1001/6a0d284cF8944e60e/027603c03c327d14.png') no-repeat center / contain;
+  }
   .atom-slot .label-text { font-size: 10px; line-height: 14px; }
   .atom-slot.selected .label-text { font-weight: 600; }
 
@@ -1094,7 +1109,7 @@
             <div class="tabbar"><div class="slots" id="slots-2-6-a"></div></div>
           </div>
         </div>
-        <p class="note">无灵动岛 · margin-left: −16 DP</p>
+        <p class="note">无灵动岛 · 向外抽缩 16 DP</p>
       </div>
       <div class="compare-cell">
         <h5>灵动岛展开 → 抽缩 28 DP</h5>
@@ -1104,7 +1119,7 @@
             <div class="tabbar"><div class="slots" id="slots-2-6-b"></div></div>
           </div>
         </div>
-        <p class="note">灵动岛存在 · margin-left: −28 DP</p>
+        <p class="note">灵动岛存在 · 向外抽缩 28 DP</p>
       </div>
     </div>
   </div>

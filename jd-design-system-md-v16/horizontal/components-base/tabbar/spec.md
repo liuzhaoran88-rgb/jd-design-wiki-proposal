@@ -93,7 +93,7 @@ uses_tokens:
 | 角色 | Atom | 来源 |
 |---|---|---|
 | 默认态图标 + 文本 | `gray_1` | 章节 02 交互状态 |
-| 选中态图标 + 文本 | `jdred` | 章节 02 交互状态 |
+| 选中态图标 + 文本 | `jdred` | 章节 02 交互状态(图标走选中态专用彩色切图,`jdred` 已烘焙进切图,见 [_assets-cdn.md](./_assets-cdn.md)) |
 | 选中态背景 | `gray_6` | 章节 02 交互状态（灵动岛展开期间消失） |
 | 常规灵动岛背景 | `gray_6` | 章节 03 颜色应用 a |
 | 常规灵动岛商品图底背景 | `white` | 章节 03 颜色应用 a，需 PNG 透明底素材 |
@@ -126,6 +126,14 @@ uses_tokens:
 > - **Tabbar 容器自身**：`radius_xxl` (16px)，参见 V16 [foundations/tokens/radius.md](../../../foundations/tokens/radius.md)「弹层/弹窗/底导」用法
 > - **灵动岛容器**：`radius_xl` (12px)
 > - 其它角色对应 px 待与设计师按章节确认
+
+## 容器描边
+
+> Relay 容器 fill 为 `background-blend-mode: normal, color-dodge` 双层结构，第二层 `color-dodge` 是液态玻璃边缘的 hairline 高光描边，导出 CSS 时丢层。
+
+| 项 | 当前取值 | 状态 |
+|---|---|---|
+| Tabbar 容器描边 | 1 px 内描边高光，`box-shadow: inset 0 0 0 1px rgba(255,255,255,0.6)` | ⚠️ **估值** — 待设计师从 Relay 回填 `color-dodge` 层确切色值 / 宽度 / 不透明度 |
 
 ## 间距 / 布局
 

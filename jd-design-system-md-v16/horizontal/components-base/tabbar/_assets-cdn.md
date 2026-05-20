@@ -7,7 +7,7 @@ purpose: 维护 tabbar 组件依赖的位图(atom 切图 + Relay 章节大图)CD
 
 # Tabbar 位图 CDN 清单
 
-> 本组件渲染依赖的所有位图资产(2 张 atom 切图 + 9 张 Relay 章节大图)。
+> 本组件渲染依赖的所有位图资产(5 张 atom 切图 + 9 张 Relay 章节大图,共 14 张)。
 >
 > **当前 CDN**:[jsdelivr](https://www.jsdelivr.com)(GitHub mirror,免费、全球加速)
 > **长期 TODO**:迁京东内部 CDN(由设计师 / 运维上传后替换下面所有 URL,本文件 + spec-page.html 同步更新)
@@ -21,13 +21,16 @@ purpose: 维护 tabbar 组件依赖的位图(atom 切图 + Relay 章节大图)CD
 ## Atom 切图
 
 > Joy Agent atom 来源:Relay `312:58236`(完整版 atom)和 `312:58243`(父 frame 含招手气泡)。
-> 坑位图标(默认/选中共用):Relay 章节 02 各坑位用 home / cart / msg 等图标,目前先给一个 home 示例。
+> 坑位图标:Relay 章节 02 各坑位用 home / cart / msg 等图标,目前先给一个 home 示例。
+> **默认态**与**选中态**是两张独立资产 —— 默认态走 CSS `mask` 染色(单色描边图),选中态用设计师专门切图(已含 `jdred` 填充 + 笑脸细节,非染色)。
 
 | 用途 | Relay 节点 | 尺寸 | CDN URL | 说明 |
 |---|---|---|---|---|
 | Joy Agent 默认形态 | `312:58236` | 64×64 px / 8 KB | <https://img13.360buyimg.com/img/jfs/t1/434027/27/16417/14829/6a0c6236F67e0986e/027609c09c2c80cd.png> | ✅ **京东正式 CDN** |
 | Joy Agent + 招手气泡 | `312:58243` | 待上传 | <https://cdn.jsdelivr.net/gh/ShuaiMXu/jd-design-wiki-proposal@aac981a/jd-design-system-md-v16/horizontal/components-base/tabbar/_assets/atoms/joy-agent-bubble.png> | ⏳ jsdelivr 临时,待京东 CDN |
-| 坑位图标 · home(示例) | 章节 02 各坑位 | 60×57 px / 1.5 KB RGBA | <https://img11.360buyimg.com/img/jfs/t1/435818/38/8886/1500/6a0c64ceFf9186b68/027603c0398a7c74.png> | ✅ **京东正式 CDN** · 用 CSS `mask` 一图双色(默认 `gray_1` / 选中 `jdred`) |
+| 坑位图标 · home 默认态(示例) | 章节 02 各坑位 | 60×57 px / 1.5 KB RGBA | <https://img11.360buyimg.com/img/jfs/t1/435818/38/8886/1500/6a0c64ceFf9186b68/027603c0398a7c74.png> | ✅ **京东正式 CDN** · 默认态,用 CSS `mask` 染 `gray_1` |
+| 坑位图标 · home 选中态(示例) | 章节 02 选中坑位 · 节点待补 | 60×60 px / 1 KB RGBA | <https://img14.360buyimg.com/img/jfs/t1/435193/37/14737/1001/6a0d284cF8944e60e/027603c03c327d14.png> | ✅ **京东正式 CDN** · 选中态专用彩色切图(`jdred` + 笑脸),直接 `background-image`,不染色 |
+| 坑位营销态示例图 | 章节 02 营销态 · 节点待补 | 114×114 px RGBA | <https://img11.360buyimg.com/img/jfs/t1/437910/36/498/25382/6a0d4838Fd985a38b/0276072072721e5e.png> | ✅ **京东正式 CDN** · 营销态 38×38 圆形图占位示例;设计「仅可替换图片」,实际由业务投放图替换 |
 
 ## Relay 章节大图
 
@@ -48,7 +51,7 @@ purpose: 维护 tabbar 组件依赖的位图(atom 切图 + Relay 章节大图)CD
 
 ## 迁移到京东 CDN 的 TODO
 
-- [ ] 11 张位图上传京东内部 CDN(由设计师 / 运维操作)
+- [ ] 14 张位图上传京东内部 CDN(由设计师 / 运维操作)
 - [ ] 替换上表「CDN URL(当前)」为正式 CDN URL
 - [ ] 删除本仓库 `_assets/` 目录(2.0 MB,迁完后无需保留)
 - [ ] 更新 spec-page.html 引用为正式 CDN URL
