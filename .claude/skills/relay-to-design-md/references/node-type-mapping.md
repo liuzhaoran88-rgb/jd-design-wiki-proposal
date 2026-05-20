@@ -14,6 +14,7 @@
 | `node.description` (PublishableMixin) | "## 一句话定义" 段（默认填，如有） | `node.description \|\| null` |
 | 子 TEXT 的 chars | "## 文案" 段（v0.1 暂不抽，留 v0.2） | `node.findAll(n => n.type==='TEXT')` |
 | 子节点 fills (SOLID) | "## 视觉 / 色彩" 段 | 见统一脚本 |
+| 子节点 fills (IMAGE) | `_assets-cdn.md` 切图清单（v0.5.2） | 见统一脚本 (g) + [cutout-detection.md](./cutout-detection.md) |
 | 子节点 textStyles | "## 视觉 / 文字" 段 | 见统一脚本 |
 | 子节点 cornerRadius | "## 视觉 / 圆角" 段 | 见统一脚本 |
 | 子节点 autoLayout 字段 | "## 视觉 / 间距" 段 | 见统一脚本 |
@@ -183,6 +184,27 @@ if (root.type === 'INSTANCE' || root.type === 'COMPONENT') {
   }
 }
 
+// (g) v0.5.2: 切图侦测 —— 带 IMAGE 类型 fill 的节点 = 位图资产（切图），必须 CDN 托管。
+// token / 矢量都无法表达位图，抽取层只负责"揪出来"，登记 / 提醒在 SKILL Step 5.2 / 8.5。
+// 判据与 _assets-cdn.md 行格式见 references/cutout-detection.md。
+const imageNodes = []
+for (const n of all) {
+  if (!('fills' in n) || !Array.isArray(n.fills)) continue
+  const imgFill = n.fills.find(f => f?.type === 'IMAGE' && f.visible !== false)
+  if (!imgFill) continue
+  const bb = n.absoluteBoundingBox || null
+  imageNodes.push({
+    id: n.id,
+    name: n.name,
+    type: n.type,
+    size: bb ? { w: Math.round(bb.width), h: Math.round(bb.height) }
+             : (n.width && n.height ? { w: Math.round(n.width), h: Math.round(n.height) } : null),
+    imageHash: imgFill.imageHash || null,   // 同 hash = 同一张切图被多处复用
+    scaleMode: imgFill.scaleMode || null,
+    chapter: chapterOf(n),
+  })
+}
+
 // v0.4: chapters 元数据（page-doc 模式）
 let chapters = null
 if (pageDocMode) {
@@ -211,6 +233,7 @@ return {
   variants,
   variantProps,
   chapters,                                // v0.4: page-doc 模式才有
+  imageNodes: imageNodes.slice(0, 100),    // v0.5.2: 切图侦测
 }
 ```
 
@@ -227,6 +250,12 @@ return {
 > - instance 加 `size`（来自 absoluteBoundingBox），用于"灵动岛 131×44 DP"这类 DP 抽取
 > - 提升 limit：textStyles 30→200，instances 30→150，layouts 20→50，text chars 80→200
 > - 返回新增 `chapters[]` 元数据（仅 page-doc 模式）：每个章节 id / name / bounds
+
+> **v0.5.2 升级（2026-05-20）** —— 切图侦测：
+> - 新增 (g) 段：扫所有节点的 `fills`，凡带 `type === 'IMAGE'` 且 `visible !== false` 的判为切图，收进 `imageNodes[]`
+> - 每条含 `id / name / type / size / imageHash / scaleMode / chapter`；`imageHash` 相同说明同一张切图被多处复用，登记时可去重
+> - 返回新增 `imageNodes`（上限 100）。**原脚本只收 SOLID fill、IMAGE fill 被静默丢弃**，导致切图资产无法被自动识别 —— 本次修复
+> - 下游处理见 [cutout-detection.md](./cutout-detection.md) + SKILL.md Step 5.2 / 8.5
 
 > 返回数据结构稳定，本文档同时也是这个脚本的**契约**。
 

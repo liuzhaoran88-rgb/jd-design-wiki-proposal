@@ -46,6 +46,10 @@ relay_source:
 
 {{section_tokens_summary}}
 
+## 切图清单（待上传 CDN）
+
+{{section_cutouts_or_none}}
+
 ## 待设计师确认
 
 {{section_confirmation_needed}}

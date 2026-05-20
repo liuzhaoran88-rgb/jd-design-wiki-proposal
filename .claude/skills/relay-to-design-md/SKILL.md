@@ -47,6 +47,8 @@ allowed-tools: [mcp__zero-design__get_design_metadata, mcp__zero-design__get_des
 - ✅ **page-doc 大节点**（高 > 5000px 或 ≥3 个章节 FRAME）→ **v0.4 单 md 内章节切分** → **v0.5 拆 4 文件 bundle** → **v0.5.1 拆 6 文件**（+ `ai-schema.yaml` + `CHANGELOG.md`，`relay_source` 单点存储）
 
 > **v0.5.1 即 bundle 结构终态(封板)**:从 v0.1 单 md → v0.4 章节切分 → v0.5 4 文件 → v0.5.1 6 文件,持续拆下去会增加设计师 review 成本。v0.5.1 起**只动内容不动结构**,后续 v0.6+ 是 level 扩展(component-business / page / flow),不再拆新文件。如果新需求似乎需要第 7 个文件,先开 issue 讨论"能否合到现有 6 文件之一"再拆。
+>
+> **辅助文件不计入封板**:下划线前缀文件(如 v0.5.2 的 `_assets-cdn.md` 切图清单)是 infra / manifest 性质,不是给设计师逐行 review 的正文文档,不受 6 文件封板约束。
 
 如果检测到 level ≠ component-base，**仍然写文件**，但 frontmatter `auto_detected.level` 标 ⚠️，并在终端输出"非 L1 节点，结果可能不准，请 review"。
 
@@ -121,6 +123,7 @@ return {
   instances: Instance[],     // 子组件 / 材质 INSTANCE 引用
   layouts: Layout[],         // autoLayout padding / spacing
   variants: string[],        // COMPONENT_SET children 名
+  imageNodes: ImageNode[],   // v0.5.2: 带 IMAGE fill 的切图节点
 }
 ```
 
@@ -154,6 +157,19 @@ return {
 
 > 目的:**让上游不静悄悄把已知 / 新冲突 token 写进 design.md** 让 design-review 后置才发现。
 
+#### Step 5.2: 切图侦测（v0.5.2）
+
+抽取脚本返回的 `imageNodes[]`（带 `IMAGE` 类型 fill 的节点 = 切图位图资产）按 [references/cutout-detection.md](./references/cutout-detection.md) 处理:
+
+- 按 `imageHash` **去重**(同一张切图被多处复用合并为 1 条);
+- 每条切图整理出「用途 / Relay 节点 ID / 尺寸」三列,CDN URL **留空**,状态 `⏳ 待上传 CDN`;
+- outline 模式 → 写进 outline 的「切图清单」段(Step 5.5);
+- `--confirm-outline` 模式 → 在 Step 8.5 登记到 `_assets-cdn.md`。
+
+> **为什么单独侦测**:位图切图(卡通形象 / 彩色图标 / 实拍图)token 和矢量都无法表达,必须 CDN 托管。原抽取脚本只收 `SOLID` fill、`IMAGE` fill 被静默丢弃 —— 切图全靠人肉登记易漏(issue #54)。
+
+`imageNodes` 为空 → 跳过,outline / `_assets-cdn.md` / 终端都不出现切图段。
+
 ### Step 5.5: 生成 outline（默认一定执行）
 
 读 [templates/outline.md](./templates/outline.md)，先输出 `{slug}/design-outline.md`，包含：
@@ -162,6 +178,7 @@ return {
 - 结构大纲（章节 / frame / 关键子节点）
 - 状态 / 变体 / 组合维度
 - 已识别 token / materials / uses_components 摘要
+- **切图清单**：Step 5.2 侦测到的 IMAGE fill 切图，标 `⏳ 待上传 CDN`，渲染到 `{{section_cutouts_or_none}}`（无切图则填「无」）
 - **待设计师确认**：只列"当前证据不足、截图未取到、上下文未读全、交互未标注"这类真实缺口，**不要**写成泛泛建议
 - **自动发现的风险**：token-miss / naming-conflict / 半步间距 / 子组件未录入 / pageDocMode 判定不稳等
 
@@ -366,6 +383,28 @@ frontmatter 必填字段见 [references/frontmatter-spec.md](./references/frontm
 | `{{skill_version}}` | 当前 skill 版本号字符串（如 `v0.4.1`、`v0.5`），从 SKILL.md 版本历史最新一行取 |
 | `{{todo_count}}` | 实际剩余 TODO 数（基础 5，page-doc 模式 + Donts 自动填 → 4） |
 
+#### v0.5.2 切图侦测占位符
+
+| 占位符 | 用在 | 替换值 |
+|---|---|---|
+| `{{section_cutouts_or_none}}` | `templates/outline.md` | 切图清单 markdown 列表（用途 / 尺寸 / 节点 ID / ⏳）；无切图填「无」 |
+| `{{section_cutouts_table}}` | `templates/_assets-cdn.md` | 去重后的切图表体（多行，模型自己构造），列：用途 / Relay 节点 / 尺寸 / CDN URL（空）/ 状态 `⏳ 待上传 CDN` |
+| `{{bundle_part_of_line_or_empty}}` | `templates/_assets-cdn.md` frontmatter | page-doc bundle → `bundle_part_of: design.md\n`；单 md → 空字符串 |
+| `{{assets_cdn_link_or_empty}}` | `component.md` / `page-doc/design.md` 关联段 | 侦测到切图 → `- 位图切图清单：[_assets-cdn.md](./_assets-cdn.md)`；无切图 → 空字符串 |
+
+### Step 8.5: 生成 / 更新 _assets-cdn.md（仅 `--confirm-outline`，侦测到切图时）
+
+如果 Step 5.2 侦测到切图(`imageNodes` 非空),按 [references/cutout-detection.md](./references/cutout-detection.md) §4 把切图清单写进输出目录的 `_assets-cdn.md`:
+
+- 套 [templates/_assets-cdn.md](./templates/_assets-cdn.md) 模板,`{{section_cutouts_table}}` 渲染为去重后的切图表(用途 / Relay 节点 / 尺寸 / CDN URL 留空 / 状态 `⏳ 待上传 CDN`);
+- **`_assets-cdn.md` 已存在 → 走「存在则合并」规则**:`Read` 原文件,命中节点 ID 的行**保留设计师已回填的 CDN URL / 状态**,只追加本次新侦测行,原文件有、本次没侦测到的行**保留不删**(可能是手工登记的 Relay 章节大图等);
+- page-doc bundle → `{{bundle_part_of_line_or_empty}}` 渲染为 `bundle_part_of: design.md`;单 md → 渲染空;
+- 在 design.md `## 关联` 段把 `{{assets_cdn_link_or_empty}}` 渲染为 `- 位图切图清单：[_assets-cdn.md](./_assets-cdn.md)`。
+
+> `_assets-cdn.md` 是**辅助资产清单**,下划线前缀标识 infra 性质,**不计入 v0.5.1 封板的 6 文件 bundle**(封板针对增加 review 成本的正文文档)。
+
+切图为空 → 跳过本步,不生成 `_assets-cdn.md`,`{{assets_cdn_link_or_empty}}` 渲染空。
+
 ### Step 9: 更新 INDEX.md（仅 `--confirm-outline` 时执行）
 
 [references/traceability.md](./references/traceability.md) 第 1 节"INDEX.md 维护"。读 `.claude/skills/relay-to-design-md/INDEX.md`，按 BG 分组追加新条目（如已存在 slug → 更新 last_synced 行不是追加）。
@@ -425,6 +464,7 @@ return { keys: node.getSharedPluginDataKeys('jd-design-wiki') }
    ├─ bg:    {自动推断} {同上}
    ├─ slug:  {自动推断} {同上}
    ├─ 待确认项: {N}
+   ├─ 切图: {C} 处待上传 CDN {仅 C>0 时显示此行}
    └─ 风险项: {M}
 
 ⏸ 当前为 outline 模式，未写入 design.md
@@ -451,6 +491,12 @@ return { keys: node.getSharedPluginDataKeys('jd-design-wiki') }
 
 {如有 token-miss / 半步间距 / 未录入子组件等}
 ⚠️ 检测到 {M} 个需要 review 的问题，详见 design.md 末尾 "本次自动同步发现的待办" 段
+
+{如 Step 5.2 侦测到切图}
+🖼 检测到 {C} 处切图（IMAGE fill），需导出并上传 CDN：
+   ├─ {用途1}  ({w}×{h})  节点 {id}   ⏳ 待上传
+   └─ ...
+   已登记到 {slug}/_assets-cdn.md，请设计师 export → 上传京东 CDN → 回填 URL
 ```
 
 **TODO 计数 N 动态计算**：基础 5 处（一句话定义 / 应用场景 / 视觉预览 / 交互 / Donts / AI Schema 中无数据 placeholder）— 本次实际自动填上的（v0.4：page-doc 模式扫到 ≥1 条 dont_rule 时 Donts 自动填，N 减 1）。最少 4 处，最多 5 处。
@@ -487,8 +533,10 @@ return { keys: node.getSharedPluginDataKeys('jd-design-wiki') }
 | [templates/page-doc/behaviors.md](./templates/page-doc/behaviors.md) | page-doc bundle 行为模板 (v0.5)；v0.5.1 AI Schema 改为摘要 + 链接 |
 | [templates/page-doc/ai-schema.yaml](./templates/page-doc/ai-schema.yaml) | page-doc bundle AI Schema 独立模板 (v0.5.1，issue #23) |
 | [templates/page-doc/CHANGELOG.md](./templates/page-doc/CHANGELOG.md) | page-doc bundle 变更记录独立模板 (v0.5.1，issue #23) |
+| [templates/_assets-cdn.md](./templates/_assets-cdn.md) | 位图切图 CDN 清单模板 (v0.5.2，辅助资产清单，非 bundle 正文文档) |
 | [references/auto-detect-rules.md](./references/auto-detect-rules.md) | 推断 level / bg / slug / name_zh 的规则表（v0.2 加 slug 变体后缀） |
 | [references/node-type-mapping.md](./references/node-type-mapping.md) | Relay 节点属性 → design.md section 对照 + 统一抽取脚本 |
+| [references/cutout-detection.md](./references/cutout-detection.md) | 切图侦测判据 + `_assets-cdn.md` 登记规则（v0.5.2） |
 | [references/token-reverse-lookup.md](./references/token-reverse-lookup.md) | hex / fontSize+weight / radius / spacing 反查 V16 token 算法（v0.2 加 rgba 容差） |
 | [references/frontmatter-spec.md](./references/frontmatter-spec.md) | Frontmatter 字段定义 + 校验规则 |
 | [references/traceability.md](./references/traceability.md) | INDEX.md 维护 + 反向引用维护 + （v0.3）Relay sharedPluginData |
@@ -548,4 +596,10 @@ return { keys: node.getSharedPluginDataKeys('jd-design-wiki') }
   - **② 变更记录搬到独立 `CHANGELOG.md`**：design.md (index) 不该承担变更历史，原 8 行变更表移到 `tabbar/CHANGELOG.md`，design.md 只留指向链接；新建 [templates/page-doc/CHANGELOG.md](./templates/page-doc/CHANGELOG.md) 模板
   - **③ `relay_source` 单点存储到 design.md**：原 spec / variants / behaviors 三个子文件都重复 `relay_source: {node_id, url}`（一旦 url / file_id 变了要改 4 处）。改为只在 design.md 写完整 `relay_source` 整段，子文件 frontmatter 只保留 `bundle_part_of: design.md` 反向指针 + 一行注释说明
   - **④ tabbar bundle 同步回填**：tabbar/{design,spec,variants,behaviors}.md 按上面 3 项重组（新增 ai-schema.yaml + CHANGELOG.md，删 3 处 relay_source 重复，搬变更表）
+- **v0.5.2** (2026-05-20) 切图侦测 —— 兑现 issue #54：
+  - **① 抽取脚本收 IMAGE fill**：`node-type-mapping.md` 统一脚本新增 (g) 段，扫所有节点 `fills`，凡带 `type === 'IMAGE'` 判为切图收进 `imageNodes[]`。**原脚本只收 SOLID、IMAGE fill 被静默丢弃**是本问题根因
+  - **② 新增 Step 5.2 切图侦测**：`imageNodes` 按 `imageHash` 去重，整理「用途 / 节点 ID / 尺寸」，CDN URL 留空 + 状态 `⏳ 待上传 CDN`
+  - **③ 新增 Step 8.5 生成 `_assets-cdn.md`**：侦测到切图时套 [templates/_assets-cdn.md](./templates/_assets-cdn.md) 写辅助资产清单，「存在则合并」保留设计师已回填 URL；下划线前缀辅助文件，不计入 6 文件封板
+  - **④ outline + 终端提醒**：outline 加「切图清单」段，`--confirm-outline` 终端打 `🖼 检测到 N 处切图` checklist
+  - **⑤ 边界**：skill 只侦测 + 登记 + 提醒，京东 CDN 上传仍需设计师手动；新建 [references/cutout-detection.md](./references/cutout-detection.md)
 - v0.6 (planned) 加 page.md / flow.md 模板 + batch 模式 + Diff 模式（只更新机器抽取段，保留人写段）

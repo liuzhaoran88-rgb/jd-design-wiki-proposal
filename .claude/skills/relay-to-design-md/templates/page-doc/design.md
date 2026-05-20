@@ -75,6 +75,7 @@ used_by: []
 - 此组件归属：`level: {{level}}`（page-doc bundle），`bg: {{bg}}`
 - V16 Foundation 引用：见 [spec.md](./spec.md) 的 `references.uses_tokens`
 - 父级页面：（待 L3 录入后由 skill 反向填 `used_by`）
+{{assets_cdn_link_or_empty}}
 
 ## 变更记录
 
