@@ -59,19 +59,22 @@ Read `~/code/jd-design-wiki-proposal/jd-design-system-md-v16/foundations/` in fu
 ```text
 foundations/
 ├── tokens/
-│   └── tokens.json         ← preferred source: all token-class structured JSON
-├── visual/
-│   ├── colors/             ← color_*, gray_*, jdred, white, etc → hex
-│   ├── typography/         ← PingFang Regular/Medium/Semibold/Bold + fontSize_N_W
-│   ├── layout.md           ← canvas, grid, safe-area rules
-│   └── materials.md        ← liquid-glass / frosted-glass / blur / shadow rules
-├── radius/                 ← radius_xs/s/m/l/xl/xxl → px
-├── spacing/                ← spacing tokens
-├── motion/                 ← easing / duration
-└── icon/                   ← icon box rules
+│   ├── tokens.json         ← preferred source: structured token JSON
+│   │                         (keys: color / typography / radius / lines / icon / spacing / palette / atom)
+│   ├── color.md            ← color_*, gray_*, jdred, white, etc → hex
+│   ├── typography.md       ← PingFang Regular/Medium/Semibold/Bold + font_size_N_W
+│   ├── radius.md           ← radius_xs/s/m/l/xl/xxl → px
+│   ├── spacing.md          ← spacing tokens
+│   ├── icon.md             ← icon box / stroke rules
+│   └── lines.md            ← stroke / divider line tokens
+└── visual/
+    ├── layout.md           ← canvas, grid, safe-area rules
+    └── materials.md        ← liquid-glass / frosted-glass / blur / shadow rules
 ```
 
-Prefer `tokens/tokens.json` (machine-readable). Fall back to per-category markdown when JSON is incomplete.
+All token-class markdown (color / typography / radius / spacing / icon / lines) lives under `foundations/tokens/` — there is no `foundations/visual/colors/`, `foundations/radius/`, or `foundations/motion/` directory. `foundations/visual/` holds only `layout.md` and `materials.md`.
+
+Prefer `tokens/tokens.json` (machine-readable). Fall back to per-category markdown under `tokens/` when JSON is incomplete.
 
 ### In-memory output
 
@@ -165,7 +168,7 @@ Output:
     { "node": "Dynamic Island", "field": "cornerRadius", "value": 13.5, "source": "tabbar/design.md 02.3" }
   ],
   "unresolvedLiterals": [
-    { "node": "...", "field": "fills[0].color", "value": "#A8A8A8", "wikiGap": "color not in foundation/visual/colors" }
+    { "node": "...", "field": "fills[0].color", "value": "#A8A8A8", "wikiGap": "color not in foundations/tokens/color.md" }
   ]
 }
 ```
