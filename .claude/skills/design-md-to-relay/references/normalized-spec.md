@@ -1,35 +1,35 @@
-# Normalized Spec JSON
+# Normalized Spec JSON · 归一化执行契约
 
-Normalized spec JSON is the machine-readable execution contract between wiki markdown and Relay/Zero scripts.
+Normalized spec JSON 是 wiki markdown 与 Relay/Zero 脚本之间机器可读的**执行契约**。
 
-The wiki is for humans. It spreads values across prose, tables, frontmatter, foundation tokens, and visual rules. **Before drawing**, this skill normalizes those sources into one structured object.
+wiki 是给人看的:值散落在散文、表格、frontmatter、foundation token、视觉规则各处。**画之前**,本 skill 把这些源归一化成一个结构化对象。
 
-## Why It Exists
+## 为什么需要它
 
-Without normalization, an agent reads natural language and starts drawing while still interpreting. That causes:
+不归一化,agent 边读自然语言边画 —— 还在「理解」就开始「执行」。后果:
 
-- **scope drift** — creating a full spec board when the user asked for one instance
-- **missing tokens** — using literal colors instead of foundation colors
-- **layout drift** — text boxes auto-resizing when the spec requires fixed bounds
-- **component leakage** — applying Tabbar lessons to Button or Toast
-- **silent cloning** from ground truth instead of generating from wiki
+- **scope drift** —— 用户只要一个实例,却画出整张 spec 板
+- **missing token** —— 用 literal 颜色而非 foundation 颜色
+- **layout drift** —— spec 要固定 bounds,文本框却 auto-resize
+- **component leakage** —— 把 Tabbar 的教训套到 Button / Toast 上
+- **silent cloning** —— 从 ground truth 复制,而非从 wiki 生成
 
-Normalized spec JSON **separates understanding from execution**.
+Normalized spec JSON 把**理解与执行分离**。
 
-## Source Precedence
+## Source Precedence · 来源优先级
 
 ```text
-user scope
-> ai-schema.yaml / spec.md structured fields
-> design.md explicit fields
-> foundation tokens and visual rules
-> component adapter defaults
-> ground truth for missing fields only
+用户 scope
+> ai-schema.yaml / spec.md 结构化字段
+> design.md 显式字段
+> foundation token + 视觉规则
+> 组件 adapter 默认值
+> ground truth(仅用于补缺失字段)
 ```
 
-If a field is defined in multiple sources, the higher-priority source wins. Lower-priority sources may fill in **only** what's missing.
+一个字段在多个源里都有定义 → 高优先级源胜出。低优先级源**只**补高优先级源缺失的部分。
 
-## Minimum Shape
+## 最小形态
 
 ```json
 {
@@ -65,9 +65,9 @@ If a field is defined in multiple sources, the higher-priority source wins. Lowe
 }
 ```
 
-## Node Spec
+## 节点 Spec
 
-Each planned node describes expected bounds, visual tokens, layout strategy, and source references.
+每个规划节点描述预期 bounds、视觉 token、布局策略、源引用。
 
 ```json
 {
@@ -102,9 +102,9 @@ Each planned node describes expected bounds, visual tokens, layout strategy, and
 }
 ```
 
-## Text Spec
+## 文本 Spec
 
-Use **fixed text bounds** when the wiki defines a label box:
+wiki 定义了 label 框时,用**固定文本框**:
 
 ```json
 {
@@ -133,9 +133,9 @@ Use **fixed text bounds** when the wiki defines a label box:
 }
 ```
 
-Use **auto-resizing text** only when no fixed text box exists and the text lives inside Auto Layout. In that case omit `bounds.width`/`bounds.height` and set `textAutoResize` to `WIDTH_AND_HEIGHT`.
+**只**在没有固定文本框、且文本处于 Auto Layout 内时用**自适应文本**。此时省略 `bounds.width`/`bounds.height`,把 `textAutoResize` 设为 `WIDTH_AND_HEIGHT`。
 
-## Asset Spec
+## 资产 Spec
 
 ```json
 {
@@ -149,9 +149,9 @@ Use **auto-resizing text** only when no fixed text box exists and the text lives
 }
 ```
 
-## Assertions
+## Assertion 断言
 
-Used **after generation** to compare expected metadata with actual Relay metadata:
+**生成之后**用来比对预期 metadata 与实际 Relay metadata:
 
 ```json
 {
@@ -168,25 +168,25 @@ Used **after generation** to compare expected metadata with actual Relay metadat
 }
 ```
 
-Tolerance defaults per [`fidelity-thresholds.md`](fidelity-thresholds.md):
+容忍度默认值见 [`fidelity-thresholds.md`](fidelity-thresholds.md):
 
-| Field | Tolerance |
+| 字段 | 容忍度 |
 |---|---|
-| fixed dimensions | 0.5 DP |
-| position anchors | 0.5 DP |
-| repeated distribution | 1 DP total drift |
-| colors | exact token or explicit accepted literal |
-| radius | exact token or explicit accepted literal |
+| 固定尺寸 | 0.5 DP |
+| 位置锚点 | 0.5 DP |
+| 重复分布 | 累计 1 DP |
+| 颜色 | 精确 token,或显式接受的 literal |
+| 圆角 | 精确 token,或显式接受的 literal |
 
-## Tabbar Single-Instance Example
+## Tabbar 单实例示例
 
-For a user request like:
+对于这样一个用户请求:
 
 ```text
-只需要写一个底导页面，放在 375x812 的页面上。有 joy agent，右侧 4 个底导，首页、新品、游戏、我的
+只需要写一个底导页面,放在 375x812 的页面上。有 joy agent,右侧 4 个底导,首页、新品、游戏、我的
 ```
 
-The normalized spec should say **one page and one bottom navigation instance**, not all states:
+normalized spec 应当表达**一个页面 + 一个底导实例**,而不是全部状态:
 
 ```json
 {
@@ -239,14 +239,14 @@ The normalized spec should say **one page and one bottom navigation instance**, 
 }
 ```
 
-Notice:
+注意:
 
-- `scope.states` lists exactly one state (`home-selected`), not all 12 atom combinations
-- `scope.allowedPlaceholders: false` — every icon must have a resolved asset
-- Joy Agent floating offset (`x: -16`) is a fixed anchor, not Auto Layout
+- `scope.states` 只列一个状态(`home-selected`),不是全部 12 种 atom 组合
+- `scope.allowedPlaceholders: false` —— 每个 icon 都必须有解析到的资产
+- Joy Agent 浮动出血偏移(`x: -16`)是固定锚点,不是 Auto Layout
 
-## When to Skip Normalization
+## 何时跳过归一化
 
-The normalized spec is required for any scope that has more than one node, more than one variant, or any asset. Trivial scopes (e.g., "place one rectangle at known coordinates") can skip normalization.
+任何 scope 只要有 1 个以上节点、1 个以上变体、或任何资产,就**必须**先建 normalized spec。平凡 scope(如「在已知坐标放一个矩形」)可以跳过。
 
-For all real component generation requests, build the normalized spec first.
+所有真实的组件生成请求,都先建 normalized spec。
