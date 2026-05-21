@@ -1,42 +1,42 @@
-# Tabbar Adapter
+# Tabbar Adapter · Tabbar 适配器
 
-This adapter captures Tabbar-specific lessons without making the main skill Tabbar-specific.
+本 adapter 沉淀 Tabbar 特异性教训,**不让主 skill 变成 Tabbar 专属**。
 
-It is **not** a copy of `tabbar/design.md`. Always read the real Tabbar spec from the source wiki repository at runtime. This adapter only explains how to map Tabbar wiki fields into a Relay node plan.
+**不是** `tabbar/design.md` 的副本。运行时永远从源 wiki 仓库实时读真实 Tabbar 规范。本 adapter 只解释「**如何把 Tabbar wiki 字段映射成 Relay 节点计划**」。
 
-## Scope Questions
+## Scope 澄清问题
 
-If the user says "画一个底导" and does not specify scope, ask:
+用户说「画一个底导」且没指定 scope 时,问:
 
 ```text
 你要的是一个底导放在手机页面里的示意，还是底导组件的多状态规范展示？
 ```
 
-Do not create multiple Tabbar variants unless requested.
+**不要**创建多个 Tabbar 变体,除非用户要求。
 
-## Common Single-Instance Defaults
+## 单实例常见默认值
 
-Use only when the wiki confirms them or the user scope matches a JD app phone page:
+仅在 wiki 确认 + 用户 scope 匹配 JD APP 手机页面时使用:
 
-| Field | Value | Source |
+| 字段 | 值 | 来源 |
 |---|---|---|
-| phone page | 375 × 812 | foundation/visual/layout.md |
-| bottom layer | 69 | tabbar/design.md 02.1 |
-| nav height | 52 | tabbar/design.md 02.1 |
-| floating safe area | 17 | tabbar/design.md 02.1 |
+| 手机页面 | 375 × 812 | foundation/visual/layout.md |
+| 底部 layer | 69 | tabbar/design.md 02.1 |
+| 导航实际高 | 52 | tabbar/design.md 02.1 |
+| 浮动安全区 | 17 | tabbar/design.md 02.1 |
 | Joy Agent atom | 52 × 52 | tabbar/design.md 02.6 |
-| Joy Agent outward offset | 16 | tabbar/design.md 02.6 |
-| Joy Agent to capsule gap | 8 | tabbar/design.md 02.6 |
-| capsule (with Joy Agent) | 319 × 52 | tabbar/design.md 02.1 |
-| tab atom | 44 × 44 | tabbar/design.md 02.4 |
-| icon box | 20 × 20, y=3 | tabbar/design.md 02.4 |
-| label box | 44 × 14, y=27 | tabbar/design.md 02.4 |
-| selected pill L/R inset | 4 (within slot) | Zero ground truth (wiki gap, see issue #60 Gap 1) |
-| selected pill radius | radius_xl (12) | tabbar/design.md 设计令牌总表 |
+| Joy Agent 出血抽缩 | 16 | tabbar/design.md 02.6 |
+| Joy Agent 到 capsule 间距 | 8 | tabbar/design.md 02.6 |
+| capsule(含 Joy Agent) | 319 × 52 | tabbar/design.md 02.1 |
+| Tab atom | 44 × 44 | tabbar/design.md 02.4 |
+| icon box | 20 × 20,y=3 | tabbar/design.md 02.4 |
+| label box | 44 × 14,y=27 | tabbar/design.md 02.4 |
+| 选中 pill 左右 inset | 4(slot 内) | Zero ground truth(wiki gap,见 issue #60 Gap 1) |
+| 选中 pill 圆角 | radius_xl (12) | tabbar/design.md 设计令牌总表 |
 
-## Text Rule
+## 文本规则
 
-For Tabbar labels, use **fixed text boxes**:
+Tabbar 的 label **必须用固定文本框**:
 
 ```text
 textAutoResize = NONE
@@ -48,66 +48,66 @@ lineHeight = 14
 align = center
 ```
 
-This prevents Chinese label frames from auto-shrinking and drifting away from the icon center. (See R3 lesson #2.)
+否则中文 label 会按内容收缩,视觉偏离 icon 中线。(R3 教训 #2)
 
-## Layering Rule
+## 分层规则
 
-Separate:
+分开如下层:
 
-- **slot distribution layer** (capsule's `layoutGrow=1` children)
-- **selected background visual layer** (the pill: gray_6 fill + radius_xl)
-- **44 × 44 tab atom content layer** (icon + label container)
-- **icon box** (20 × 20 SVG container)
-- **label box** (44 × 14 fixed-bound text)
+- **slot 分布层**(capsule 内 `layoutGrow=1` 子节点)
+- **选中背景视觉层**(pill:gray_6 fill + radius_xl)
+- **44 × 44 tab atom 内容层**(icon + label 的容器)
+- **icon box**(20 × 20 SVG 容器)
+- **label box**(44 × 14 固定 bound 文本)
 
-Do not attach selected background directly to icon or label nodes. (See R3 lesson #3.)
+**不要**把选中背景直接挂在 icon / label 节点上。(R3 教训 #3)
 
-## Ground Truth
+## Ground Truth 用法
 
-Use original Relay Tabbar nodes (e.g., `266:475` Joy Agent form, `266:674` regular form) only to:
+原版 Relay Tabbar 节点(如 `266:475` Joy Agent 形态,`266:674` 常规形态)**只用来**:
 
-- fill missing dimensions
-- detect stale/incomplete wiki fields
-- generate wiki gap reports
+- 补缺失尺寸
+- 检测 wiki 字段过时 / 不完整
+- 生成 wiki gap 报告
 
-Do **not** clone them unless the user explicitly asks.
+**不要** clone,除非用户显式要求。
 
-## Asset Rule
+## 资产规则
 
-- Icon SVG preferred. If `_assets-cdn.md` only registers PNG, use PNG and flag a wiki gap (see issue #60 Gap 4).
-- Joy Agent atom (`312:58236` per `_assets-cdn.md`): 64 × 64 PNG currently; SVG source pending.
-- Per-slot icons (home / category / message / profile): wiki currently only registers home; other slots must be flagged as missing in `assetUsage.placeholder` with explicit wiki gap.
+- icon SVG **优先**。`_assets-cdn.md` 只登记 PNG 时,**使用 PNG + flag wiki gap**(见 issue #60 Gap 4)
+- Joy Agent atom(`_assets-cdn.md` 里的 `312:58236`):当前是 64 × 64 PNG;SVG 源待补
+- 各坑位 icon(home / 分类 / 消息 / 我的):**当前 wiki 仅登记 home 一张**;其他坑位必须标到 `assetUsage.placeholder` + 显式 wiki gap
 
-## Variants Coverage (when user asks for all)
+## 变体覆盖(用户要求全套时)
 
-The full Tabbar variant matrix (per `tabbar/variants.md`):
+完整 Tabbar 变体矩阵(参 `tabbar/variants.md`):
 
-| Dimension | Values |
+| 维度 | 取值 |
 |---|---|
-| form | regular / Joy Agent combo |
-| slot count | 2 / 3 / 4 / 5 |
-| slot state | default / selected / marketing |
-| badge state | none / red dot / number / text |
-| dynamic island | none / regular / operational / promo |
+| 形态 | 常规 / Joy Agent 组合 |
+| 坑位数 | 2 / 3 / 4 / 5 |
+| 坑位状态 | 默认 / 选中 / 营销 |
+| 招手状态 | 无 / 红点 / 数字 / 文字 |
+| 灵动岛 | 无 / 常规 / 运营 / 大促 |
 
-A "full state matrix" output requires explicit user confirmation; default scope is one slot count × one state.
+「**全状态矩阵**」输出需要用户**显式确认**;默认 scope 是 1 个坑位数 × 1 种状态。
 
-## Wiki Gaps Found (during R3 走查, 2026-05-20)
+## R3 走查发现的 wiki gap(2026-05-20)
 
-These gaps were surfaced when generating R3 reference. All filed in upstream [issue #60](https://github.com/ShuaiMXu/jd-design-wiki-proposal/issues/60):
+这几个 gap 都在生成 R3 参考稿时浮出,全部归入上游 [issue #60](https://github.com/ShuaiMXu/jd-design-wiki-proposal/issues/60):
 
-| Gap | Section | Symptom |
+| Gap | 章节 | 症状 |
 |---|---|---|
-| 1 | 02.4 交互状态表 | Selected bg L/R inset (4 DP) + radius (`radius_xl`) not declared |
-| 2 | Component layer table | Relay node IDs (`266:475`, `266:674`) listed but not anchored as ground truth |
-| 3 | 02.x alignment description | Geometric results stated, but Auto Layout pattern not made explicit |
-| 4 | `_assets-cdn.md` | Only PNG registered, no SVG channel |
+| 1 | 02.4 交互状态表 | 选中 bg L/R inset (4 DP) + 圆角(`radius_xl`)没声明 |
+| 2 | 组件层表 | 列了 Relay 节点 ID(`266:475` / `266:674`)但没明示「以它们为 ground truth」 |
+| 3 | 02.x 对齐描述 | 写了几何结果数值,但 Auto Layout 模式没明文 |
+| 4 | `_assets-cdn.md` | 只登记 PNG,SVG channel 缺失 |
 
-When skill v0.2 runs, these gaps will appear in `wikiGapsFound` output until upstream PRs land.
+skill v0.2 跑动时这些 gap 会出现在 `wikiGapsFound` 输出里,直到上游 PR 合并掉。
 
-## R3 Implementation Pitfalls (lessons)
+## R3 实现 pitfall(教训 4 条)
 
-1. **Selected bg sizing**: do not attach background to the 44×44 atom; use a separate pill layer sized `(slot − 8) × 44`.
-2. **Label horizontal alignment**: do not rely on `textAlignHorizontal` with default `textAutoResize`; use fixed text box or Auto Layout center.
-3. **State background layering**: keep visual (pill) and content (atom) on separate frames so state toggling doesn't fight content layout.
-4. **Icon asset format**: SVG over PNG; per-slot SVG missing today, flag wiki gap rather than silently using PNG.
+1. **选中 bg 尺寸**:不要把 bg 挂在 44×44 atom 上;独立 pill 层做,尺寸 `(slot − 8) × 44`
+2. **label 水平对齐**:不要依赖默认 `textAutoResize` 下的 `textAlignHorizontal`;用固定文本框或 Auto Layout 居中
+3. **状态背景分层**:视觉层(pill)和内容层(atom)分 frame,避免状态切换跟内容布局打架
+4. **icon 资产格式**:SVG 优先于 PNG;各坑位 SVG 今天缺失,**flag wiki gap 而不是悄悄用 PNG 凑数**
