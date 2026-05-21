@@ -1,320 +1,431 @@
 ---
 name: design-md-to-relay
-description: 按 wiki design.md 规范在 Relay 当前打开文件里实例化一份**100% 还原的参考稿**。通用 component 生成器(任意 component-base),自动 auto-pull foundation 真相源、读 Relay 原版组件 ground truth、SVG 优先拉资产、用 Auto Layout 接管对齐、所有色/字/圆角强制绑定 V16 foundation token。补 V16 三面闭环的「md → Relay」反向。⚠️ v0.1 骨架版本,等 issue #60 P0 合并后启动实现。
+description: Generate a Relay/Zero reference design from JD design wiki markdown. The workflow first clarifies scope, syncs foundation, reads wiki bundle + foundation rules, normalizes them into a machine-readable spec, creates only the requested scope in the current Relay file, and verifies with metadata + screenshot. Foundation is auto-pulled from upstream main with commit SHA traceability. Use for "按 wiki 规范画一个组件", "根据 design.md 生成 Zero 设计稿", "生成一个对照设计稿".
 allowed-tools: [mcp__zero-design__get_design_metadata, mcp__zero-design__get_design_context, mcp__zero-design__get_screenshot, mcp__zero-design__get_variables, mcp__zero-design__use_design_script, Bash, Read, Write, Edit]
 ---
 
-# /design-md-to-relay · design.md → Relay 参考稿
+# /design-md-to-relay
 
-> ⚠️ **v0.1 骨架版本** —— 流程已梳理,实现脚本尚未编写。完整实现等 issue [#60](https://github.com/ShuaiMXu/issues/60) P0 合并后启动。详见 [`README.md`](README.md)。
+Create a Relay/Zero reference design from JD design wiki markdown.
 
-## 设计目标(硬约束)
+This skill is a **wiki-to-Relay generator**, not a component-specific Tabbar generator and not a creative design assistant. It faithfully instantiates the user-requested scope from wiki, foundation tokens, and visual rules.
 
-| # | 目标 | 含义 |
-|---|---|---|
-| 1 | **通用 component 生成器** | 跑任意 `component-base` 组件,不绑定 tabbar 或具体业务 |
-| 2 | **100% 还原度** | 几何 0 DP diff / 0 placeholder / 100% token binding,任一不达 strict 模式 fail |
-| 3 | **符合 V16 Foundation** | 所有 fill / stroke / cornerRadius / fontSize / spacing 必须从 foundation 反查绑定,**禁止裸 hex / 裸 px** |
-| 4 | **Foundation 实时同步** | skill 起手 auto-pull upstream main,产出报告附 foundation commit SHA(可追溯) |
+> ⚠️ **v0.1 骨架** —— flow + contracts in place; executable scripts pending. v0.2 implementation starts after upstream [issue #60](https://github.com/ShuaiMXu/jd-design-wiki-proposal/issues/60) P0 merges. See [`README.md`](README.md).
 
-## 这个 skill 做什么
+## Prime Directive
 
-读 wiki 里某个组件的 `design.md`(+ bundle 兄弟文件 spec.md / behaviors.md / variants.md / ai-schema.yaml / _assets-cdn.md),读 V16 foundation,按 wiki 规范在 **当前打开的 Relay 文件** 内创建一份对应设计稿,作为「按 wiki 规范实例化」的参考产物。
+**Do not guess the output shape.**
 
-跟既有 4 skill 的位置关系:
+Before writing anything to Relay, clarify what the user actually wants. A request like "画一个底导设计稿" may mean one bottom navigation instance inside a 375x812 phone page, **not** a full component spec page, all state variants, or multiple examples.
 
-```
-                          Relay
-                          ↑    ↓
-  relay-to-design-md   ───┘    └───  design-md-to-relay (本 skill,补反向)
-                                 ↓
-                            design.md (bundle)
-                                 ↓
-                                 ├── design-md-to-portal (聚合发布)
-                                 ├── design-md-to-spec-page (单组件发布)
-                                 └── design-review (审计)
-```
+If scope is ambiguous, ask **one concise** clarification question and wait.
 
-V16 编辑面、发布面、审计面三面闭环现已齐整。
+Do not create extra variants, state grids, explanatory sections, business content, or multiple pages unless the user explicitly asks.
 
-## 调用方式
+## When To Use
 
-```
+User asks any of:
+
+- 按 wiki 规范画一个 X
+- 根据 design.md 生成 Zero 设计稿
+- 把 X 组件实例化到当前 Relay 文件
+- 生成一个对照设计稿给设计师比对
+- 根据最新 wiki 画一个页面/组件
+
+Do not use for:
+
+- freeform creative design not based on wiki
+- writing or improving wiki docs only
+- reviewing an existing Relay design only
+- cloning an original Relay node when the user asks to generate from wiki
+
+## Required Inputs
+
+```text
 /design-md-to-relay <design-md-path-or-slug>
-/design-md-to-relay <slug> --canvas-position <x,y>
-/design-md-to-relay <slug> --strict                    # 默认即 strict;100% 还原硬门
-/design-md-to-relay <slug> --no-strict                 # warn 模式,不 fail 占位 / DP diff
-/design-md-to-relay <slug> --no-pull                   # 跳过 Step 0 foundation auto-pull(离线 / dev)
-/design-md-to-relay <slug> --foundation-from <path>    # 用指定路径的 foundation(调试 / PR 分支验证)
+/design-md-to-relay <slug> --scope "single instance on 375x812 page"
+/design-md-to-relay <slug> --canvas-position 3200,-760
+/design-md-to-relay <slug> --no-pull              # skip Foundation auto-pull (offline / dev)
+/design-md-to-relay <slug> --foundation-from <path>   # use specified wiki path (debug fork / PR branch)
 ```
 
-例:
+If no explicit path, infer slug from request and search local wiki repository.
 
+Default wiki location: `~/code/jd-design-wiki-proposal`
+
+If repository missing, search current workspace first, then ask user for the repo path.
+
+## Source Of Truth
+
+**Do not copy component `design.md` files into this skill's `references/` directory.**
+
+Always read component specs from source wiki repository at runtime:
+
+```text
+jd-design-system-md-v16/**/<slug>/design.md
+jd-design-system-md-v16/**/<slug>/spec.md
+jd-design-system-md-v16/**/<slug>/variants.md
+jd-design-system-md-v16/**/<slug>/behaviors.md
+jd-design-system-md-v16/**/<slug>/ai-schema.yaml
+jd-design-system-md-v16/**/<slug>/_assets-cdn.md
 ```
-/design-md-to-relay jd-design-system-md-v16/horizontal/components-base/tabbar/design.md
-/design-md-to-relay tabbar
-/design-md-to-relay button --canvas-position 5600,100
+
+Skill `references/` directory is **only** for workflow docs, normalized spec schemas, adapter notes, and implementation guidance. It must not become a copied component spec library.
+
+Adapters may describe how to interpret a component's wiki fields, but they must not duplicate full source wiki content.
+
+## Source Precedence
+
+```text
+user scope
+> ai-schema.yaml / spec.md structured fields
+> design.md explicit fields
+> foundation tokens and visual rules
+> component adapter defaults
+> ground truth Relay node (only for missing fields)
 ```
 
-默认只接受 1 个参数(design.md path 或 slug),其他全部自动推断。**不要**问额外问题。
-
-## 何时触发
-
-用户想:
-
-- 「**按 wiki 规范在 Relay 里画一个 X**」
-- 「**把 X 组件实例化到当前 Relay 文件**」
-- 「**生成 X 组件的参考稿,用来对比设计师手稿**」
-- 「**走查前先按 wiki 画一份对照**」
-- 「**根据最新的 wiki 画一个 X**」
-
-## 不适用场景
-
-- 设计师想从零创意(不基于 wiki)→ 不走 skill
-- wiki 里没有目标组件的 `design.md` → skill 不生成新 wiki 内容,先用 `relay-to-design-md` 反向产出 md
-- 跨 Relay 文件操作 → 只在当前打开稿件内画
-- page-doc level / flow level(L2/L3/L4)→ v1.0 才支持,v0.1-v0.6 仅 component-base
-
-## 前置条件
-
-- Relay 桌面端已打开目标文件(同所有 zero-design 系列 skill)
-- 当前 page 视口位置已确定(避免画到屏幕外)
-- 本地 jd-design-wiki-proposal 仓库存在(默认路径 `~/code/jd-design-wiki-proposal/`)
-- 当前 wiki 内有目标组件的 `design.md` bundle
-- 网络可达 GitHub(`--no-pull` 时除外)
+If ground truth conflicts with wiki fields, record a diff and **choose the wiki field** unless user explicitly asks to match the original Relay node.
 
 ---
 
-## Workflow · 10 步
+## Workflow
 
-> 详细 reference 见 [`references/workflow-10-steps.md`](references/workflow-10-steps.md)(v0.2 写)。
+### Step 0. Clarify Scope
 
-### Step 0 · Sync Foundation ★ 新加
+Before reading or drawing, decide whether the user's desired output scope is clear.
 
-⚠️ **Foundation 是真相源,必须最新**。skill 起手:
+Clarify these dimensions when missing:
+
+| Question | Examples |
+|---|---|
+| Output level | single component, component inside phone page, state matrix, full business page |
+| Quantity | one instance, all variants, selected states only |
+| Canvas | component only, 375x812 phone page, existing page section |
+| Content | labels, selected item, icon names, placeholder content |
+| Freedom | strict wiki only, wiki plus reasonable placeholders |
+
+Ask only **one concise** question if needed. Prefer:
+
+```text
+你要的是一个 X 放在页面里的示意，还是 X 的多状态规范展示？
+```
+
+If user answers narrow, keep output narrow. One bottom navigation in a 375x812 page = exactly that, not a spec board.
+
+### Step 1. Sync Foundation
+
+Foundation is the truth source. Sync upstream before reading:
 
 ```bash
 git -C ~/code/jd-design-wiki-proposal pull --ff-only origin main
 ```
 
-- 成功 → 拿到 upstream 最新 foundation,记录当前 commit SHA
-- 失败(网络故障 / 非 fast-forward)→ 降级用本地 cache,**输出 warn**:「foundation 用的是本地 X 分钟前快照(commit Y)」
-- `--no-pull` flag → 跳过 pull,直接用本地
-- `--foundation-from <path>` flag → 完全绕开本仓库的 foundation,用指定路径(调试用)
+Record commit SHA in output `foundationVersion.commit` for traceability.
 
-详见 [`references/foundation-token-table.md`](references/foundation-token-table.md)。
-
-### Step 1 · Parse input
-
-解析输入,定位 `design.md` path 与 bundle 兄弟文件位置。
-
-- 接受全路径 / 短 slug(`tabbar` → 在 `jd-design-system-md-v16/**/tabbar/design.md` 查找)
-- 容错:slug 多匹配时报歧义 + 列出候选
-
-### Step 2 · Read bundle
-
-读完整 bundle:
-
-| 文件 | 取什么 |
+| State | Handling |
 |---|---|
-| `design.md` | 主规范文本 + frontmatter(level / bg / slug / Relay 节点 ID)|
-| `spec.md` | 视觉令牌精细字段(优先于 design.md 文字)|
-| `variants.md` | 变体维度 |
-| `behaviors.md` | 交互 / Donts |
-| `ai-schema.yaml` | 机器可读 schema(若有)|
-| `_assets-cdn.md` | 切图清单(SVG 优先,PNG fallback)|
+| ✅ fast-forward / up-to-date | `pullStatus = "success"` |
+| ⚠️ diverged (local commits) | use local; warn with local SHA + reason; `pullStatus = "diverged"` |
+| ⚠️ network failure | use local cache; warn with SHA + last-pull age; `pullStatus = "offline"` |
+| ❌ repo missing | fail; prompt user to clone |
+| `--no-pull` | skip; `pullStatus = "skipped"` |
+| `--foundation-from <path>` | use specified path; `foundationSource = <path>` |
 
-### Step 2.5 · Build Foundation token table ★ 新加
+See [`references/foundation-token-table.md`](references/foundation-token-table.md).
 
-读 `jd-design-system-md-v16/foundations/` 全集,建本次跑动用的 token 表(in-memory):
+### Step 2. Resolve Target
 
-| Foundation 类目 | 读什么 | 给 skill 用作什么 |
-|---|---|---|
-| `visual/colors/` | 全部 color token(`color_*` / `gray_*` / `jdred` / `white` / 等)→ hex 映射 | 反查 fill / stroke / 文字色 |
-| `visual/typography/` | 字体 family + style + size + lineHeight 全套 | 反查 fontName / fontSize / lineHeight |
-| `radius/` | `radius_xs/s/m/l/xl/xxl` → px 映射 | 反查 cornerRadius |
-| `spacing/` | 间距 token | 反查 padding / itemSpacing |
-| `motion/` | 动效 token | 用于变体的动效字段(v0.4+)|
-| `materials/` | 液态玻璃 / 毛玻璃材质 | fill blend mode 配置 |
-| `icon/` | icon 规范 | 校验 _assets-cdn.md 资产 |
+Resolve the target `design.md`.
 
-输出:`tokenTable = { colorByName, colorByHex, typographyByName, radiusByPx, ... }` —— 双向反查能力。
+Accept:
 
-详见 [`references/foundation-token-table.md`](references/foundation-token-table.md)。
+- absolute or relative `design.md` path
+- component slug (e.g. `tabbar` → search `jd-design-system-md-v16/**/tabbar/design.md`)
+- wiki URL
 
-### Step 3 · Probe Relay ground truth ★
+If slug matches multiple files, list candidates and ask the user to choose.
 
-⚠️ **这是 R3 走查反复错的根因门。不可跳过**。
+### Step 3. Read Wiki Bundle
 
-读 `design.md` frontmatter 里登记的 Relay 原版组件节点(如 tabbar 的 `266:475` Joy Agent 形态 / `266:674` 普通形态),`get_design_metadata` 抽出真实子结构,**作为尺寸 / inset / 圆角的 ground truth**。
+Read the target bundle as available:
 
-design.md 文字与 Relay 实测如果有冲突,**实测优先**。详见 [`references/ground-truth-anchors.md`](references/ground-truth-anchors.md)(v0.2 写)。
-
-### Step 4 · Diff & report wiki gaps
-
-把 Step 2 文字声明 vs Step 3 Relay 实测做字段 diff:
-
-- 文字未声明、实测存在 → 标记为「wiki gap」,记录到产出报告
-- 文字声明、实测不存在 → 标记为「wiki stale」
-- 两者数值 diff > 0.5 DP → ⚠️ warn,> 2 DP → ❌ violate
-
-产出 wiki gap 列表,可直接喂给 maintainer 开 issue(或 skill 内部触发 design-review skill)。
-
-### Step 5 · Plan structure with Auto Layout ★
-
-⚠️ **强制用 Auto Layout 接管对齐,禁止手算 x/y**。详见 [`references/auto-layout-patterns.md`](references/auto-layout-patterns.md)(v0.2 写)。
-
-核心规则:
-
-- **子节点位置:不写 x/y**,父 frame 用 `layoutMode` + `primaryAxisAlignItems` + `counterAxisAlignItems` 接管
-- **均分场景**:子节点 `layoutGrow=1`,父 frame `primaryAxisSizingMode='FIXED'`
-- **状态切换**:**层职责分离**(bg 层 / 行为层 / 视觉层),用不同 frame 承担
-- **text 节点**:`fontName` 先 set,`characters` 后 set;**不依赖 `textAlignHorizontal`**,用父 frame Auto Layout 居中(参 R3 实录)
-
-### Step 6 · Fetch assets + bind tokens ★ 改名加强
-
-按 `_assets-cdn.md` 解析资产清单 **并强制走 token 表绑定所有视觉值**:
-
-| 字段 | 处理 |
+| File | Purpose |
 |---|---|
-| `svg_url` 存在 | `createFrameFromSvgAsync(svg)`(优先)|
-| 仅 `png_fallback_url` | `createImageAsync(url)` + flag「资产应有 SVG」|
-| 都缺失 | strict 模式 → fail;非 strict → placeholder + flag |
-| 任何 fill / stroke / cornerRadius / fontSize | **必须经 token 表反查**,直接传 hex / px = anti-pattern,strict 模式 fail |
+| `design.md` | main component spec, frontmatter, anatomy, sizes, states |
+| `spec.md` | detailed visual fields, if present |
+| `variants.md` | variant dimensions |
+| `behaviors.md` | interaction and don'ts |
+| `ai-schema.yaml` | machine-readable source of truth, if present |
+| `_assets-cdn.md` | asset inventory (SVG preferred, PNG fallback) |
 
-`relay.util.solidPaint('#FF0F23')` ❌ → `paintFromToken(tokenTable, 'jdred')` ✅
+Treat `ai-schema.yaml` and `spec.md` as more structured than prose. Use prose to fill gaps, not to override structured fields.
 
-详见 [`references/asset-fallback-chain.md`](references/asset-fallback-chain.md)(v0.2 写)+ [`references/foundation-token-table.md`](references/foundation-token-table.md)。
+### Step 4. Read Foundation Rules
 
-### Step 7 · Execute use_design_script
+Read foundation sources relevant to the target wiki version:
 
-分小步执行(< 5 个 batch),每步:
+| Source | Required Data |
+|---|---|
+| `foundations/tokens/tokens.json` | colors, radius, spacing, typography, effects |
+| `foundations/visual/layout.md` | canvas, grid, layer, safe-area, page layout rules |
+| `foundations/visual/materials.md` | material, glass, blur, shadow rules |
+| icon docs / asset docs | icon box, stroke, active/default rules |
 
-- 单一目标(创建容器 / 填子节点 / 替换资产 等)
-- `return` 结构化数据(IDs + dimensions + status)
-- 失败先停,读 err,修脚本再继续
-- 所有视觉值**已 Step 6 绑定 token**,这里不应出现裸值
+Every literal visual value in the generated design should either resolve to a token, come from the component spec, or be listed in `unresolvedLiterals`.
 
-### Step 8 · Strict post-verify ★ 加 strict 模式
+### Step 5. Build Normalized Spec JSON
 
-实现后:
+Convert wiki bundle + foundation rules into a machine-readable normalized spec **before** writing to Relay.
 
-1. `get_screenshot` 拉视觉截图自检
-2. `get_design_metadata` 读所创建节点的 bounds + properties
-3. 跟 wiki 字段 + Relay 原版做最终 diff
-4. **strict 模式判定**(默认开):
+The normalized spec is the execution contract. It must include:
 
-| 维度 | strict 阈值 | 非 strict 阈值 |
-|---|---|---|
-| 几何 dimension diff | 0 DP → 任何 > 0 即 fail | > 0.5 DP warn / > 2 DP violate |
-| Token binding 覆盖率 | 100%(0 个裸 hex / px)| 80%+ 即可 |
-| Placeholder 数量 | 0 个 | 不限 |
-| 变体完整性 | 100%(枚举状态全画)| 至少 1 个 |
+- requested scope
+- canvas size and background
+- node tree plan
+- component dimensions
+- layout strategy
+- token map
+- text specs
+- asset specs
+- states to instantiate
+- verification assertions
+- unresolved fields and assumptions
 
-任一不达 → strict 模式 ❌ fail,要求修复。详见 [`references/fidelity-thresholds.md`](references/fidelity-thresholds.md)。
+See [`references/normalized-spec.md`](references/normalized-spec.md).
 
-### Step 9 · Sub-component composition ★ 新加
+**Do not draw directly from prose when a normalized spec can be created.**
 
-如组件 references 其他组件(如 tabbar references Joy Agent),递归处理:
+### Step 6. Probe Ground Truth Only When Useful
 
-- 解析 design.md frontmatter `references.uses_components` 字段
-- 对每个 dependency:递归调用本 skill(slug + 上下文)
-- 子组件生成在父组件之前(`useChild → useParent` 拓扑序)
-- 循环引用检测:DFS + visited 集合,出现环 → 报错
+Ground truth = an existing Relay node referenced by wiki frontmatter or related docs.
 
-详见 [`references/cross-component-deps.md`](references/cross-component-deps.md)(v0.2 写)。
+Use it to:
+
+- fill missing dimensions
+- understand existing layer anatomy
+- detect stale or incomplete wiki fields
+- generate wiki gap reports
+
+**Do not** use it to:
+
+- clone an original design
+- override explicit wiki or foundation tokens silently
+- expand the requested scope
+- ignore user instructions such as "不要用原稿 clone"
+
+If ground truth conflicts with wiki fields, record a diff in `wikiGapsFound` and follow Source Precedence above.
+
+### Step 7. Plan Relay Node Tree
+
+Plan the node tree **before** executing scripts.
+
+**Layout rule:**
+
+- Use Auto Layout for repeated, distributed, naturally centered structures.
+- Use fixed bounds (x/y + resize) for: canvas and device pages, safe areas, icon boxes, fixed-size atoms, text boxes with explicit spec dimensions, overlay/floating anchor positions, assets imported from SVG/PNG.
+- Do not ban x/y globally. Use x/y for top-level placement and fixed spec anchors (e.g. Joy Agent x=-16 floating outward).
+- Avoid ad hoc hand-positioning for repeated children.
+
+**Text rule:**
+
+- If the spec defines a text box, set `textAutoResize = 'NONE'`, then set `x/y`, `resize(width, height)`, alignment, font, line-height, characters.
+- If text is natural content inside Auto Layout with no fixed box, auto-resize is allowed.
+
+**Layer rule:**
+
+- Keep visual layers, behavior containers, and content layers separate **when states affect only one layer** (e.g. selected background vs icon+label).
+- Do not attach selected backgrounds, overlays, or masks to content nodes if the spec treats them as independent visual surfaces.
+- Do not over-split layers when the spec treats them as one (avoid premature decomposition).
+
+### Step 8. Fetch and Normalize Assets
+
+Asset priority:
+
+```text
+SVG source
+> vector path data in wiki
+> PNG fallback
+> placeholder with explicit warning
+```
+
+For SVG:
+
+- import with `createFrameFromSvgAsync`
+- normalize into specified icon/asset box
+- ensure imported SVG does not resize parent
+- preserve intended fill/stroke states
+
+For PNG:
+
+- use only as fallback
+- mark `assetUsage.png_fallback`
+- record missing SVG as a wiki gap
+
+**Token binding for all visual values:**
+
+- All `fill`/`stroke`/`cornerRadius`/`fontSize`/`lineHeight`/`itemSpacing`/`padding*` must resolve through Foundation token table when a matching token exists
+- Direct hex/px values are anti-pattern; report in `tokenCoverage.unresolvedLiterals`
+
+### Step 9. Execute In Small Batches
+
+Before calling `mcp__zero-design__use_design_script`, ensure design-on-zero skill and Relay plugin API index are loaded.
+
+Run no more than one logical operation per script:
+
+1. create root canvas/page frame
+2. create major containers
+3. add repeated children
+4. add text and assets
+5. apply states and final fixed bounds
+
+Every script must return structured data:
+
+```json
+{
+  "createdNodeIds": [],
+  "mutatedNodeIds": [],
+  "bounds": [],
+  "warnings": []
+}
+```
+
+Stop and fix errors before continuing.
+
+### Step 10. Verify
+
+After writing:
+
+1. call `get_design_metadata` on the created root
+2. call `get_screenshot` on the created root
+3. compare actual bounds against normalized spec assertions
+4. compare token usage against token map
+5. report unresolved literals, assumptions, warnings, violations
+
+Verification tolerance:
+
+| Field | Tolerance |
+|---|---|
+| fixed dimensions | 0.5 DP |
+| position anchors | 0.5 DP |
+| repeated distribution | 1 DP total drift |
+| colors | exact token or explicit accepted literal |
+| radius | exact token or explicit accepted literal |
+
+If verification finds a fixable mismatch, fix it before final response.
+
+See [`references/fidelity-thresholds.md`](references/fidelity-thresholds.md).
 
 ---
 
-## 输出契约
+## Output Contract
 
-每次 skill 完整跑完返回 JSON:
+Return a concise human summary plus a structured result:
 
 ```json
 {
   "createdRootId": "59:xxxx",
-  "createdNodeIds": ["59:xxxx", "..."],
+  "scope": {
+    "level": "single-instance-on-phone-page",
+    "canvas": "375x812",
+    "states": ["selected-home"]
+  },
   "foundationVersion": {
     "commit": "99c2e6f",
     "pulledAt": "2026-05-21T14:32:00Z",
     "pullStatus": "success",
-    "remote": "ShuaiMXu/jd-design-wiki-proposal@main"
+    "remote": "ShuaiMXu/jd-design-wiki-proposal@main",
+    "foundationSource": "~/code/jd-design-wiki-proposal/jd-design-system-md-v16/foundations/"
+  },
+  "source": {
+    "designMd": "jd-design-system-md-v16/.../design.md",
+    "foundationTokens": "jd-design-system-md-v16/foundations/tokens/tokens.json",
+    "visualRules": [
+      "foundations/visual/layout.md",
+      "foundations/visual/materials.md"
+    ]
   },
   "tokenCoverage": {
-    "color_*": "12/12 ✓ 100%",
-    "radius_*": "2/2 ✓ 100%",
-    "font_*": "3/3 ✓ 100%",
-    "spacing_*": "5/5 ✓ 100%",
-    "rawHexCount": 0,
-    "rawPxCount": 0
+    "resolved": ["color_background", "color_primary", "radius_xxl"],
+    "unresolvedLiterals": []
   },
   "assetUsage": {
-    "svg": ["home-default", "home-active"],
+    "svg": [],
     "png_fallback": [],
     "placeholder": []
   },
-  "wikiGapsFound": [
-    {
-      "section": "02.4",
-      "missing_field": "selected_bg_inset_lr",
-      "suggested_value": "4 DP",
-      "source": "Relay ground truth 266:475 sec-2-states 实测"
-    }
-  ],
-  "groundTruthDiff": [],
-  "variantsCovered": ["default", "selected", "marketing", "with-bubble"],
-  "strictMode": true,
-  "fidelity": {
-    "geometricDiffMaxDp": 0,
-    "tokenBindingPercent": 100,
-    "placeholderCount": 0,
-    "variantCompleteness": "100%",
-    "verdict": "PASS"
+  "verification": {
+    "passed": true,
+    "warnings": [],
+    "violations": []
   },
-  "warnings": [],
-  "violations": []
+  "wikiGapsFound": []
 }
 ```
 
----
-
-## 核心规则 · 8 条
-
-> 1-4 来自 R3 Tabbar 实战,5-8 来自本次设计目标硬化。完整记录见 [`references/lessons-from-r3-tabbar.md`](references/lessons-from-r3-tabbar.md)
-
-1. **Step 3 不可跳过** —— 没读 Relay 原版组件直接动笔几乎必错(R3 选中态宽度 2 次错根因)
-2. **手算 x/y 是 anti-pattern** —— 全部 Auto Layout(R3 label 偏 12 DP 根因)
-3. **PNG icon 是退而求其次** —— 资产清单未登记 SVG 时,先 flag wiki gap 再 fallback
-4. **状态切换不要叠加同一节点 fill** —— 用层职责分离,bg 在 pill,内容在 atom
-5. **裸 hex / 裸 px 即违反 foundation 优先** —— strict 模式 fail。所有视觉值必须 token 反查绑定
-6. **占位形状(ellipse / placeholder)不算「实现」** —— strict 模式 fail。无 SVG 即开 wiki gap issue
-7. **> 0 DP 的几何 diff 即非 100% 还原** —— strict 模式 fail。Relay 原版组件实测为 0 DP 基准
-8. **跨组件依赖必须递归全展开** —— 不允许「先画外壳留子组件 TODO」(违反目标 1 + 2)
+`foundationVersion.commit` is the traceability anchor — user can verify exactly which foundation snapshot was used.
 
 ---
 
-## 边界与不做
+## Component Adapters
 
-- ❌ **不生成新 wiki 内容**:wiki gap 只 flag,不补;补由 owner 走 PR
-- ❌ **不替代设计师创意**:只画「按 wiki 规范」的参考稿,不是创意稿
-- ❌ **不处理 page-doc / flow level**:L2/L3/L4 等 v1.0
-- ❌ **跨 Relay 文件操作**:只在当前打开稿件内画
-- ❌ **不强行兼容 v0.5 及以下 wiki bundle**:v0.6 起的 frontmatter / 字段结构为准
-- ❌ **不修改 foundation 本身**:foundation 是只读真相源,有问题走 wiki PR
+The main skill is generic. Component-specific behavior belongs in adapters.
+
+Adapters may define:
+
+- required scope questions
+- anatomy mapping
+- default node tree patterns
+- state model
+- asset naming conventions
+- verification assertions
+
+Example adapter paths:
+
+```text
+references/adapters/tabbar.md
+references/adapters/button.md
+references/adapters/toast.md
+references/adapters/navbar.md
+```
+
+If no adapter exists, use the generic normalized spec flow and ask for scope when component anatomy is unclear.
+
+Adapters must **not** duplicate the source wiki — they only encode mapping decisions and skill-specific defaults.
 
 ---
 
-## Reference Docs
+## Guardrails
 
-| Doc | 用途 | 状态 |
+- Do not copy component markdown from source wiki into this skill. Read it at runtime.
+- Do not create a spec page unless user asks for a spec page.
+- Do not create all variants unless user asks for all variants.
+- Do not invent business content unless scope requires a contextual page and user allows placeholders.
+- Do not clone ground truth nodes unless user explicitly asks to clone or match an existing Relay node.
+- Do not silently replace wiki fields with ground truth fields.
+- Do not skip foundation tokens and visual rules.
+- Do not finish without screenshot and metadata verification when Relay tools are available.
+- Do not ban x/y globally; use it for top-level placement and fixed spec anchors.
+
+---
+
+## Relationship to Upstream Issue #60
+
+This skill and upstream [issue #60](https://github.com/ShuaiMXu/jd-design-wiki-proposal/issues/60) are mutual products:
+
+- **skill** = the "correct way" codified after wiki gaps are fixed
+- **issue** = wiki gaps surfaced during skill design
+
+v0.2 implementation depends on issue #60 P0 (Gap 1 + Gap 4) merging upstream. See [`README.md`](README.md) for full roadmap.
+
+---
+
+## References
+
+| Doc | Purpose | Status |
 |---|---|---|
-| [`README.md`](README.md) | v0.1 状态 / 路线图 / 跟 issue #60 的依赖 | ✅ v0.1 |
-| [`references/lessons-from-r3-tabbar.md`](references/lessons-from-r3-tabbar.md) | R3 完整实录 + 4 处反复错的根因(规则 1-4 依据)| ✅ v0.1 |
-| [`references/foundation-token-table.md`](references/foundation-token-table.md) | Foundation auto-pull + token 表构建 + 反查协议 | ✅ v0.1 |
-| [`references/fidelity-thresholds.md`](references/fidelity-thresholds.md) | 100% 还原度量化判定:几何 0 DP / 0 placeholder / 100% binding / 变体全枚举 | ✅ v0.1 |
-| [`references/workflow-10-steps.md`](references/workflow-10-steps.md) | 10 步详细流程 + 每步可执行脚本 | ⏳ v0.2 |
-| [`references/auto-layout-patterns.md`](references/auto-layout-patterns.md) | Auto Layout 对齐模式 cookbook | ⏳ v0.2 |
-| [`references/ground-truth-anchors.md`](references/ground-truth-anchors.md) | Relay 节点作为真相源 SOP | ⏳ v0.2 |
-| [`references/asset-fallback-chain.md`](references/asset-fallback-chain.md) | SVG → PNG → fail 链 | ⏳ v0.2 |
-| [`references/cross-component-deps.md`](references/cross-component-deps.md) | 子组件依赖解析 / 递归生成 / 循环引用检测 | ⏳ v0.2 |
-| [`references/foundation-coverage.md`](references/foundation-coverage.md) | 7 个 foundation 类目各自怎么消费 | ⏳ v0.2 |
+| [`README.md`](README.md) | status, usage notes, roadmap, upstream dependency | ✅ v0.1 |
+| [`references/normalized-spec.md`](references/normalized-spec.md) | normalized spec JSON schema + examples | ✅ v0.1 |
+| [`references/foundation-token-table.md`](references/foundation-token-table.md) | Foundation auto-pull + token resolver protocol | ✅ v0.1 |
+| [`references/fidelity-thresholds.md`](references/fidelity-thresholds.md) | verification tolerances + token coverage rules | ✅ v0.1 |
+| [`references/adapters/tabbar.md`](references/adapters/tabbar.md) | Tabbar-specific mapping + R3 lessons distilled | ✅ v0.1 |

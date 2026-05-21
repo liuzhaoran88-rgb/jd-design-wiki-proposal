@@ -1,205 +1,113 @@
-# 100% 还原度量化判定
+# Fidelity Thresholds
 
-> 实现 skill **Step 8 (Strict post-verify)** 的详细判定规则。
+Defines verification tolerances and token coverage rules for the **Step 10 Verify** phase.
 
-## 核心原则
+## Core Principle
 
-> 「100% 还原」不是模糊的「视觉差不多」,而是**4 个维度全部硬达标,任一不达即 fail**。
+100% pixel-exact fidelity is **not the goal** — Auto Layout floating-point rounding and font metrics make sub-pixel diffs unavoidable. The goal is:
 
-## 4 维度判定矩阵
+> Every visual value either resolves to a foundation token or is an explicit accepted literal, with bounds matching the wiki spec within a tight published tolerance.
 
-| 维度 | strict 模式(默认)| 非 strict 模式(`--no-strict`)| 来源 |
-|---|---|---|---|
-| **几何尺寸 diff** | 0 DP,任何 > 0 即 fail | > 0.5 DP warn / > 2 DP violate | 跟 Relay 原版组件实测 bounds 对照 |
-| **Token binding 覆盖率** | 100%(0 个裸 hex / px) | 80%+ 即可 | 跟 Foundation token 表反查 |
-| **Placeholder 数量** | 0 个 | 不限 | _assets-cdn.md 资产清单是否齐全 |
-| **变体完整性** | 100%(枚举状态全画) | 至少 1 个变体 | variants.md / spec.md 声明的状态矩阵 |
+This makes outputs verifiable, traceable, and reproducible without forcing impossible exactness.
 
-## 维度 1 · 几何尺寸 diff
+## Verification Tolerance Table
 
-### 判定逻辑
+| Field | Tolerance | Verdict if exceeded |
+|---|---|---|
+| Fixed dimensions (width/height of spec'd nodes) | **0.5 DP** | violation |
+| Position anchors (x/y of spec'd nodes) | **0.5 DP** | violation |
+| Repeated distribution drift (n slots均分) | **1 DP total** across all slots | warning |
+| Auto Layout rounding (n.7499... vs n.75) | treated as 0 (round to 0.01 DP) | ignored |
+| Text glyph vertical metrics | 0.5 DP within text frame | ignored if frame size matches |
+| Colors | exact token, OR literal listed in `unresolvedLiterals` | violation if neither |
+| Radius | exact token, OR literal listed in `unresolvedLiterals` | violation if neither |
+| FontSize / lineHeight | exact token (from typography) | violation if missing |
+| Spacing (padding / itemSpacing) | exact token, OR explicit accepted literal | warning |
 
-```
-for each created node:
-  对应 Relay 原版子节点 = find by name pattern in 原版组件 (266:475 等)
-  if 对应节点存在:
-    diffX = abs(created.x - 原版.x)
-    diffY = abs(created.y - 原版.y)
-    diffW = abs(created.width - 原版.width)
-    diffH = abs(created.height - 原版.height)
-    
-    strict: diffMax = max(diffX, diffY, diffW, diffH)
-      if diffMax > 0 → fail
-    non-strict:
-      if diffMax > 2 → violate
-      elif diffMax > 0.5 → warn
-```
+## Token Coverage Rules
 
-### 例外
+Every literal visual value should fall into one of three buckets:
 
-| 例外 | 处理 |
-|---|---|
-| Auto Layout 引擎计算的浮点(如 79.74999 vs 79.75) | 视为 0 DP diff(diffMax ≤ 0.01 时舍入) |
-| 文字 frame 因字体 metrics 微小差异 | 视为 0 DP diff(diffMax ≤ 0.5 时归零,但仅 text 节点适用) |
-| 浮动节点(`layoutPositioning='ABSOLUTE'` + 出血到屏幕外) | 跟原版同样为浮动 → 用 absoluteTransform 对比 |
+1. **Resolved** — value comes from a foundation token via the token table
+2. **Spec literal** — value declared explicitly in component spec (e.g. `tabbar/spec.md` says `13.5` for dynamic island radius)
+3. **Unresolved** — value is a literal with no token and no spec declaration; **must be listed** in `tokenCoverage.unresolvedLiterals`
 
-## 维度 2 · Token Binding 覆盖率
+If a value falls into the **unresolved** bucket, the verification verdict is **violation** unless:
 
-### 判定逻辑
+- the user passed `--allow-literals` flag
+- the literal is documented in `wikiGapsFound` with a suggested token
 
-详见 [`foundation-token-table.md`](foundation-token-table.md) 「Token 命中率审计」节。
+## Verdict Logic
 
-```
-for each created node:
-  for each fill / stroke in fills/strokes:
-    if type === 'SOLID':
-      tokenName = tokenForHex(tokenTable, paint.color)
-      if !tokenName:
-        rawHexCount++
-        violations.push({ nodeId, field: 'fills', value: paint.color })
-  
-  if cornerRadius:
-    tokenName = tokenForPx(tokenTable, cornerRadius)
-    if !tokenName: rawPxCount++
-  
-  if type === 'TEXT':
-    tokenName = tokenForFontSize(tokenTable, fontSize)
-    if !tokenName: rawPxCount++
-  
-  if itemSpacing / padding*:
-    tokenName = tokenForSpacing(tokenTable, value)
-    if !tokenName: rawPxCount++
-
-strict:
-  if rawHexCount > 0 || rawPxCount > 0 → fail
-non-strict:
-  binding% = (totalRefs - rawCount) / totalRefs
-  if binding% < 80% → warn
+```text
+violations.length === 0  &&  warnings can be 0 or more  →  PASS
+violations.length > 0                                   →  FAIL (return early, do not silent-pass)
 ```
 
-### 例外
-
-| 例外 | 处理 |
-|---|---|
-| 透明色 `rgba(0,0,0,0)` | 不参与 binding 检查 |
-| 渐变色 GradientPaint | 每个 stop 走 tokenForHex 反查;全部命中 → 通过;有一个未命中 → fail |
-| 切图 ImagePaint | 不参与 binding 检查(资产自身已是 token-resolved) |
-| 浮点 cornerRadius(如 `13.5` 灵动岛) | 若 wiki 自身就声明这个非 token 数值 → 允许;否则 → fail |
-
-## 维度 3 · Placeholder 数量
-
-### 判定逻辑
-
-```
-for each "icon" or "asset" position (per _assets-cdn.md 应当登记的位置):
-  if 当前创建的是 ellipse / rectangle 占位:
-    placeholderCount++
-    violations.push({ position, expectedAsset: '...' })
-
-strict:
-  if placeholderCount > 0 → fail
-non-strict:
-  无限制
-```
-
-### 例外
-
-| 例外 | 处理 |
-|---|---|
-| _assets-cdn.md 自身就标 "无资产" 的位置 | 允许 placeholder |
-| 设计稿本身就是 placeholder 区域(如内容卡片占位) | 允许;skill 应识别 design.md 是否把该位置标为 "示意" |
-
-### 修法引导
-
-placeholder 出现 → skill 必须输出明确动作建议:
+Output:
 
 ```json
 {
-  "placeholderViolations": [
+  "verification": {
+    "passed": true,
+    "warnings": [
+      {
+        "node": "Slot 1 (home)",
+        "field": "width",
+        "expected": 80.75,
+        "actual": 79.75,
+        "delta": 1.0,
+        "note": "wiki 02.2 表声明 80.75,实测 319÷4=79.75。capsule 319 与 80.75×4=323 不自洽,wiki 内部冲突;归到 wikiGapsFound"
+      }
+    ],
+    "violations": []
+  },
+  "wikiGapsFound": [
     {
-      "slot": "分类",
-      "position": "tabbar slot 2 icon",
-      "currentAsset": "ellipse placeholder",
-      "expectedAsset": "category icon SVG",
-      "action": "请设计师在 _assets-cdn.md 补 'category-default.svg' + 'category-active.svg' 登记;skill 不主动占位"
+      "section": "02.2 表",
+      "kind": "internal-inconsistency",
+      "note": "Agent 组合容器宽 319 与单 slot 宽 80.75 × 4 = 323 不自洽",
+      "suggestedFix": "either capsule 319 or single slot 80.75 — pick one"
     }
   ]
 }
 ```
 
-## 维度 4 · 变体完整性
+## What Strict Mode Is Not
 
-### 判定逻辑
+Earlier drafts of this skill specified `strict mode = 0 DP / 0 placeholder / 100% token binding, any > 0 fails`. That spec is **withdrawn** because:
 
-```
-variantMatrix = parseVariantsMatrix(variants.md)
-// 例:tabbar 有「默认态/选中态/营销态」× 「无招手/红点/数字/文字」= 12 个组合
+- Auto Layout produces sub-pixel float diffs (0.01 DP) that are not real defects
+- Spec literals (e.g., `13.5` for dynamic island) exist legitimately
+- Forcing 100% token binding makes the skill unable to generate when wiki has token gaps
 
-createdVariants = scan created nodes for variant markers (name + properties)
+The current model is: **strict on declared fields, flexible on undeclared**. Wiki gaps surface as `wikiGapsFound` for upstream fix, not as skill failures.
 
-coverage = createdVariants.length / variantMatrix.length
+## When to Adjust Tolerances
 
-strict:
-  if coverage < 100% → fail
-non-strict:
-  if coverage < 1 (至少 1 个) → fail
-  else → warn 列出 missing
-```
-
-### 例外
-
-| 例外 | 处理 |
+| Scenario | Adjusted tolerance |
 |---|---|
-| user 显式跑 `--single-variant <name>` flag | 跳过此维度;只画 1 个变体 |
-| design.md 标 「典型场景默认形态」时 | strict 模式仍要全枚举,只是把「典型」作为 highlighted |
+| Foundation values themselves are sub-pixel (rare) | accept; document in spec |
+| Component spec declares fractional values (e.g. `79.75`) | use spec value as expected, tolerance still 0.5 DP |
+| Repeated distribution across 5+ slots | extend drift tolerance to 2 DP total |
+| Text frame with default `textAutoResize` | width tolerance disabled (text auto-fits content) |
+| Imported SVG content position | tolerance follows the parent's icon box, not the SVG paths |
 
-## 复合判定:fidelity verdict
+## Relationship to Source Precedence
 
-```js
-const verdict = {
-  geometricDiffMaxDp: maxDiffAcrossNodes,
-  tokenBindingPercent: bindingPercent,
-  placeholderCount: placeholderCount,
-  variantCompleteness: coveragePercent,
-  
-  // strict 模式四维齐过 → PASS;任一不达 → FAIL
-  verdict: strict
-    ? (geometricDiffMaxDp === 0 && bindingPercent === 100 && placeholderCount === 0 && coveragePercent === 100)
-      ? "PASS" : "FAIL"
-    : (geometricDiffMaxDp <= 2 && bindingPercent >= 80 && coveragePercent > 0)
-      ? "PASS-NONSTRICT" : "FAIL"
-};
-```
+The verification step compares:
 
-## 输出契约
+- **created node** (actual)
+- **normalized spec** (expected per Step 5)
+- **wiki bundle source** (precedence per source precedence ordering)
 
-```json
-{
-  "fidelity": {
-    "geometricDiffMaxDp": 0,
-    "tokenBindingPercent": 100,
-    "placeholderCount": 0,
-    "variantCompleteness": "100%",
-    "verdict": "PASS",
-    "perDimensionDetails": {
-      "geometry": [/* 每个节点 diff 详情 */],
-      "tokens": { "rawHexes": [], "rawPxes": [] },
-      "placeholders": [],
-      "variants": { "matrix": [...], "covered": [...], "missing": [] }
-    }
-  }
-}
-```
+Diff vs normalized spec → tolerance applies.
+Diff vs wiki bundle → goes to `wikiGapsFound` (wiki may be wrong, not skill).
 
-## strict 模式的意义
+This keeps the skill from silently masking wiki inconsistencies as "passed".
 
-strict 默认开 = **「这个 skill 默认不留模糊空间」**。任何 0.5 DP / 一个 placeholder / 一个裸 hex,都强制 fail,让 user 看到具体 violation + 修法,而不是「差不多就行」混过去。
+## Related
 
-这条价值观直接对应 100% 还原度目标 —— 若允许「差不多」就不是 100% 了。
-
-## 关联
-
-- 维度 1 依赖 Step 3 (Probe Relay ground truth) + Step 8 自读
-- 维度 2 依赖 [`foundation-token-table.md`](foundation-token-table.md)
-- 维度 3 依赖 [`asset-fallback-chain.md`](asset-fallback-chain.md)(v0.2 写)
-- 维度 4 依赖 variants.md 解析(v0.2 写在 `references/cross-component-deps.md` 或新加 `references/variants-matrix.md`)
+- [`normalized-spec.md`](normalized-spec.md) — assertions are declared during normalization
+- [`foundation-token-table.md`](foundation-token-table.md) — token resolution determines `resolved` vs `unresolvedLiterals` buckets
+- [`adapters/tabbar.md`](adapters/tabbar.md) — component-specific tolerance overrides (if any)
